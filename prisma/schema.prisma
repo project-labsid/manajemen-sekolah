@@ -1,0 +1,225 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model SettingSekolah {
+  id                String   @id @default(cuid())
+  namaSekolah       String   @default("SMA Negeri 1 Contoh")
+  logo              String   @default("")
+  alamat            String   @default("")
+  npsn              String   @default("")
+  email             String   @default("")
+  website           String   @default("")
+  telepon           String   @default("")
+  kepalaSekolah     String   @default("")
+  nipKepalaSekolah  String   @default("")
+  moto              String   @default("")
+  visi              String   @default("")
+  misi              String   @default("")
+  semesterAktif     String   @default("Genap")
+  tahunAjaranAktif  String   @default("2023/2024")
+  tema              String   @default("light")
+  darkMode          Boolean  @default(false)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+}
+
+model User {
+  id         String   @id @default(cuid())
+  nama       String
+  username   String   @unique
+  password   String
+  role       String   @default("guru")
+  status     String   @default("aktif")
+  foto       String   @default("")
+  email      String   @default("")
+  noHP       String   @default("")
+  lastLogin  DateTime?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+model Guru {
+  id          String   @id @default(cuid())
+  nip         String   @unique
+  nama        String
+  gelar       String   @default("")
+  jenisKelamin String   @default("Laki-laki")
+  tempatLahir String   @default("")
+  tanggalLahir String   @default("")
+  alamat      String   @default("")
+  email       String   @default("")
+  noHP        String   @default("")
+  mapel       String   @default("")
+  status      String   @default("aktif")
+  foto        String   @default("")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Siswa {
+  id          String   @id @default(cuid())
+  nis         String   @unique
+  nisn        String   @default("")
+  nama        String
+  jenisKelamin String   @default("Laki-laki")
+  tempatLahir String   @default("")
+  tanggalLahir String   @default("")
+  agama       String   @default("Islam")
+  alamat      String   @default("")
+  namaAyah    String   @default("")
+  namaIbu     String   @default("")
+  noHP        String   @default("")
+  kelas       String   @default("")
+  status      String   @default("aktif")
+  foto        String   @default("")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Kelas {
+  id         String  @id @default(cuid())
+  kodeKelas  String  @unique
+  namaKelas  String
+  waliKelas  String  @default("")
+  status     String  @default("aktif")
+}
+
+model MataPelajaran {
+  id        String  @id @default(cuid())
+  kodeMapel String  @unique
+  namaMapel String
+  kkm       Int     @default(75)
+  guru      String  @default("")
+  status    String  @default("aktif")
+}
+
+model TahunAjaran {
+  id     String  @id @default(cuid())
+  nama   String  @unique
+  status String  @default("aktif")
+}
+
+model Semester {
+  id       String  @id @default(cuid())
+  semester String  @unique
+  status   String  @default("aktif")
+}
+
+model Nilai {
+  id          String   @id @default(cuid())
+  tahunAjaran String   @default("2023/2024")
+  semester    String   @default("Genap")
+  kelas       String   @default("")
+  mapel       String   @default("")
+  guru        String   @default("")
+  nis         String   @default("")
+  nama        String   @default("")
+  ph1         Float    @default(0)
+  ph2         Float    @default(0)
+  ph3         Float    @default(0)
+  ph4         Float    @default(0)
+  pts         Float    @default(0)
+  pas         Float    @default(0)
+  rataRata    Float    @default(0)
+  nilaiAkhir  Float    @default(0)
+  predikat    String   @default("")
+  deskripsi   String   @default("")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model AbsensiGuru {
+  id          String   @id @default(cuid())
+  tanggal     String   @default("")
+  namaGuru    String   @default("")
+  nip         String   @default("")
+  jamMasuk    String   @default("")
+  jamPulang   String   @default("")
+  durasi      String   @default("")
+  status      String   @default("")
+  latitude    String   @default("")
+  longitude   String   @default("")
+  alamat      String   @default("")
+  browser     String   @default("")
+  device      String   @default("")
+  ip          String   @default("")
+  keterangan  String   @default("")
+  createdAt   DateTime @default(now())
+}
+
+model AbsensiSiswa {
+  id         String  @id @default(cuid())
+  tanggal    String  @default("")
+  kelas      String  @default("")
+  nis        String  @default("")
+  nama       String  @default("")
+  status     String  @default("Hadir")
+  keterangan String  @default("")
+  guru       String  @default("")
+  createdAt  DateTime @default(now())
+}
+
+model Pengumuman {
+  id        String   @id @default(cuid())
+  judul     String
+  isi       String   @default("")
+  lampiran  String   @default("")
+  tanggal   String   @default("")
+  status    String   @default("aktif")
+  createdAt DateTime @default(now())
+}
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  tanggal   String   @default("")
+  user      String   @default("")
+  role      String   @default("")
+  aktivitas String   @default("")
+  ip        String   @default("")
+  detail    String   @default("")
+  createdAt DateTime @default(now())
+}
+
+model Backup {
+  id            String   @id @default(cuid())
+  namaFile      String   @default("")
+  ukuran        String   @default("")
+  tanggalBackup String   @default("")
+  status        String   @default("aktif")
+  createdAt     DateTime @default(now())
+}
+
+model Alumni {
+  id         String  @id @default(cuid())
+  nis        String  @default("")
+  nama       String  @default("")
+  tahunLulus String  @default("")
+  keterangan String  @default("")
+}
+
+model JurnalMengajar {
+  id         String  @id @default(cuid())
+  tanggal    String  @default("")
+  guru       String  @default("")
+  kelas      String  @default("")
+  mapel      String  @default("")
+  materi     String  @default("")
+  keterangan String  @default("")
+  createdAt  DateTime @default(now())
+}
+
+model RiwayatLogin {
+  id        String   @id @default(cuid())
+  user      String   @default("")
+  role      String   @default("")
+  waktuLogin String  @default("")
+  ipAddress String   @default("")
+  userAgent String  @default("")
+  createdAt DateTime @default(now())
+}
