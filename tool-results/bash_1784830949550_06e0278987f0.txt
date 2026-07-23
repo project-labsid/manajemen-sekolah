@@ -1,0 +1,338 @@
+Error at line 3 col 57 : Cannot find module 'react' or its corresponding type declarations.
+Error at line 16 col 8 : Cannot find module 'lucide-react' or its corresponding type declarations.
+Error at line 17 col 21 : Cannot find module '@/lib/api' or its corresponding type declarations.
+Error at line 18 col 23 : Cannot find module 'sonner' or its corresponding type declarations.
+Error at line 19 col 24 : Cannot find module '@/components/ui/button' or its corresponding type declarations.
+Error at line 20 col 23 : Cannot find module '@/components/ui/badge' or its corresponding type declarations.
+Error at line 21 col 26 : Cannot find module '@/components/ui/skeleton' or its corresponding type declarations.
+Error at line 22 col 23 : Cannot find module '@/components/ui/label' or its corresponding type declarations.
+Error at line 23 col 23 : Cannot find module '@/components/ui/input' or its corresponding type declarations.
+Error at line 30 col 8 : Cannot find module '@/components/ui/select' or its corresponding type declarations.
+Error at line 31 col 44 : Cannot find module '@/components/ui/radio-group' or its corresponding type declarations.
+Error at line 163 col 17 : Cannot find name 'Record'.
+Error at line 228 col 38 : An async function or method must return a 'Promise'. Make sure you have a declaration for 'Promise' or include 'ES2015' in your '--lib' option.
+Error at line 231 col 42 : Cannot find name 'Promise'. Do you need to change your target library? Try changing the 'lib' compiler option to 'es2015' or later.
+Error at line 237 col 20 : Cannot find name 'Array'.
+Error at line 238 col 20 : Cannot find name 'Array'.
+Error at line 258 col 39 : An async function or method must return a 'Promise'. Make sure you have a declaration for 'Promise' or include 'ES2015' in your '--lib' option.
+Error at line 267 col 28 : Cannot find name 'URLSearchParams'.
+Error at line 298 col 28 : Cannot find name 'URLSearchParams'.
+Error at line 323 col 42 : Parameter 'item' implicitly has an 'any' type.
+Error at line 323 col 48 : Parameter 'idx' implicitly has an 'any' type.
+Error at line 338 col 17 : Property 'join' does not exist on type '{}'.
+Error at line 339 col 22 : Parameter 'row' implicitly has an 'any' type.
+Error at line 340 col 20 : Parameter 'cell' implicitly has an 'any' type.
+Error at line 341 col 25 : Cannot find name 'String'.
+Error at line 347 col 9 : Property 'join' does not exist on type '{}'.
+Error at line 348 col 24 : Cannot find name 'Blob'.
+Error at line 349 col 19 : Cannot find name 'URL'.
+Error at line 350 col 20 : Cannot find name 'document'. Do you need to change your target library? Try changing the 'lib' compiler option to include 'dom'.
+Error at line 353 col 7 : Cannot find name 'document'. Do you need to change your target library? Try changing the 'lib' compiler option to include 'dom'.
+Error at line 355 col 7 : Cannot find name 'document'. Do you need to change your target library? Try changing the 'lib' compiler option to include 'dom'.
+Error at line 356 col 7 : Cannot find name 'URL'.
+Error at line 363 col 44 : Parameter 'item' implicitly has an 'any' type.
+Error at line 363 col 50 : Parameter 'idx' implicitly has an 'any' type.
+Error at line 376 col 17 : Property 'join' does not exist on type '{}'.
+Error at line 377 col 22 : Parameter 'row' implicitly has an 'any' type.
+Error at line 378 col 20 : Parameter 'cell' implicitly has an 'any' type.
+Error at line 379 col 25 : Cannot find name 'String'.
+Error at line 385 col 9 : Property 'join' does not exist on type '{}'.
+Error at line 386 col 24 : Cannot find name 'Blob'.
+Error at line 387 col 19 : Cannot find name 'URL'.
+Error at line 388 col 20 : Cannot find name 'document'. Do you need to change your target library? Try changing the 'lib' compiler option to include 'dom'.
+Error at line 391 col 7 : Cannot find name 'document'. Do you need to change your target library? Try changing the 'lib' compiler option to include 'dom'.
+Error at line 393 col 7 : Cannot find name 'document'. Do you need to change your target library? Try changing the 'lib' compiler option to include 'dom'.
+Error at line 394 col 7 : Cannot find name 'URL'.
+Error at line 411 col 5 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 413 col 7 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 414 col 9 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 416 col 11 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 416 col 79 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 417 col 9 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 421 col 27 : Parameter 'v' implicitly has an 'any' type.
+Error at line 424 col 11 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 431 col 15 : Property 'join' does not exist on type '{}'.
+Error at line 434 col 13 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 436 col 15 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 438 col 15 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 439 col 13 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 440 col 11 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 442 col 11 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 449 col 15 : Property 'join' does not exist on type '{}'.
+Error at line 452 col 13 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 454 col 15 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 456 col 15 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 457 col 13 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 458 col 11 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 460 col 7 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 463 col 7 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 464 col 9 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 466 col 11 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 468 col 11 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 469 col 9 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 473 col 11 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 474 col 13 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 481 col 41 : Property 'map' does not exist on type '{}'.
+Error at line 481 col 46 : Parameter 'ta' implicitly has an 'any' type.
+Error at line 488 col 13 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 490 col 13 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 497 col 37 : Property 'map' does not exist on type '{}'.
+Error at line 497 col 42 : Parameter 's' implicitly has an 'any' type.
+Error at line 504 col 13 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 506 col 13 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 513 col 35 : Parameter 'k' implicitly has an 'any' type.
+Error at line 520 col 13 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 522 col 13 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 530 col 35 : Parameter 'm' implicitly has an 'any' type.
+Error at line 537 col 13 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 539 col 13 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 552 col 13 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 553 col 11 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 556 col 11 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 557 col 13 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 564 col 35 : Parameter 'k' implicitly has an 'any' type.
+Error at line 571 col 13 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 573 col 13 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 578 col 28 : Parameter 'e' implicitly has an 'any' type.
+Error at line 580 col 13 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 582 col 13 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 587 col 28 : Parameter 'e' implicitly has an 'any' type.
+Error at line 589 col 13 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 591 col 13 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 604 col 13 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 605 col 11 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 607 col 7 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 611 col 9 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 612 col 11 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 613 col 13 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 615 col 13 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 616 col 13 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 617 col 15 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 617 col 83 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 618 col 15 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 618 col 94 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 619 col 13 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 620 col 11 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 622 col 11 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 623 col 13 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 625 col 13 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 626 col 13 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 627 col 15 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 627 col 81 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 628 col 15 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 628 col 103 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 629 col 13 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 630 col 11 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 632 col 11 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 633 col 13 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 635 col 13 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 636 col 13 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 637 col 15 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 637 col 87 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 638 col 15 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 638 col 98 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 639 col 13 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 640 col 11 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 642 col 11 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 643 col 13 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 645 col 13 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 646 col 13 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 647 col 15 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 647 col 86 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 648 col 15 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 648 col 97 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 649 col 13 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 650 col 11 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 652 col 11 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 653 col 13 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 655 col 13 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 656 col 13 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 657 col 15 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 657 col 83 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 658 col 15 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 660 col 15 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 661 col 13 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 662 col 11 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 663 col 9 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 668 col 9 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 669 col 11 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 670 col 13 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 672 col 13 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 673 col 13 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 674 col 15 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 674 col 82 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 675 col 15 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 675 col 93 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 676 col 13 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 677 col 11 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 679 col 11 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 680 col 13 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 682 col 13 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 683 col 13 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 684 col 15 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 684 col 77 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 685 col 15 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 685 col 93 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 686 col 13 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 687 col 11 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 689 col 11 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 690 col 13 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 692 col 13 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 693 col 13 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 694 col 15 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 694 col 77 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 695 col 15 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 695 col 93 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 696 col 13 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 697 col 11 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 699 col 11 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 700 col 13 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 702 col 13 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 703 col 13 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 704 col 15 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 704 col 76 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 705 col 15 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 705 col 92 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 706 col 13 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 707 col 11 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 709 col 11 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 710 col 13 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 712 col 13 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 713 col 13 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 714 col 15 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 714 col 77 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 715 col 15 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 715 col 93 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 716 col 13 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 717 col 11 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 718 col 9 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 722 col 7 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 723 col 9 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 726 col 13 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 728 col 16 : Cannot find name 'Array'.
+Error at line 728 col 47 : Parameter '_' implicitly has an 'any' type.
+Error at line 728 col 50 : Parameter 'i' implicitly has an 'any' type.
+Error at line 731 col 13 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 734 col 13 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 736 col 15 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 736 col 78 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 737 col 15 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 739 col 15 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 740 col 13 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 743 col 13 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 745 col 15 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 745 col 70 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 746 col 15 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 746 col 83 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 747 col 13 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 750 col 13 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 751 col 15 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 752 col 17 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 753 col 19 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 753 col 25 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 754 col 19 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 754 col 26 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 755 col 19 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 755 col 27 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 756 col 19 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 756 col 32 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 757 col 19 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 757 col 34 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 758 col 19 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 758 col 31 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 759 col 19 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 759 col 35 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 760 col 17 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 761 col 15 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 762 col 15 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 763 col 33 : Parameter 'item' implicitly has an 'any' type.
+Error at line 763 col 39 : Parameter 'idx' implicitly has an 'any' type.
+Error at line 767 col 21 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 768 col 23 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 768 col 60 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 769 col 23 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 769 col 67 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 770 col 23 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 770 col 62 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 771 col 23 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 771 col 68 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 772 col 23 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 772 col 74 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 773 col 23 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 773 col 55 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 774 col 23 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 774 col 55 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 775 col 21 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 778 col 15 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 779 col 13 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 782 col 13 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 783 col 15 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 784 col 17 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 785 col 19 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 785 col 25 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 786 col 19 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 786 col 26 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 787 col 19 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 787 col 27 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 788 col 19 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 788 col 28 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 789 col 19 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 789 col 28 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 790 col 19 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 790 col 27 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 791 col 19 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 791 col 28 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 792 col 19 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 792 col 28 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 793 col 19 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 793 col 33 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 794 col 17 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 795 col 15 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 796 col 15 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 797 col 35 : Parameter 'item' implicitly has an 'any' type.
+Error at line 797 col 41 : Parameter 'idx' implicitly has an 'any' type.
+Error at line 798 col 19 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 799 col 21 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 799 col 58 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 800 col 21 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 800 col 65 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 801 col 21 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 801 col 60 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 802 col 21 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 803 col 23 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 803 col 84 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 804 col 21 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 805 col 21 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 806 col 23 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 806 col 82 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 807 col 21 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 808 col 21 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 809 col 23 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 809 col 82 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 810 col 21 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 811 col 21 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 812 col 23 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 812 col 80 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 813 col 21 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 814 col 21 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 814 col 67 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 815 col 21 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 816 col 23 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 818 col 23 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 819 col 21 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 820 col 19 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 822 col 15 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 823 col 13 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 825 col 9 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 828 col 9 : This kind of expression is always truthy.
+Error at line 828 col 22 : ',' expected.
+Error at line 829 col 11 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 830 col 13 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 832 col 15 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 834 col 15 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 836 col 13 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 837 col 13 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 852 col 13 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 853 col 11 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 855 col 7 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.
+Error at line 856 col 5 : JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists.

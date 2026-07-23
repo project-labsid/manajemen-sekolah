@@ -1,0 +1,697 @@
+   133→  // ref for file input
+   134→  const fileInputRef = useRef<HTMLInputElement>(null)
+   135→
+   136→  /* ---- debounce ---- */
+   137→  const debounceTimer = useRef<ReturnType<typeof setTimeout>>()
+   138→
+   139→  const handleSearchChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+   140→    const value = e.target.value
+   141→    setSearch(value)
+   142→    if (debounceTimer.current) clearTimeout(debounceTimer.current)
+   143→    debounceTimer.current = setTimeout(() => {
+   144→      setDebouncedSearch(value)
+   145→      setPage(1)
+   146→    }, 400)
+   147→  }, [])
+   148→
+   149→  /* ---- fetch ---- */
+   150→  const fetchData = useCallback(async () => {
+   151→    setLoading(true)
+   152→    try {
+   153→      const res = await api.get<GuruResponse>(
+   154→        `/guru?page=${page}&limit=${LIMIT}&search=${encodeURIComponent(debouncedSearch)}`
+   155→      )
+   156→      setData(res.data)
+   157→      setTotal(res.total)
+   158→      setTotalPages(res.totalPages)
+   159→    } catch (err: unknown) {
+   160→      const message = err instanceof Error ? err.message : 'Gagal memuat data guru'
+   161→      toast.error(message)
+   162→    } finally {
+   163→      setLoading(false)
+   164→    }
+   165→  }, [page, debouncedSearch])
+   166→
+   167→  useEffect(() => {
+   168→    fetchData()
+   169→  }, [fetchData])
+   170→
+   171→  /* ---- pagination helpers ---- */
+   172→  const getPageNumbers = (): (number | '...')[] => {
+   173→    const pages: (number | '...')[] = []
+   174→    if (totalPages <= 7) {
+   175→      for (let i = 1; i <= totalPages; i++) pages.push(i)
+   176→    } else {
+   177→      pages.push(1)
+   178→      if (page > 3) pages.push('...')
+   179→      const start = Math.max(2, page - 1)
+   180→      const end = Math.min(totalPages - 1, page + 1)
+   181→      for (let i = start; i <= end; i++) pages.push(i)
+   182→      if (page < totalPages - 2) pages.push('...')
+   183→      pages.push(totalPages)
+   184→    }
+   185→    return pages
+   186→  }
+   187→
+   188→  /* ---- CRUD ---- */
+   189→  const openAdd = () => {
+   190→    setEditingId(null)
+   191→    setForm({ ...EMPTY_FORM })
+   192→    setFormErrors({})
+   193→    setFormOpen(true)
+   194→  }
+   195→
+   196→  const openEdit = (g: Guru) => {
+   197→    setEditingId(g.id)
+   198→    setForm({
+   199→      nip: g.nip,
+   200→      nama: g.nama,
+   201→      gelar: g.gelar,
+   202→      jenisKelamin: g.jenisKelamin,
+   203→      tempatLahir: g.tempatLahir,
+   204→      tanggalLahir: g.tanggalLahir,
+   205→      alamat: g.alamat,
+   206→      email: g.email,
+   207→      noHp: g.noHp,
+   208→      mapel: g.mapel,
+   209→      status: g.status,
+   210→    })
+   211→    setFormErrors({})
+   212→    setFormOpen(true)
+   213→  }
+   214→
+   215→  const validate = (): boolean => {
+   216→    const errors: Partial<Record<keyof GuruForm, string>> = {}
+   217→    if (!form.nip.trim()) errors.nip = 'NIP wajib diisi'
+   218→    if (!form.nama.trim()) errors.nama = 'Nama wajib diisi'
+   219→    if (!form.email.trim()) {
+   220→      errors.email = 'Email wajib diisi'
+   221→    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) {
+   222→      errors.email = 'Format email tidak valid'
+   223→    }
+   224→    if (!form.noHp.trim()) errors.noHp = 'No HP wajib diisi'
+   225→    if (!form.mapel.trim()) errors.mapel = 'Mapel wajib diisi'
+   226→    setFormErrors(errors)
+   227→    return Object.keys(errors).length === 0
+   228→  }
+   229→
+   230→  const handleSubmit = async () => {
+   231→    if (!validate()) return
+   232→    setSubmitting(true)
+   233→    try {
+   234→      if (editingId) {
+   235→        await api.put('/guru', { id: editingId, ...form })
+   236→        toast.success('Data guru berhasil diperbarui')
+   237→      } else {
+   238→        await api.post('/guru', form)
+   239→        toast.success('Data guru berhasil ditambahkan')
+   240→      }
+   241→      setFormOpen(false)
+   242→      fetchData()
+   243→    } catch (err: unknown) {
+   244→      const message = err instanceof Error ? err.message : 'Gagal menyimpan data guru'
+   245→      toast.error(message)
+   246→    } finally {
+   247→      setSubmitting(false)
+   248→    }
+   249→  }
+   250→
+   251→  const openDelete = (g: Guru) => {
+   252→    setDeleteId(g.id)
+   253→    setDeleteName(g.nama)
+   254→    setDeleteOpen(true)
+   255→  }
+   256→
+   257→  const handleDelete = async () => {
+   258→    if (!deleteId) return
+   259→    setDeleting(true)
+   260→    try {
+   261→      await api.del(`/guru?id=${deleteId}`)
+   262→      toast.success('Data guru berhasil dihapus')
+   263→      setDeleteOpen(false)
+   264→      fetchData()
+   265→    } catch (err: unknown) {
+   266→      const message = err instanceof Error ? err.message : 'Gagal menghapus data guru'
+   267→      toast.error(message)
+   268→    } finally {
+   269→      setDeleting(false)
+   270→    }
+   271→  }
+   272→
+   273→  /* ---- export / import ---- */
+   274→  const handleExport = async () => {
+   275→    try {
+   276→      const res = await fetch('/api/guru/export', {
+   277→        headers: {
+   278→          Authorization: `Bearer ${(await import('@/lib/store')).useAppStore.getState().token}`,
+   279→        },
+   280→      })
+   281→      if (!res.ok) throw new Error('Gagal mengekspor data')
+   282→      const blob = await res.blob()
+   283→      const url = window.URL.createObjectURL(blob)
+   284→      const a = document.createElement('a')
+   285→      a.href = url
+   286→      a.download = 'data-guru.xlsx'
+   287→      a.click()
+   288→      window.URL.revokeObjectURL(url)
+   289→      toast.success('Data berhasil diekspor')
+   290→    } catch (err: unknown) {
+   291→      const message = err instanceof Error ? err.message : 'Gagal mengekspor data'
+   292→      toast.error(message)
+   293→    }
+   294→  }
+   295→
+   296→  const handleImport = async (e: React.ChangeEvent<HTMLInputElement>) => {
+   297→    const file = e.target.files?.[0]
+   298→    if (!file) return
+   299→    const formData = new FormData()
+   300→    formData.append('file', file)
+   301→    try {
+   302→      const res = await fetch('/api/guru/import', {
+   303→        method: 'POST',
+   304→        headers: {
+   305→          Authorization: `Bearer ${(await import('@/lib/store')).useAppStore.getState().token}`,
+   306→        },
+   307→        body: formData,
+   308→      })
+   309→      if (!res.ok) {
+   310→        const json = await res.json()
+   311→        throw new Error(json.error || 'Gagal mengimpor data')
+   312→      }
+   313→      toast.success('Data berhasil diimpor')
+   314→      fetchData()
+   315→    } catch (err: unknown) {
+   316→      const message = err instanceof Error ? err.message : 'Gagal mengimpor data'
+   317→      toast.error(message)
+   318→    } finally {
+   319→      // reset file input
+   320→      if (fileInputRef.current) fileInputRef.current.value = ''
+   321→    }
+   322→  }
+   323→
+   324→  /* ---- update form field ---- */
+   325→  const setField = <K extends keyof GuruForm>(key: K, value: GuruForm[K]) => {
+   326→    setForm((prev) => ({ ...prev, [key]: value }))
+   327→    if (formErrors[key]) {
+   328→      setFormErrors((prev) => {
+   329→        const next = { ...prev }
+   330→        delete next[key]
+   331→        return next
+   332→      })
+   333→    }
+   334→  }
+   335→
+   336→  /* ---- render ---- */
+   337→  return (
+   338→    <div
+   339→      className="min-h-screen p-4 md:p-6"
+   340→      style={{ backgroundColor: '#f4f6f9' }}
+   341→    >
+   342→      {/* ---------- Action Bar ---------- */}
+   343→      <div
+   344→        className="rounded-2xl bg-white p-4 shadow-sm md:p-6"
+   345→      >
+   346→        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+   347→          {/* left: title + buttons */}
+   348→          <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+   349→            <h1 className="text-xl font-bold" style={{ color: '#0a2540' }}>
+   350→              Data Guru
+   351→            </h1>
+   352→            <div className="flex flex-wrap items-center gap-2">
+   353→              <Button
+   354→                onClick={openAdd}
+   355→                className="gap-2 text-white"
+   356→                style={{ backgroundColor: '#10b981' }}
+   357→                onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#059669')}
+   358→                onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#10b981')}
+   359→              >
+   360→                <Plus className="size-4" />
+   361→                Tambah
+   362→              </Button>
+   363→
+   364→              <Button
+   365→                variant="outline"
+   366→                className="gap-2 border-emerald-300 text-emerald-700 hover:bg-emerald-50"
+   367→                onClick={() => fileInputRef.current?.click()}
+   368→              >
+   369→                <Upload className="size-4" />
+   370→                Import Excel
+   371→              </Button>
+   372→              <input
+   373→                ref={fileInputRef}
+   374→                type="file"
+   375→                accept=".xlsx,.xls"
+   376→                className="hidden"
+   377→                onChange={handleImport}
+   378→              />
+   379→
+   380→              <Button
+   381→                variant="outline"
+   382→                className="gap-2 border-sky-300 text-sky-700 hover:bg-sky-50"
+   383→                onClick={handleExport}
+   384→              >
+   385→                <Download className="size-4" />
+   386→                Export Excel
+   387→              </Button>
+   388→            </div>
+   389→          </div>
+   390→
+   391→          {/* right: search */}
+   392→          <div className="relative w-full sm:w-72">
+   393→            <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-gray-400" />
+   394→            <Input
+   395→              placeholder="Cari guru..."
+   396→              value={search}
+   397→              onChange={handleSearchChange}
+   398→              className="pl-9"
+   399→            />
+   400→            {search && (
+   401→              <button
+   402→                type="button"
+   403→                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+   404→                onClick={() => {
+   405→                  setSearch('')
+   406→                  setDebouncedSearch('')
+   407→                  setPage(1)
+   408→                }}
+   409→              >
+   410→                <X className="size-4" />
+   411→              </button>
+   412→            )}
+   413→          </div>
+   414→        </div>
+   415→      </div>
+   416→
+   417→      {/* ---------- Table ---------- */}
+   418→      <div className="mt-4 rounded-2xl bg-white p-4 shadow-sm md:p-6">
+   419→        <div className="overflow-x-auto">
+   420→          <table className="siadak-table w-full text-sm">
+   421→            <thead>
+   422→              <tr
+   423→                className="border-b text-left text-xs font-semibold uppercase tracking-wider"
+   424→                style={{ color: '#0a2540', borderBottomColor: '#e2e8f0' }}
+   425→              >
+   426→                <th className="whitespace-nowrap px-4 py-3">No</th>
+   427→                <th className="whitespace-nowrap px-4 py-3">NIP</th>
+   428→                <th className="whitespace-nowrap px-4 py-3">Nama</th>
+   429→                <th className="whitespace-nowrap px-4 py-3">Mapel</th>
+   430→                <th className="whitespace-nowrap px-4 py-3">Email</th>
+   431→                <th className="whitespace-nowrap px-4 py-3">No HP</th>
+   432→                <th className="whitespace-nowrap px-4 py-3">Status</th>
+   433→                <th className="whitespace-nowrap px-4 py-3 text-center">Aksi</th>
+   434→              </tr>
+   435→            </thead>
+   436→            <tbody>
+   437→              {loading ? (
+   438→                // Skeleton rows
+   439→                Array.from({ length: 5 }).map((_, i) => (
+   440→                  <tr key={i} className="border-b border-gray-100">
+   441→                    <td className="px-4 py-3">
+   442→                      <Skeleton className="h-4 w-6" />
+   443→                    </td>
+   444→                    <td className="px-4 py-3">
+   445→                      <Skeleton className="h-4 w-24" />
+   446→                    </td>
+   447→                    <td className="px-4 py-3">
+   448→                      <Skeleton className="h-4 w-32" />
+   449→                    </td>
+   450→                    <td className="px-4 py-3">
+   451→                      <Skeleton className="h-4 w-20" />
+   452→                    </td>
+   453→                    <td className="px-4 py-3">
+   454→                      <Skeleton className="h-4 w-36" />
+   455→                    </td>
+   456→                    <td className="px-4 py-3">
+   457→                      <Skeleton className="h-4 w-28" />
+   458→                    </td>
+   459→                    <td className="px-4 py-3">
+   460→                      <Skeleton className="h-5 w-16 rounded-full" />
+   461→                    </td>
+   462→                    <td className="px-4 py-3">
+   463→                      <div className="flex justify-center gap-2">
+   464→                        <Skeleton className="size-8 rounded-md" />
+   465→                        <Skeleton className="size-8 rounded-md" />
+   466→                      </div>
+   467→                    </td>
+   468→                  </tr>
+   469→                ))
+   470→              ) : data.length === 0 ? (
+   471→                <tr>
+   472→                  <td colSpan={8} className="px-4 py-12 text-center text-gray-400">
+   473→                    Tidak ada data guru ditemukan.
+   474→                  </td>
+   475→                </tr>
+   476→              ) : (
+   477→                data.map((g, idx) => (
+   478→                  <tr
+   479→                    key={g.id}
+   480→                    className="border-b border-gray-50 transition-colors hover:bg-gray-50/60"
+   481→                  >
+   482→                    <td className="px-4 py-3 text-gray-500">
+   483→                      {(page - 1) * LIMIT + idx + 1}
+   484→                    </td>
+   485→                    <td className="whitespace-nowrap px-4 py-3 font-medium" style={{ color: '#0a2540' }}>
+   486→                      {g.nip}
+   487→                    </td>
+   488→                    <td className="whitespace-nowrap px-4 py-3 font-medium" style={{ color: '#0a2540' }}>
+   489→                      {g.nama}
+   490→                    </td>
+   491→                    <td className="whitespace-nowrap px-4 py-3 text-gray-600">
+   492→                      {g.mapel}
+   493→                    </td>
+   494→                    <td className="whitespace-nowrap px-4 py-3 text-gray-600">
+   495→                      {g.email}
+   496→                    </td>
+   497→                    <td className="whitespace-nowrap px-4 py-3 text-gray-600">
+   498→                      {g.noHp}
+   499→                    </td>
+   500→                    <td className="px-4 py-3">
+   501→                      {g.status === 'Aktif' ? (
+   502→                        <Badge
+   503→                          className="bg-emerald-100 text-emerald-700 border-emerald-200"
+   504→                        >
+   505→                          Aktif
+   506→                        </Badge>
+   507→                      ) : (
+   508→                        <Badge
+   509→                          className="bg-red-100 text-red-700 border-red-200"
+   510→                        >
+   511→                          Nonaktif
+   512→                        </Badge>
+   513→                      )}
+   514→                    </td>
+   515→                    <td className="px-4 py-3">
+   516→                      <div className="flex items-center justify-center gap-1">
+   517→                        <button
+   518→                          type="button"
+   519→                          title="Edit"
+   520→                          className="inline-flex size-8 items-center justify-center rounded-lg text-gray-500 transition-colors hover:bg-sky-50 hover:text-sky-600"
+   521→                          onClick={() => openEdit(g)}
+   522→                        >
+   523→                          <Pencil className="size-4" />
+   524→                        </button>
+   525→                        <button
+   526→                          type="button"
+   527→                          title="Hapus"
+   528→                          className="inline-flex size-8 items-center justify-center rounded-lg text-gray-500 transition-colors hover:bg-red-50 hover:text-red-600"
+   529→                          onClick={() => openDelete(g)}
+   530→                        >
+   531→                          <Trash2 className="size-4" />
+   532→                        </button>
+   533→                      </div>
+   534→                    </td>
+   535→                  </tr>
+   536→                ))
+   537→              )}
+   538→            </tbody>
+   539→          </table>
+   540→        </div>
+   541→
+   542→        {/* ---------- Pagination ---------- */}
+   543→        {!loading && totalPages > 1 && (
+   544→          <div className="mt-4 flex items-center justify-end gap-1">
+   545→            <button
+   546→              type="button"
+   547→              disabled={page <= 1}
+   548→              className="inline-flex size-9 items-center justify-center rounded-lg border border-gray-200 text-gray-600 transition-colors hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-40"
+   549→              onClick={() => setPage((p) => Math.max(1, p - 1))}
+   550→            >
+   551→              <ChevronLeft className="size-4" />
+   552→            </button>
+   553→
+   554→            {getPageNumbers().map((p, i) =>
+   555→              p === '...' ? (
+   556→                <span
+   557→                  key={`ellipsis-${i}`}
+   558→                  className="flex size-9 items-center justify-center text-gray-400"
+   559→                >
+   560→                  …
+   561→                </span>
+   562→              ) : (
+   563→                <button
+   564→                  key={p}
+   565→                  type="button"
+   566→                  className={
+   567→                    p === page
+   568→                      ? 'inline-flex size-9 items-center justify-center rounded-lg text-sm font-semibold text-white'
+   569→                      : 'inline-flex size-9 items-center justify-center rounded-lg text-sm font-medium text-gray-600 transition-colors hover:bg-gray-100'
+   570→                  }
+   571→                  style={
+   572→                    p === page
+   573→                      ? { backgroundColor: '#0a2540' }
+   574→                      : undefined
+   575→                  }
+   576→                  onClick={() => setPage(p)}
+   577→                >
+   578→                  {p}
+   579→                </button>
+   580→              )
+   581→            )}
+   582→
+   583→            <button
+   584→              type="button"
+   585→              disabled={page >= totalPages}
+   586→              className="inline-flex size-9 items-center justify-center rounded-lg border border-gray-200 text-gray-600 transition-colors hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-40"
+   587→              onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+   588→            >
+   589→              <ChevronRight className="size-4" />
+   590→            </button>
+   591→          </div>
+   592→        )}
+   593→
+   594→        {/* info text */}
+   595→        {!loading && data.length > 0 && (
+   596→          <div className="mt-2 text-right text-xs text-gray-400">
+   597→            Menampilkan {(page - 1) * LIMIT + 1}–
+   598→            {Math.min(page * LIMIT, total)} dari {total} data
+   599→          </div>
+   600→        )}
+   601→      </div>
+   602→
+   603→      {/* ==================== ADD / EDIT MODAL ==================== */}
+   604→      <Dialog open={formOpen} onOpenChange={(open) => !open && setFormOpen(false)}>
+   605→        <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-2xl rounded-2xl">
+   606→          <DialogHeader>
+   607→            <DialogTitle style={{ color: '#0a2540' }}>
+   608→              {editingId ? 'Edit Data Guru' : 'Tambah Data Guru'}
+   609→            </DialogTitle>
+   610→            <DialogDescription>
+   611→              {editingId
+   612→                ? 'Perbarui informasi data guru di bawah ini.'
+   613→                : 'Isi form di bawah ini untuk menambahkan guru baru.'}
+   614→            </DialogDescription>
+   615→          </DialogHeader>
+   616→
+   617→          <div className="grid gap-4 py-2 sm:grid-cols-2">
+   618→            {/* NIP */}
+   619→            <div className="space-y-1.5">
+   620→              <Label htmlFor="nip">
+   621→                NIP <span className="text-red-500">*</span>
+   622→              </Label>
+   623→              <Input
+   624→                id="nip"
+   625→                placeholder="Masukkan NIP"
+   626→                value={form.nip}
+   627→                onChange={(e) => setField('nip', e.target.value)}
+   628→              />
+   629→              {formErrors.nip && (
+   630→                <p className="text-xs text-red-500">{formErrors.nip}</p>
+   631→              )}
+   632→            </div>
+   633→
+   634→            {/* Nama */}
+   635→            <div className="space-y-1.5">
+   636→              <Label htmlFor="nama">
+   637→                Nama <span className="text-red-500">*</span>
+   638→              </Label>
+   639→              <Input
+   640→                id="nama"
+   641→                placeholder="Masukkan nama lengkap"
+   642→                value={form.nama}
+   643→                onChange={(e) => setField('nama', e.target.value)}
+   644→              />
+   645→              {formErrors.nama && (
+   646→                <p className="text-xs text-red-500">{formErrors.nama}</p>
+   647→              )}
+   648→            </div>
+   649→
+   650→            {/* Gelar */}
+   651→            <div className="space-y-1.5">
+   652→              <Label htmlFor="gelar">Gelar</Label>
+   653→              <Input
+   654→                id="gelar"
+   655→                placeholder="Contoh: S.Pd, M.Pd"
+   656→                value={form.gelar}
+   657→                onChange={(e) => setField('gelar', e.target.value)}
+   658→              />
+   659→            </div>
+   660→
+   661→            {/* Jenis Kelamin */}
+   662→            <div className="space-y-1.5">
+   663→              <Label>Jenis Kelamin</Label>
+   664→              <Select
+   665→                value={form.jenisKelamin}
+   666→                onValueChange={(v) => setField('jenisKelamin', v)}
+   667→              >
+   668→                <SelectTrigger className="w-full">
+   669→                  <SelectValue placeholder="Pilih jenis kelamin" />
+   670→                </SelectTrigger>
+   671→                <SelectContent>
+   672→                  <SelectItem value="L">Laki-laki</SelectItem>
+   673→                  <SelectItem value="P">Perempuan</SelectItem>
+   674→                </SelectContent>
+   675→              </Select>
+   676→            </div>
+   677→
+   678→            {/* Tempat Lahir */}
+   679→            <div className="space-y-1.5">
+   680→              <Label htmlFor="tempatLahir">Tempat Lahir</Label>
+   681→              <Input
+   682→                id="tempatLahir"
+   683→                placeholder="Masukkan tempat lahir"
+   684→                value={form.tempatLahir}
+   685→                onChange={(e) => setField('tempatLahir', e.target.value)}
+   686→              />
+   687→            </div>
+   688→
+   689→            {/* Tanggal Lahir */}
+   690→            <div className="space-y-1.5">
+   691→              <Label htmlFor="tanggalLahir">Tanggal Lahir</Label>
+   692→              <Input
+   693→                id="tanggalLahir"
+   694→                type="date"
+   695→                value={form.tanggalLahir}
+   696→                onChange={(e) => setField('tanggalLahir', e.target.value)}
+   697→              />
+   698→            </div>
+   699→
+   700→            {/* Alamat — full width */}
+   701→            <div className="space-y-1.5 sm:col-span-2">
+   702→              <Label htmlFor="alamat">Alamat</Label>
+   703→              <Textarea
+   704→                id="alamat"
+   705→                placeholder="Masukkan alamat lengkap"
+   706→                value={form.alamat}
+   707→                onChange={(e) => setField('alamat', e.target.value)}
+   708→                rows={2}
+   709→              />
+   710→            </div>
+   711→
+   712→            {/* Email */}
+   713→            <div className="space-y-1.5">
+   714→              <Label htmlFor="email">
+   715→                Email <span className="text-red-500">*</span>
+   716→              </Label>
+   717→              <Input
+   718→                id="email"
+   719→                type="email"
+   720→                placeholder="contoh@email.com"
+   721→                value={form.email}
+   722→                onChange={(e) => setField('email', e.target.value)}
+   723→              />
+   724→              {formErrors.email && (
+   725→                <p className="text-xs text-red-500">{formErrors.email}</p>
+   726→              )}
+   727→            </div>
+   728→
+   729→            {/* No HP */}
+   730→            <div className="space-y-1.5">
+   731→              <Label htmlFor="noHp">
+   732→                No HP <span className="text-red-500">*</span>
+   733→              </Label>
+   734→              <Input
+   735→                id="noHp"
+   736→                placeholder="08xxxxxxxxxx"
+   737→                value={form.noHp}
+   738→                onChange={(e) => setField('noHp', e.target.value)}
+   739→              />
+   740→              {formErrors.noHp && (
+   741→                <p className="text-xs text-red-500">{formErrors.noHp}</p>
+   742→              )}
+   743→            </div>
+   744→
+   745→            {/* Mapel */}
+   746→            <div className="space-y-1.5">
+   747→              <Label htmlFor="mapel">
+   748→                Mata Pelajaran <span className="text-red-500">*</span>
+   749→              </Label>
+   750→              <Input
+   751→                id="mapel"
+   752→                placeholder="Masukkan mata pelajaran"
+   753→                value={form.mapel}
+   754→                onChange={(e) => setField('mapel', e.target.value)}
+   755→              />
+   756→              {formErrors.mapel && (
+   757→                <p className="text-xs text-red-500">{formErrors.mapel}</p>
+   758→              )}
+   759→            </div>
+   760→
+   761→            {/* Status */}
+   762→            <div className="space-y-1.5">
+   763→              <Label>Status</Label>
+   764→              <Select
+   765→                value={form.status}
+   766→                onValueChange={(v) => setField('status', v)}
+   767→              >
+   768→                <SelectTrigger className="w-full">
+   769→                  <SelectValue placeholder="Pilih status" />
+   770→                </SelectTrigger>
+   771→                <SelectContent>
+   772→                  <SelectItem value="Aktif">Aktif</SelectItem>
+   773→                  <SelectItem value="Nonaktif">Nonaktif</SelectItem>
+   774→                </SelectContent>
+   775→              </Select>
+   776→            </div>
+   777→          </div>
+   778→
+   779→          <DialogFooter className="gap-2 pt-2">
+   780→            <Button
+   781→              variant="outline"
+   782→              onClick={() => setFormOpen(false)}
+   783→              disabled={submitting}
+   784→            >
+   785→              Batal
+   786→            </Button>
+   787→            <Button
+   788→              onClick={handleSubmit}
+   789→              disabled={submitting}
+   790→              className="text-white"
+   791→              style={{ backgroundColor: '#10b981' }}
+   792→              onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#059669')}
+   793→              onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#10b981')}
+   794→            >
+   795→              {submitting ? 'Menyimpan...' : editingId ? 'Simpan Perubahan' : 'Simpan'}
+   796→            </Button>
+   797→          </DialogFooter>
+   798→        </DialogContent>
+   799→      </Dialog>
+   800→
+   801→      {/* ==================== DELETE CONFIRMATION ==================== */}
+   802→      <AlertDialog open={deleteOpen} onOpenChange={(open) => !open && setDeleteOpen(false)}>
+   803→        <AlertDialogContent className="rounded-2xl">
+   804→          <AlertDialogHeader>
+   805→            <AlertDialogTitle style={{ color: '#0a2540' }}>
+   806→              Hapus Data Guru
+   807→            </AlertDialogTitle>
+   808→            <AlertDialogDescription>
+   809→              Apakah Anda yakin ingin menghapus data guru{' '}
+   810→              <span className="font-semibold text-gray-900">{deleteName}</span>? Tindakan
+   811→              ini tidak dapat dibatalkan.
+   812→            </AlertDialogDescription>
+   813→          </AlertDialogHeader>
+   814→          <AlertDialogFooter className="gap-2">
+   815→            <AlertDialogCancel disabled={deleting}>Batal</AlertDialogCancel>
+   816→            <AlertDialogAction
+   817→              onClick={handleDelete}
+   818→              disabled={deleting}
+   819→              className="bg-red-500 text-white hover:bg-red-600 focus:ring-red-300"
+   820→            >
+   821→              {deleting ? 'Menghapus...' : 'Hapus'}
+   822→            </AlertDialogAction>
+   823→          </AlertDialogFooter>
+   824→        </AlertDialogContent>
+   825→      </AlertDialog>
+   826→    </div>
+   827→  )
+   828→}
+   829→
