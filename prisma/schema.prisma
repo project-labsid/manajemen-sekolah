@@ -22,7 +22,7 @@ model SettingSekolah {
   visi              String   @default("")
   misi              String   @default("")
   semesterAktif     String   @default("Genap")
-  tahunAjaranAktif  String   @default("2023/2024")
+  tahunAjaranAktif  String   @default("2024/2025")
   tema              String   @default("light")
   darkMode          Boolean  @default(false)
   createdAt         DateTime @default(now())
@@ -39,6 +39,8 @@ model User {
   foto       String   @default("")
   email      String   @default("")
   noHP       String   @default("")
+ nip        String   @default("")
+  jabatan    String   @default("")
   lastLogin  DateTime?
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
