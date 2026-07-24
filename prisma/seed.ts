@@ -28,8 +28,8 @@ async function main() {
   })
 
   // Users (Admin + Guru)
-  const adminPw = hashSync('admin123', 10)
-  const guruPw = hashSync('guru123', 10)
+  const adminPw = hashSync('admin123', 4)
+  const guruPw = hashSync('guru123', 4)
 
   await db.user.upsert({
     where: { username: 'admin' },

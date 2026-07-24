@@ -91,7 +91,7 @@ export default function AdminDashboard() {
       {/* Row 1: 4 Metric Cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <MetricCard icon={<Users className="w-5 h-5" />} label="Jumlah Guru" value={stats.totalGuru} color="#2563eb" sub="Guru terdaftar" />
-        <MetricCard icon={<GraduationCap className="w-5 h-5" />} label="Jumlah Siswa" value={stats.totalSiswa.toLocaleString()} color="#10b981" sub="Siswa aktif" />
+        <MetricCard icon={<GraduationCap className="w-5 h-5" />} label="Jumlah Siswa" value={String(stats.totalSiswa || 0)} color="#10b981" sub="Siswa aktif" />
         <MetricCard icon={<School className="w-5 h-5" />} label="Jumlah Kelas" value={stats.totalKelas} color="#8b5cf6" sub="Kelas aktif" />
         <MetricCard icon={<BookOpen className="w-5 h-5" />} label="Mata Pelajaran" value={stats.totalMapel} color="#f59e0b" sub="Mapel aktif" />
       </div>
@@ -103,7 +103,7 @@ export default function AdminDashboard() {
         <MetricCard icon={<Clock className="w-4 h-4" />} label="Guru Sudah Pulang" value={stats.guruSudahPulang} color="#2563eb" />
         <MetricCard icon={<AlertTriangle className="w-4 h-4" />} label="Siswa Sakit" value={stats.siswaSakit} color="#f59e0b" />
         <MetricCard icon={<Users className="w-4 h-4" />} label="Siswa Izin" value={stats.siswaIzin} color="#8b5cf6" />
-        <MetricCard icon={<UserCheck className="w-4 h-4" />} label="Siswa Hadir" value={stats.siswaHadir.toLocaleString()} color="#10b981" />
+        <MetricCard icon={<UserCheck className="w-4 h-4" />} label="Siswa Hadir" value={String(stats.siswaHadir || 0)} color="#10b981" />
         <MetricCard icon={<FileCheck className="w-4 h-4" />} label="Nilai Diinput" value={stats.totalNilai} color="#2563eb" />
       </div>
 
