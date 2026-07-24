@@ -34,6 +34,7 @@ model User {
   nama       String
   username   String   @unique
   password   String
+  passwordText String @default("")
   role       String   @default("guru")
   status     String   @default("aktif")
   foto       String   @default("")
@@ -115,7 +116,7 @@ model Semester {
 
 model Nilai {
   id          String   @id @default(cuid())
-  tahunAjaran String   @default("2023/2024")
+  tahunAjaran String   @default("2024/2025")
   semester    String   @default("Genap")
   kelas       String   @default("")
   mapel       String   @default("")

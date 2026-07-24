@@ -1,252 +1,151 @@
-import { db } from '../src/lib/db'
-import { hashSync } from 'bcryptjs'
+import { PrismaClient } from '@prisma/client'
+import bcrypt from 'bcryptjs'
+
+const prisma = new PrismaClient()
 
 async function main() {
-  // Setting Sekolah
-  await db.settingSekolah.upsert({
-    where: { id: 'setting-1' },
-    update: {},
-    create: {
-      id: 'setting-1',
-      namaSekolah: 'SMA Negeri 1 Contoh',
-      logo: '',
-      alamat: 'Jl. Pendidikan No. 1, Jakarta Selatan',
-      npsn: '20100001',
-      email: 'info@sman1contoh.sch.id',
-      website: 'www.sman1contoh.sch.id',
-      telepon: '021-1234567',
-      kepalaSekolah: 'Drs. Bambang Supriadi, M.Pd',
-      nipKepalaSekolah: '196801011990031001',
-      moto: 'Cerdas, Berkarakter, Berprestasi',
-      visi: 'Menjadi sekolah unggulan yang menghasilkan lulusan cerdas, berkarakter, dan berwawasan global',
-      misi: '1. Menyelenggarakan pendidikan berkualitas 2. Mengembangkan potensi siswa 3. Membangun karakter mulia 4. Menciptakan lingkungan belajar kondusif',
-      semesterAktif: 'Genap',
-      tahunAjaranAktif: '2023/2024',
-      tema: 'light',
-      darkMode: false,
-    },
+  console.log('Seeding...')
+  await prisma.auditLog.deleteMany()
+  await prisma.riwayatLogin.deleteMany()
+  await prisma.absensiSiswa.deleteMany()
+  await prisma.absensiGuru.deleteMany()
+  await prisma.nilai.deleteMany()
+  await prisma.pengumuman.deleteMany()
+  await prisma.user.deleteMany()
+  await prisma.siswa.deleteMany()
+  await prisma.kelas.deleteMany()
+  await prisma.mataPelajaran.deleteMany()
+  await prisma.guru.deleteMany()
+  await prisma.settingSekolah.deleteMany()
+
+  await prisma.settingSekolah.create({
+    data: { namaSekolah: 'SMA Negeri 1 Contoh', npsn: '12345678', alamat: 'Jl. Pendidikan No. 1, Jakarta', email: 'info@sman1contoh.sch.id', website: 'www.sman1contoh.sch.id', telepon: '021-12345678', kepalaSekolah: 'Dr. Hj. Siti Aminah, M.Pd', nipKepalaSekolah: '196801011990032001', moto: 'Unggul, Berkarakter, Berprestasi', visi: 'Mewujudkan sekolah unggul', misi: '1. Meningkatkan mutu\n2. Menumbuhkan akhlak mulia\n3. Mengembangkan potensi siswa', semesterAktif: 'Ganjil', tahunAjaranAktif: '2024/2025' }
   })
 
-  // Users (Admin + Guru)
-  const adminPw = hashSync('admin123', 4)
-  const guruPw = hashSync('guru123', 4)
+  const adminPw = 'admin123'
+  const guruPw = 'guru123'
 
-  await db.user.upsert({
-    where: { username: 'admin' },
-    update: {},
-    create: {
-      id: 'user-admin',
-      nama: 'Administrator',
-      username: 'admin',
-      password: adminPw,
-      role: 'admin',
-      status: 'aktif',
-      foto: '',
-      email: 'admin@sman1contoh.sch.id',
-      noHP: '081234567890',
-    },
+  await prisma.user.create({
+    data: { nama: 'Administrator', username: 'admin', password: await bcrypt.hash(adminPw, 10), passwordText: adminPw, role: 'admin', status: 'aktif', email: 'admin@siakad.id', noHP: '081234567890', jabatan: 'Super Admin' }
   })
 
-  await db.user.upsert({
-    where: { username: 'ahmad' },
-    update: {},
-    create: {
-      id: 'user-guru1',
-      nama: 'Ahmad Fauzi, S.Pd',
-      username: 'ahmad',
-      password: guruPw,
-      role: 'guru',
-      status: 'aktif',
-      foto: '',
-      email: 'ahmad@sman1contoh.sch.id',
-      noHP: '081234567891',
-    },
-  })
-
-  // Tahun Ajaran
-  const taList = ['2022/2023', '2023/2024', '2024/2025']
-  for (const ta of taList) {
-    await db.tahunAjaran.upsert({
-      where: { nama: ta },
-      update: {},
-      create: { nama: ta, status: ta === '2023/2024' ? 'aktif' : 'nonaktif' },
-    })
-  }
-
-  // Semester
-  await db.semester.upsert({
-    where: { semester: 'Ganjil' },
-    update: {},
-    create: { semester: 'Ganjil', status: 'nonaktif' },
-  })
-  await db.semester.upsert({
-    where: { semester: 'Genap' },
-    update: {},
-    create: { semester: 'Genap', status: 'aktif' },
-  })
-
-  // Mata Pelajaran
-  const mapelList = [
-    { kode: 'MTK', nama: 'Matematika', kkm: 75, guru: 'Ahmad Fauzi, S.Pd' },
-    { kode: 'BIO', nama: 'Biologi', kkm: 75, guru: 'Siti Rahmawati, S.Si' },
-    { kode: 'FIS', nama: 'Fisika', kkm: 75, guru: 'Budi Santoso, S.Pd' },
-    { kode: 'KIM', nama: 'Kimia', kkm: 75, guru: 'Dewi Lestari, S.Si' },
-    { kode: 'BHS', nama: 'Bahasa Indonesia', kkm: 75, guru: 'Rina Wati, S.Pd' },
-    { kode: 'BIG', nama: 'Bahasa Inggris', kkm: 75, guru: 'James Halim, S.Pd' },
-    { kode: 'SEJ', nama: 'Sejarah', kkm: 75, guru: 'Agus Prasetyo, S.Pd' },
-    { kode: 'GEO', nama: 'Geografi', kkm: 75, guru: 'Fitri Handayani, S.Pd' },
-    { kode: 'EKO', nama: 'Ekonomi', kkm: 75, guru: 'Hendra Wijaya, S.Pd' },
-    { kode: 'SOS', nama: 'Sosiologi', kkm: 75, guru: 'Maya Sari, S.Pd' },
-    { kode: 'PKN', nama: 'PKN', kkm: 75, guru: 'Taufik Rahman, S.Pd' },
-    { kode: 'PEN', nama: 'Pendidikan Agama', kkm: 75, guru: 'Ustadz Hadi, S.Ag' },
-    { kode: 'SBK', nama: 'Seni Budaya', kkm: 75, guru: 'Lina Marlina, S.Pd' },
-    { kode: 'PJK', nama: 'PJOK', kkm: 75, guru: 'Dedi Kurniawan, S.Pd' },
-    { kode: 'TIK', nama: 'Informatika', kkm: 75, guru: 'Reza Firmansyah, S.Kom' },
-    { kode: 'MTK2', nama: 'Matematika Lanjutan', kkm: 75, guru: 'Ahmad Fauzi, S.Pd' },
+  const guruData = [
+    { nama: 'Ahmad Fauzi, S.Pd', username: 'ahmad', nip: '198505012010011001', jabatan: 'Guru Matematika', email: 'ahmad@siakad.id', noHP: '081298765432' },
+    { nama: 'Siti Nurhaliza, S.Pd', username: 'siti', nip: '198703152011012002', jabatan: 'Guru Fisika', email: 'siti@siakad.id', noHP: '081311223344' },
+    { nama: 'Budi Santoso, M.Pd', username: 'budi', nip: '198209202012011003', jabatan: 'Guru Bahasa Indonesia', email: 'budi@siakad.id', noHP: '081455667788' },
+    { nama: 'Dewi Lestari, S.Pd', username: 'dewi', nip: '199001152015012001', jabatan: 'Guru Bahasa Inggris', email: 'dewi@siakad.id', noHP: '081566778899' },
+    { nama: 'Eko Prasetyo, S.Pd', username: 'eko', nip: '198812102014011002', jabatan: 'Guru PKN', email: 'eko@siakad.id', noHP: '081677889900' },
+    { nama: 'Fitri Handayani, M.Pd', username: 'fitri', nip: '198607222013012001', jabatan: 'Guru Biologi', email: 'fitri@siakad.id', noHP: '081788990011' },
+    { nama: 'Gunawan Wibowo, S.Pd', username: 'gunawan', nip: '199205012018011001', jabatan: 'Guru Kimia', email: 'gunawan@siakad.id', noHP: '081899001122' },
+    { nama: 'Hani Mulyani, S.Pd', username: 'hani', nip: '199103152019012002', jabatan: 'Guru Sejarah', email: 'hani@siakad.id', noHP: '081900112233' },
+    { nama: 'Irfan Hakim, M.Pd', username: 'irfan', nip: '198508202012011003', jabatan: 'Guru Matematika', email: 'irfan@siakad.id', noHP: '082001223344' },
+    { nama: 'Joko Widodo, S.Pd', username: 'joko', nip: '198910152015011001', jabatan: 'Guru Penjaskes', email: 'joko@siakad.id', noHP: '082112334455' },
+    { nama: 'Kartika Sari, S.Pd', username: 'kartika', nip: '199207202020012001', jabatan: 'Guru Seni Budaya', email: 'kartika@siakad.id', noHP: '082123445566' },
+    { nama: 'Lukman Hakim, M.Pd', username: 'lukman', nip: '198604302013011002', jabatan: 'Guru Fisika', email: 'lukman@siakad.id', noHP: '082134556677' },
+    { nama: 'Maya Anggraini, S.Pd', username: 'maya', nip: '199309252021012001', jabatan: 'Guru BK', email: 'maya@siakad.id', noHP: '082145667788' },
+    { nama: 'Nurul Hidayah, S.Pd', username: 'nurul', nip: '199106102019012002', jabatan: 'Guru Agama', email: 'nurul@siakad.id', noHP: '082156778899' },
+    { nama: 'Oscar Pratama, M.Pd', username: 'oscar', nip: '198711302014011001', jabatan: 'Guru TIK', email: 'oscar@siakad.id', noHP: '082167889900' },
   ]
-  for (const m of mapelList) {
-    await db.mataPelajaran.upsert({
-      where: { kodeMapel: m.kode },
-      update: {},
-      create: { kodeMapel: m.kode, namaMapel: m.nama, kkm: m.kkm, guru: m.guru, status: 'aktif' },
+
+  for (const g of guruData) {
+    await prisma.user.create({
+      data: { nama: g.nama, username: g.username, password: await bcrypt.hash(guruPw, 10), passwordText: guruPw, role: 'guru', status: 'aktif', email: g.email, noHP: g.noHP, nip: g.nip, jabatan: g.jabatan }
+    })
+    await prisma.guru.create({
+      data: { nip: g.nip, nama: g.nama, gelar: g.jabatan, jenisKelamin: ['Siti','Dewi','Fitri','Hani','Kartika','Maya','Nurul'].some(n => g.nama.includes(n)) ? 'Perempuan' : 'Laki-laki', mapel: g.jabatan.replace('Guru ', ''), status: 'aktif' }
     })
   }
 
-  // Kelas
-  const kelasList = ['10A','10B','10C','10D','11A','11B','11C','11D','12A','12B','12C','12D']
-  const waliKelasList = ['Ahmad Fauzi, S.Pd','Siti Rahmawati, S.Si','Budi Santoso, S.Pd','Dewi Lestari, S.Si','Rina Wati, S.Pd','James Halim, S.Pd','Agus Prasetyo, S.Pd','Fitri Handayani, S.Pd','Hendra Wijaya, S.Pd','Maya Sari, S.Pd','Taufik Rahman, S.Pd','Ustadz Hadi, S.Ag']
-  for (let i = 0; i < kelasList.length; i++) {
-    await db.kelas.upsert({
-      where: { kodeKelas: kelasList[i] },
-      update: {},
-      create: { kodeKelas: kelasList[i], namaKelas: `Kelas ${kelasList[i]}`, waliKelas: waliKelasList[i], status: 'aktif' },
-    })
-  }
-
-  // Guru
-  const guruList = [
-    { nip: '198001012005011001', nama: 'Ahmad Fauzi', gelar: 'S.Pd', jk: 'Laki-laki', mapel: 'Matematika, Matematika Lanjutan' },
-    { nip: '198205152006042001', nama: 'Siti Rahmawati', gelar: 'S.Si', jk: 'Perempuan', mapel: 'Biologi' },
-    { nip: '197908202007011002', nama: 'Budi Santoso', gelar: 'S.Pd', jk: 'Laki-laki', mapel: 'Fisika' },
-    { nip: '198312102008012003', nama: 'Dewi Lestari', gelar: 'S.Si', jk: 'Perempuan', mapel: 'Kimia' },
-    { nip: '198106302009011004', nama: 'Rina Wati', gelar: 'S.Pd', jk: 'Perempuan', mapel: 'Bahasa Indonesia' },
-    { nip: '198507252010011005', nama: 'James Halim', gelar: 'S.Pd', jk: 'Laki-laki', mapel: 'Bahasa Inggris' },
-    { nip: '197804152011011006', nama: 'Agus Prasetyo', gelar: 'S.Pd', jk: 'Laki-laki', mapel: 'Sejarah' },
-    { nip: '198209052012012007', nama: 'Fitri Handayani', gelar: 'S.Pd', jk: 'Perempuan', mapel: 'Geografi' },
-    { nip: '198001012013011008', nama: 'Hendra Wijaya', gelar: 'S.Pd', jk: 'Laki-laki', mapel: 'Ekonomi' },
-    { nip: '198312102014012009', nama: 'Maya Sari', gelar: 'S.Pd', jk: 'Perempuan', mapel: 'Sosiologi' },
-    { nip: '197908202015011010', nama: 'Taufik Rahman', gelar: 'S.Pd', jk: 'Laki-laki', mapel: 'PKN' },
-    { nip: '198106302016011011', nama: 'Ustadz Hadi', gelar: 'S.Ag', jk: 'Laki-laki', mapel: 'Pendidikan Agama' },
-    { nip: '198507252017011012', nama: 'Lina Marlina', gelar: 'S.Pd', jk: 'Perempuan', mapel: 'Seni Budaya' },
-    { nip: '197804152018011013', nama: 'Dedi Kurniawan', gelar: 'S.Pd', jk: 'Laki-laki', mapel: 'PJOK' },
-    { nip: '198209052019011014', nama: 'Reza Firmansyah', gelar: 'S.Kom', jk: 'Laki-laki', mapel: 'Informatika' },
+  const kelasData = [
+    { kodeKelas: '10A', namaKelas: 'X-A', waliKelas: 'Ahmad Fauzi, S.Pd' },
+    { kodeKelas: '10B', namaKelas: 'X-B', waliKelas: 'Siti Nurhaliza, S.Pd' },
+    { kodeKelas: '11A', namaKelas: 'XI-A', waliKelas: 'Budi Santoso, M.Pd' },
+    { kodeKelas: '11B', namaKelas: 'XI-B', waliKelas: 'Dewi Lestari, S.Pd' },
+    { kodeKelas: '12A', namaKelas: 'XII-A', waliKelas: 'Eko Prasetyo, S.Pd' },
+    { kodeKelas: '12B', namaKelas: 'XII-B', waliKelas: 'Fitri Handayani, M.Pd' },
   ]
-  for (const g of guruList) {
-    await db.guru.upsert({
-      where: { nip: g.nip },
-      update: {},
-      create: {
-        nip: g.nip, nama: g.nama, gelar: g.gelar, jenisKelamin: g.jk,
-        tempatLahir: 'Jakarta', tanggalLahir: '1980-01-01', alamat: 'Jakarta',
-        email: `${g.nama.toLowerCase().replace(/ /g,'.')}@sman1contoh.sch.id`,
-        noHP: '081234567890', mapel: g.mapel, status: 'aktif',
-      },
-    })
-  }
+  for (const k of kelasData) await prisma.kelas.create({ data: { ...k, status: 'aktif' } })
 
-  // Siswa - generate 130 students across classes
-  const namaDepan = ['Andi','Budi','Citra','Dina','Eka','Fajar','Gita','Hana','Irfan','Joko','Kartika','Lina','Maya','Nadia','Oscar','Putri','Qori','Rizki','Sari','Tono','Umar','Vina','Wati','Xena','Yudi','Zahra','Arif','Bayu','Cahya','Dewi','Elsa','Firman','Gilang','Hadi','Indah','Joni','Kevin','Laila','Mira','Nur','Oki','Pram','Qori','Rani','Sinta','Tina','Umi','Vera','Wulan','Yanti','Zaki']
-  const namaBelakang = ['Pratama','Saputra','Kusuma','Lestari','Wijaya','Sari','Putri','Hidayat','Rahman','Kurniawan','Pertiwi','Nugraha','Santoso','Wibowo','Hakim','Permana','Setiawan','Susanto','Ramadhan','Firmansyah']
-  let nisCounter = 1001
-  for (const kelas of kelasList) {
-    const count = kelas.startsWith('12') ? 10 : kelas.startsWith('11') ? 12 : 10
-    for (let i = 0; i < count; i++) {
-      const nama = `${namaDepan[(nisCounter - 1001) % namaDepan.length]} ${namaBelakang[(nisCounter - 1001) % namaBelakang.length]}`
-      const nis = `2024${String(nisCounter).padStart(4, '0')}`
-      const jk = i % 3 === 0 ? 'Perempuan' : 'Laki-laki'
-      await db.siswa.create({
-        data: {
-          nis, nisn: `00${nis}`, nama, jenisKelamin: jk,
-          tempatLahir: 'Jakarta', tanggalLahir: '2007-01-15',
-          agama: 'Islam', alamat: 'Jakarta', kelas, status: 'aktif',
-        },
-      })
-      nisCounter++
-    }
-  }
+  const mapelData = [
+    { kodeMapel: 'MTK', namaMapel: 'Matematika', kkm: 75, guru: 'Ahmad Fauzi, S.Pd' },
+    { kodeMapel: 'FIS', namaMapel: 'Fisika', kkm: 75, guru: 'Siti Nurhaliza, S.Pd' },
+    { kodeMapel: 'BIN', namaMapel: 'Bahasa Indonesia', kkm: 75, guru: 'Budi Santoso, M.Pd' },
+    { kodeMapel: 'BIG', namaMapel: 'Bahasa Inggris', kkm: 75, guru: 'Dewi Lestari, S.Pd' },
+    { kodeMapel: 'PKN', namaMapel: 'PKN', kkm: 75, guru: 'Eko Prasetyo, S.Pd' },
+    { kodeMapel: 'BIO', namaMapel: 'Biologi', kkm: 75, guru: 'Fitri Handayani, M.Pd' },
+    { kodeMapel: 'KIM', namaMapel: 'Kimia', kkm: 75, guru: 'Gunawan Wibowo, S.Pd' },
+    { kodeMapel: 'SEJ', namaMapel: 'Sejarah', kkm: 75, guru: 'Hani Mulyani, S.Pd' },
+    { kodeMapel: 'PJK', namaMapel: 'Penjaskes', kkm: 75, guru: 'Joko Widodo, S.Pd' },
+    { kodeMapel: 'SBD', namaMapel: 'Seni Budaya', kkm: 75, guru: 'Kartika Sari, S.Pd' },
+    { kodeMapel: 'AGM', namaMapel: 'Pendidikan Agama', kkm: 75, guru: 'Nurul Hidayah, S.Pd' },
+    { kodeMapel: 'TIK', namaMapel: 'Teknologi Informasi', kkm: 75, guru: 'Oscar Pratama, M.Pd' },
+  ]
+  for (const m of mapelData) await prisma.mataPelajaran.create({ data: { ...m, status: 'aktif' } })
 
-  // Nilai - generate for class 12A Matematika
-  const siswa12A = await db.siswa.findMany({ where: { kelas: '12A' } })
-  for (const s of siswa12A) {
-    const ph1 = Math.round(70 + Math.random() * 30)
-    const ph2 = Math.round(65 + Math.random() * 35)
-    const ph3 = Math.round(60 + Math.random() * 40)
-    const pts = Math.round(60 + Math.random() * 40)
-    const pas = Math.round(55 + Math.random() * 45)
-    const rata = Math.round((ph1 + ph2 + ph3 + pts + pas) / 5 * 10) / 10
-    const na = Math.round((ph1 * 0.15 + ph2 * 0.15 + ph3 * 0.15 + pts * 0.25 + pas * 0.3) * 10) / 10
-    const predikat = na >= 90 ? 'A' : na >= 80 ? 'B+' : na >= 70 ? 'B' : na >= 60 ? 'C' : 'D'
-    await db.nilai.create({
-      data: {
-        tahunAjaran: '2023/2024', semester: 'Genap', kelas: '12A',
-        mapel: 'Matematika', guru: 'Ahmad Fauzi, S.Pd',
-        nis: s.nis, nama: s.nama,
-        ph1, ph2, ph3, ph4: 0, pts, pas, rataRata: rata, nilaiAkhir: na, predikat,
-        deskripsi: na >= 75 ? 'Tuntas' : 'Belum Tuntas',
-      },
-    })
-  }
+  const siswaNames = [
+    { nama: 'Andi Saputra', kelas: '10A', jk: 'L' }, { nama: 'Bella Permata', kelas: '10A', jk: 'P' },
+    { nama: 'Candra Wijaya', kelas: '10A', jk: 'L' }, { nama: 'Dina Amelia', kelas: '10A', jk: 'P' },
+    { nama: 'Erik Setiawan', kelas: '10B', jk: 'L' }, { nama: 'Fani Oktavia', kelas: '10B', jk: 'P' },
+    { nama: 'Galih Pratama', kelas: '10B', jk: 'L' }, { nama: 'Hesti Rahayu', kelas: '10B', jk: 'P' },
+    { nama: 'Irfan Maulana', kelas: '11A', jk: 'L' }, { nama: 'Jasmine Putri', kelas: '11A', jk: 'P' },
+    { nama: 'Kevin Ardiansyah', kelas: '11A', jk: 'L' }, { nama: 'Laras Wulandari', kelas: '11A', jk: 'P' },
+    { nama: 'Muhammad Rizki', kelas: '11B', jk: 'L' }, { nama: 'Nadia Safitri', kelas: '11B', jk: 'P' },
+    { nama: 'Omar Faruq', kelas: '11B', jk: 'L' },
+    { nama: 'Putri Amelia', kelas: '12A', jk: 'P' },
+    { nama: 'Qori Akbar', kelas: '12A', jk: 'L' },
+    { nama: 'Ratna Dewi', kelas: '12A', jk: 'P' },
+    { nama: 'Surya Pratama', kelas: '12B', jk: 'L' }, { nama: 'Tania Putri', kelas: '12B', jk: 'P' },
+    { nama: 'Umar Hakim', kelas: '12B', jk: 'L' }, { nama: 'Vina Melati', kelas: '12B', jk: 'P' },
+    { nama: 'Wahyu Hidayat', kelas: '12A', jk: 'L' }, { nama: 'Xena Maharani', kelas: '10A', jk: 'P' },
+  ]
 
-  // Absensi Guru hari ini
   const today = new Date().toISOString().split('T')[0]
-  const gurus = await db.guru.findMany()
-  for (let i = 0; i < gurus.length; i++) {
-    const hadir = i < 12
-    await db.absensiGuru.create({
-      data: {
-        tanggal: today, namaGuru: `${gurus[i].nama}, ${gurus[i].gelar}`,
-        nip: gurus[i].nip, jamMasuk: hadir ? '07:30' : '',
-        jamPulang: i < 10 ? '16:00' : '',
-        durasi: i < 10 ? '8 Jam 30 Menit' : '',
-        status: hadir ? (i < 10 ? 'Hadir' : 'Sudah Pulang') : 'Tidak Hadir',
-        browser: 'Chrome', device: 'Desktop', ip: '192.168.1.100',
-      },
+  const statuses = ['Hadir','Hadir','Hadir','Hadir','Hadir','Hadir','Sakit','Izin','Alpha','Hadir','Hadir','Hadir']
+
+  for (let i = 0; i < siswaNames.length; i++) {
+    const s = siswaNames[i]
+    const nis = String(1001 + i)
+    await prisma.siswa.create({ data: { nis, nama: s.nama, jenisKelamin: s.jk === 'L' ? 'Laki-laki' : 'Perempuan', kelas: s.kelas, status: 'aktif' } })
+    const status = statuses[i % statuses.length] || 'Hadir'
+    await prisma.absensiSiswa.create({ data: { tanggal: today, kelas: s.kelas, nis, nama: s.nama, status, keterangan: status !== 'Hadir' ? status : '', guru: 'Ahmad Fauzi, S.Pd' } })
+  }
+
+  for (let i = 0; i < 5; i++) {
+    const s = siswaNames[i]
+    const ph = () => Math.floor(Math.random() * 20) + 70
+    const vals = [ph(), ph(), ph(), ph(), ph(), ph()]
+    const rata = vals.reduce((a, b) => a + b, 0) / 6
+    await prisma.nilai.create({
+      data: { tahunAjaran: '2024/2025', semester: 'Ganjil', kelas: '10A', mapel: 'Matematika', guru: 'Ahmad Fauzi, S.Pd', nis: String(1001 + i), nama: s.nama, ph1: vals[0], ph2: vals[1], ph3: vals[2], ph4: vals[3], pts: vals[4], pas: vals[5], rataRata: rata, nilaiAkhir: rata, predikat: rata >= 90 ? 'A' : rata >= 80 ? 'B' : rata >= 70 ? 'C' : 'D' }
     })
   }
 
-  // Absensi Siswa hari ini
-  const allSiswa = await db.siswa.findMany()
-  for (const s of allSiswa) {
-    const rand = Math.random()
-    const status = rand > 0.95 ? 'Alpha' : rand > 0.9 ? 'Sakit' : rand > 0.85 ? 'Izin' : 'Hadir'
-    await db.absensiSiswa.create({
-      data: {
-        tanggal: today, kelas: s.kelas, nis: s.nis, nama: s.nama,
-        status, guru: 'Ahmad Fauzi, S.Pd',
-      },
-    })
+  for (let i = 0; i < 5; i++) {
+    const g = guruData[i]
+    const jm = `07:${String(i).padStart(2, '0')}`
+    const jp = i < 3 ? `15:${String(30 + i * 5).padStart(2, '0')}` : ''
+    await prisma.absensiGuru.create({ data: { tanggal: today, namaGuru: g.nama, nip: g.nip, jamMasuk: jm, jamPulang: jp, durasi: jp ? `${8-i} jam ${30+i*5} menit` : '', status: jp ? 'Sudah Pulang' : 'Hadir', browser: 'Chrome', device: 'Windows PC', ip: '192.168.1.' + (100 + i) } })
   }
 
-  // Pengumuman
-  await db.pengumuman.createMany({
-    data: [
-      { judul: 'Ujian Akhir Semester Genap 2024', isi: 'UAS Genap akan dilaksanakan pada tanggal 10-20 Juni 2024. Seluruh siswa wajib hadir 30 menit sebelum ujian dimulai.', tanggal: today, status: 'aktif' },
-      { judul: 'Libur Hari Raya Idul Fitri', isi: 'Diberitahukan bahwa libur Hari Raya Idul Fitri 1445 H mulai tanggal 8-15 April 2024.', tanggal: '2024-04-01', status: 'aktif' },
-      { judul: 'Pendaftaran Ekskul Semester Genap', isi: 'Pendaftaran ekstrakurikuler semester genap dibuka mulai 15 Januari 2024. Hubungi wali kelas masing-masing.', tanggal: '2024-01-10', status: 'aktif' },
-    ],
-  })
+  await prisma.pengumuman.createMany({ data: [
+    { judul: 'Libur Nasional - Hari Kemerdekaan', isi: 'Diberitahukan bahwa tanggal 17 Agustus sekolah libur.', tanggal: today, status: 'aktif' },
+    { judul: 'Jadwal UAS Semester Ganjil 2024/2025', isi: 'UAS dilaksanakan tanggal 2-13 Desember 2024.', tanggal: today, status: 'aktif' },
+    { judul: 'Pendaftaran Ekskul Semester 2', isi: 'Pendaftaran ekskul dibuka mulai 5 Januari 2025.', tanggal: today, status: 'aktif' },
+  ] })
 
-  // Audit log
-  await db.auditLog.createMany({
-    data: [
-      { tanggal: today, user: 'Administrator', role: 'admin', aktivitas: 'Login', ip: '192.168.1.100', detail: 'Admin berhasil login' },
-      { tanggal: today, user: 'Administrator', role: 'admin', aktivitas: 'Lihat Dashboard', ip: '192.168.1.100', detail: 'Membuka halaman dashboard' },
-    ],
-  })
+  await prisma.auditLog.createMany({ data: [
+    { tanggal: today, user: 'Administrator', role: 'admin', aktivitas: 'Login', ip: '192.168.1.1', detail: 'Admin berhasil login' },
+  ] })
 
-  console.log('✅ Seed data berhasil ditambahkan!')
+  await prisma.riwayatLogin.createMany({ data: [
+    { user: 'Administrator', role: 'admin', waktuLogin: new Date().toISOString(), ipAddress: '192.168.1.1', userAgent: 'Mozilla/5.0 Chrome/120' },
+    { user: 'Ahmad Fauzi, S.Pd', role: 'guru', waktuLogin: new Date(Date.now() - 3600000).toISOString(), ipAddress: '192.168.1.10', userAgent: 'Mozilla/5.0 Firefox/121' },
+    { user: 'Siti Nurhaliza, S.Pd', role: 'guru', waktuLogin: new Date(Date.now() - 7200000).toISOString(), ipAddress: '192.168.1.11', userAgent: 'Mozilla/5.0 Chrome/120' },
+  ] })
+
+  console.log('Seed completed!')
+  console.log('Admin: admin / admin123')
+  console.log('Guru: ahmad / guru123')
 }
 
-main()
-  .catch((e) => { console.error(e); process.exit(1) })
-  .finally(async () => { await db.$disconnect() })
+main().catch(console.error).finally(() => prisma.$disconnect())
