@@ -21,6 +21,8 @@ const PAGE_TITLES: Record<string, string> = {
   pengaturan: 'Pengaturan Sekolah',
   'audit-log': 'Audit Log',
   profil: 'Profil',
+  users: 'Data User',
+  'riwayat-login': 'Riwayat Login',
 }
 
 export default function Navbar() {

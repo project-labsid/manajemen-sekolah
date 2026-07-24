@@ -2,7 +2,8 @@
 import { useState } from 'react'
 import { api } from '@/lib/api'
 import { useAppStore } from '@/lib/store'
-import { Eye, EyeOff, GraduationCap, Lock, User } from 'lucide-react'
+import Image from 'next/image'
+import { Eye, EyeOff, Lock, User } from 'lucide-react'
 
 export default function LoginPage() {
   const [username, setUsername] = useState('')
@@ -32,17 +33,17 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen flex flex-col md:flex-row">
-      {/* Left Panel - Blue Dark */}
+      {/* Left Panel - Branding */}
       <div className="hidden md:flex md:w-1/2 relative overflow-hidden" style={{ background: 'linear-gradient(135deg, #0a2540 0%, #1e3a8a 50%, #0d47a1 100%)' }}>
         <div className="absolute inset-0 bg-black/20" />
         <div className="absolute inset-0" style={{
           backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
         }} />
         <div className="relative z-10 flex flex-col items-center justify-center p-12 text-white text-center">
-          <div className="w-24 h-24 rounded-full bg-white/10 backdrop-blur-sm flex items-center justify-center mb-8 border-2 border-white/20">
-            <GraduationCap className="w-14 h-14 text-white" />
+          <div className="w-28 h-28 rounded-2xl bg-white/10 backdrop-blur-sm flex items-center justify-center mb-8 border-2 border-white/20 overflow-hidden">
+            <Image src="/logo-tuweri.png" alt="TUWERI Logo" width={96} height={96} className="object-contain" />
           </div>
-          <h1 className="text-3xl font-bold mb-3">SIAKAD</h1>
+          <h1 className="text-3xl font-bold mb-3">TUWERI</h1>
           <p className="text-lg font-medium opacity-90 mb-2">Sistem Informasi Akademik Sekolah</p>
           <div className="w-16 h-1 bg-blue-400 rounded-full my-4" />
           <p className="text-sm opacity-70 max-w-sm leading-relaxed">
@@ -70,10 +71,10 @@ export default function LoginPage() {
         <div className="w-full max-w-md animate-fadeIn">
           {/* Mobile Logo */}
           <div className="md:hidden flex flex-col items-center mb-8">
-            <div className="w-16 h-16 rounded-full flex items-center justify-center mb-3" style={{ background: '#0a2540' }}>
-              <GraduationCap className="w-9 h-9 text-white" />
+            <div className="w-20 h-20 rounded-2xl flex items-center justify-center mb-3 overflow-hidden" style={{ background: '#0a2540' }}>
+              <Image src="/logo-tuweri.png" alt="TUWERI Logo" width={64} height={64} className="object-contain" />
             </div>
-            <h1 className="text-xl font-bold" style={{ color: '#0a2540' }}>SIAKAD</h1>
+            <h1 className="text-xl font-bold" style={{ color: '#0a2540' }}>TUWERI</h1>
           </div>
 
           <div className="bg-white rounded-2xl shadow-lg p-8 md:p-10">
@@ -143,14 +144,10 @@ export default function LoginPage() {
                 ) : 'Login'}
               </button>
             </form>
-
-            <div className="mt-6 p-3 rounded-xl text-xs text-center" style={{ background: '#f0f9ff', color: '#0369a1' }}>
-              <strong>Demo:</strong> admin / admin123 &nbsp;|&nbsp; ahmad / guru123
-            </div>
           </div>
 
           <p className="text-center mt-6 text-xs" style={{ color: '#94a3b8' }}>
-            &copy; {currentYear} SIAKAD Sekolah v2.0.0
+            &copy; {currentYear} TUWERI SIAKAD v2.0.0
           </p>
         </div>
       </div>
