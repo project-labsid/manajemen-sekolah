@@ -2,25 +2,27 @@
 import { useEffect, useState } from 'react'
 import { api } from '@/lib/api'
 import { useAppStore } from '@/lib/store'
-import { User, Mail, Phone, MapPin, Camera, KeyRound, Save, X } from 'lucide-react'
+import { User, Mail, Phone, Camera, KeyRound, Save, AtSign } from 'lucide-react'
 
 export default function Profil() {
   const { user, setUser } = useAppStore()
-  const [form, setForm] = useState({ nama: '', email: '', noHP: '' })
+  const [form, setForm] = useState({ nama: '', username: '', email: '', noHP: '' })
   const [pwForm, setPwForm] = useState({ passwordOld: '', passwordNew: '' })
   const [saving, setSaving] = useState(false)
   const [msg, setMsg] = useState('')
-  const [showPw, setShowPw] = useState(false)
 
   useEffect(() => {
-    if (user) setForm({ nama: user.nama || '', email: user.email || '', noHP: user.noHP || '' })
+    if (user) setForm({ nama: user.nama || '', username: user.username || '', email: user.email || '', noHP: user.noHP || '' })
   }, [user])
 
   const handleSave = async () => {
     setSaving(true); setMsg('')
     try {
       const res = await api.put<{ data: any }>('/profil', form)
-      if (res.data) setUser({ ...user!, ...res.data })
+      if (res.data) {
+        const updatedUser = { ...user!, ...res.data, username: form.username || user!.username }
+        setUser(updatedUser)
+      }
       setMsg('Profil berhasil diperbarui!')
       setTimeout(() => setMsg(''), 3000)
     } catch (e: any) { setMsg('Gagal: ' + e.message) }
@@ -74,6 +76,14 @@ export default function Profil() {
           <h3 className="text-base font-semibold mb-5 flex items-center gap-2" style={{ color: '#0a2540' }}><User className="w-5 h-5" /> Informasi Profil</h3>
           <div className="space-y-4">
             <div><label className={labelCls}>Nama Lengkap</label><input value={form.nama} onChange={(e) => setForm({ ...form, nama: e.target.value })} className={inputCls} /></div>
+            <div>
+              <label className={labelCls}>Username</label>
+              <div className="relative">
+                <AtSign className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                <input value={form.username} onChange={(e) => setForm({ ...form, username: e.target.value })} className={inputCls + ' pl-10'} placeholder="Username untuk login" />
+              </div>
+              <p className="text-xs text-muted-foreground mt-1">Username digunakan untuk login. Ubah dengan hati-hati.</p>
+            </div>
             <div><label className={labelCls}>Email</label><div className="relative"><Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" /><input type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} className={inputCls + ' pl-10'} /></div></div>
             <div><label className={labelCls}>No. HP</label><div className="relative"><Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" /><input value={form.noHP} onChange={(e) => setForm({ ...form, noHP: e.target.value })} className={inputCls + ' pl-10'} /></div></div>
             <button onClick={handleSave} disabled={saving} className="w-full flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl text-white text-sm font-medium disabled:opacity-50" style={{ background: '#2563eb' }}><Save className="w-4 h-4" /> {saving ? 'Menyimpan...' : 'Simpan'}</button>
@@ -93,8 +103,8 @@ export default function Profil() {
             <p className="text-xs font-medium" style={{ color: '#0a2540' }}>Informasi Akun</p>
             <div className="mt-2 space-y-1.5 text-xs text-muted-foreground">
               <p>Username: <span className="font-medium text-foreground">{user?.username}</span></p>
+              <p>Role: <span className="font-medium capitalize">{user?.role === 'admin' ? 'Administrator' : 'Guru'}</span></p>
               <p>Status: <span className="font-medium text-green-600">{user?.status}</span></p>
-              <p>Bergabung: {user?.createdAt ? new Date(user.createdAt).toLocaleDateString('id-ID') : '-'}</p>
             </div>
           </div>
         </div>

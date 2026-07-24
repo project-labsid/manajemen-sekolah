@@ -2,9 +2,18 @@
 import { useEffect, useState } from 'react'
 import { api } from '@/lib/api'
 import { useAppStore } from '@/lib/store'
-import { Save, School, BookOpen, Palette, Shield, Database, Building } from 'lucide-react'
+import { Save, School, BookOpen, Palette, Building, Users, ChevronRight, Search, Plus, Pencil, Trash2, X, Eye, EyeOff, Loader2, UserCog } from 'lucide-react'
+import { toast } from 'sonner'
 
-type TabKey = 'sekolah' | 'akademik' | 'tampilan'
+const currentYear = new Date().getFullYear()
+const tahunAjaranList = [
+  `${currentYear - 2}/${currentYear - 1}`,
+  `${currentYear - 1}/${currentYear}`,
+  `${currentYear}/${currentYear + 1}`,
+  `${currentYear + 1}/${currentYear + 2}`,
+]
+
+type TabKey = 'sekolah' | 'akademik' | 'tampilan' | 'guru-profiles'
 
 export default function Pengaturan() {
   const { user } = useAppStore()
@@ -15,10 +24,18 @@ export default function Pengaturan() {
   const [form, setForm] = useState({
     namaSekolah: '', alamat: '', npsn: '', email: '', website: '', telepon: '',
     kepalaSekolah: '', nipKepalaSekolah: '', moto: '', visi: '', misi: '',
-    semesterAktif: 'Genap', tahunAjaranAktif: '2023/2024',
+    semesterAktif: 'Ganjil', tahunAjaranAktif: `${currentYear - 1}/${currentYear}`,
   })
 
+  // Guru profiles state
+  const [guruList, setGuruList] = useState<any[]>([])
+  const [searchGuru, setSearchGuru] = useState('')
+  const [editGuru, setEditGuru] = useState<any>(null)
+  const [showPassword, setShowPassword] = useState(false)
+  const [savingGuru, setSavingGuru] = useState(false)
+
   useEffect(() => { loadSettings() }, [])
+  useEffect(() => { if (activeTab === 'guru-profiles') loadGuruList() }, [activeTab])
 
   const loadSettings = async () => {
     try {
@@ -38,11 +55,50 @@ export default function Pengaturan() {
     finally { setSaving(false) }
   }
 
-  const tabs: { key: TabKey; label: string; icon: React.ReactNode }[] = [
+  const loadGuruList = async () => {
+    try {
+      const res = await api.get<{ data: any[] }>('/users?role=guru')
+      setGuruList(res.data || [])
+    } catch { setGuruList([]) }
+  }
+
+  const filteredGuru = guruList.filter(g =>
+    g.nama.toLowerCase().includes(searchGuru.toLowerCase()) ||
+    g.username.toLowerCase().includes(searchGuru.toLowerCase())
+  )
+
+  const handleSaveGuruProfile = async () => {
+    if (!editGuru) return
+    setSavingGuru(true)
+    try {
+      await api.put('/users', editGuru)
+      toast.success(`Profil ${editGuru.nama} berhasil diperbarui`)
+      setEditGuru(null)
+      loadGuruList()
+    } catch (e: any) {
+      toast.error(e.message || 'Gagal memperbarui profil')
+    } finally { setSavingGuru(false) }
+  }
+
+  const handleResetGuruPassword = async (guruUser: any) => {
+    const newPw = 'guru123'
+    setSavingGuru(true)
+    try {
+      await api.put('/users', { id: guruUser.id, password: newPw })
+      toast.success(`Password ${guruUser.nama} berhasil direset ke: ${newPw}`)
+    } catch (e: any) {
+      toast.error(e.message || 'Gagal reset password')
+    } finally { setSavingGuru(false) }
+  }
+
+  const tabs: { key: TabKey; label: string; icon: React.ReactNode; adminOnly?: boolean }[] = [
     { key: 'sekolah', label: 'Data Sekolah', icon: <Building className="w-4 h-4" /> },
     { key: 'akademik', label: 'Akademik', icon: <BookOpen className="w-4 h-4" /> },
+    { key: 'guru-profiles', label: 'Profil Guru', icon: <UserCog className="w-4 h-4" />, adminOnly: true },
     { key: 'tampilan', label: 'Tampilan', icon: <Palette className="w-4 h-4" /> },
   ]
+
+  const visibleTabs = isAdmin ? tabs : tabs.filter(t => !t.adminOnly)
 
   const inputCls = "w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-slate-600 bg-gray-50 dark:bg-slate-700 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
   const labelCls = "block text-sm font-medium mb-1.5"
@@ -57,10 +113,10 @@ export default function Pengaturan() {
 
       <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-700/50">
         {/* Tab Navigation */}
-        <div className="flex border-b border-gray-100 dark:border-slate-700 px-6">
-          {tabs.map((t) => (
+        <div className="flex border-b border-gray-100 dark:border-slate-700 px-6 overflow-x-auto">
+          {visibleTabs.map((t) => (
             <button key={t.key} onClick={() => setActiveTab(t.key)}
-              className={`flex items-center gap-2 px-5 py-4 text-sm font-medium border-b-2 transition-all -mb-px ${
+              className={`flex items-center gap-2 px-5 py-4 text-sm font-medium border-b-2 transition-all -mb-px whitespace-nowrap ${
                 activeTab === t.key
                   ? 'border-blue-600 text-blue-600'
                   : 'border-transparent text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'
@@ -92,7 +148,7 @@ export default function Pengaturan() {
               <div>
                 <label className={labelCls}>Tahun Ajaran Aktif</label>
                 <select value={form.tahunAjaranAktif} onChange={(e) => setForm({ ...form, tahunAjaranAktif: e.target.value })} className={inputCls}>
-                  {['2022/2023','2023/2024','2024/2025'].map((t) => <option key={t} value={t}>{t}</option>)}
+                  {tahunAjaranList.map((t) => <option key={t} value={t}>{t}</option>)}
                 </select>
               </div>
               <div>
@@ -102,6 +158,103 @@ export default function Pengaturan() {
                   <option value="Genap">Genap</option>
                 </select>
               </div>
+            </div>
+          )}
+
+          {activeTab === 'guru-profiles' && isAdmin && (
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <p className="text-sm text-muted-foreground">Kelola profil akun guru. Ubah nama, username, email, dan password guru.</p>
+                <div className="relative w-64">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                  <input type="text" placeholder="Cari guru..." value={searchGuru} onChange={(e) => setSearchGuru(e.target.value)}
+                    className="w-full pl-9 pr-4 py-2 rounded-lg border border-gray-200 dark:border-slate-600 bg-gray-50 dark:bg-slate-700 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                </div>
+              </div>
+
+              <div className="overflow-x-auto max-h-[500px] overflow-y-auto rounded-xl border border-gray-100 dark:border-slate-700">
+                <table className="siadak-table">
+                  <thead className="sticky top-0 z-10">
+                    <tr>
+                      <th>No</th>
+                      <th>Nama</th>
+                      <th>Username</th>
+                      <th>Role</th>
+                      <th>Status</th>
+                      <th>Aksi</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {filteredGuru.map((g, i) => (
+                      <tr key={g.id}>
+                        <td className="text-center">{i + 1}</td>
+                        <td className="font-medium">{g.nama}</td>
+                        <td><code className="text-xs bg-gray-100 dark:bg-slate-700 px-2 py-1 rounded">{g.username}</code></td>
+                        <td className="capitalize">{g.role}</td>
+                        <td>
+                          <span className={`inline-flex px-2 py-1 rounded-full text-xs font-medium ${g.status === 'aktif' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-600'}`}>
+                            {g.status}
+                          </span>
+                        </td>
+                        <td>
+                          <div className="flex items-center gap-1">
+                            <button onClick={() => setEditGuru({ ...g, _newPassword: '' })}
+                              className="p-1.5 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-900/30 text-blue-600 transition-colors" title="Edit Profil">
+                              <Pencil className="w-4 h-4" />
+                            </button>
+                            <button onClick={() => handleResetGuruPassword(g)}
+                              className="p-1.5 rounded-lg hover:bg-amber-50 dark:hover:bg-amber-900/30 text-amber-600 transition-colors" title="Reset Password">
+                              <Eye className="w-4 h-4" />
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                    {filteredGuru.length === 0 && (
+                      <tr><td colSpan={6} className="text-center py-8 text-muted-foreground">Tidak ada data guru</td></tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
+
+              {/* Edit Guru Modal */}
+              {editGuru && (
+                <div className="fixed inset-0 bg-black/50 z-[100] flex items-center justify-center p-4" onClick={() => setEditGuru(null)}>
+                  <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl w-full max-w-lg p-6" onClick={(e) => e.stopPropagation()}>
+                    <div className="flex items-center justify-between mb-6">
+                      <h3 className="text-lg font-semibold" style={{ color: '#0a2540' }}>Edit Profil - {editGuru.nama}</h3>
+                      <button onClick={() => setEditGuru(null)} className="p-1 hover:bg-gray-100 dark:hover:bg-slate-700 rounded-lg"><X className="w-5 h-5" /></button>
+                    </div>
+                    <div className="space-y-4">
+                      <div><label className={labelCls}>Nama</label><input value={editGuru.nama} onChange={(e) => setEditGuru({ ...editGuru, nama: e.target.value })} className={inputCls} /></div>
+                      <div><label className={labelCls}>Username</label><input value={editGuru.username} onChange={(e) => setEditGuru({ ...editGuru, username: e.target.value })} className={inputCls} /></div>
+                      <div><label className={labelCls}>Email</label><input type="email" value={editGuru.email || ''} onChange={(e) => setEditGuru({ ...editGuru, email: e.target.value })} className={inputCls} /></div>
+                      <div><label className={labelCls}>No. HP</label><input value={editGuru.noHP || ''} onChange={(e) => setEditGuru({ ...editGuru, noHP: e.target.value })} className={inputCls} /></div>
+                      <div><label className={labelCls}>Password Baru</label>
+                        <div className="relative">
+                          <input type={showPassword ? 'text' : 'password'} value={editGuru._newPassword || ''} onChange={(e) => setEditGuru({ ...editGuru, _newPassword: e.target.value })} className={inputCls + ' pr-10'} placeholder="Kosongkan jika tidak diubah" />
+                          <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400">
+                            {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                          </button>
+                        </div>
+                      </div>
+                      <div>
+                        <label className={labelCls}>Status</label>
+                        <select value={editGuru.status} onChange={(e) => setEditGuru({ ...editGuru, status: e.target.value })} className={inputCls}>
+                          <option value="aktif">Aktif</option>
+                          <option value="nonaktif">Nonaktif</option>
+                        </select>
+                      </div>
+                    </div>
+                    <div className="flex justify-end gap-3 mt-6">
+                      <button onClick={() => setEditGuru(null)} className="px-5 py-2.5 rounded-xl text-sm font-medium border border-gray-200 dark:border-slate-600 hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors">Batal</button>
+                      <button onClick={handleSaveGuruProfile} disabled={savingGuru} className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-white text-sm font-medium disabled:opacity-50" style={{ background: '#2563eb' }}>
+                        {savingGuru ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />} Simpan
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           )}
 
@@ -115,7 +268,7 @@ export default function Pengaturan() {
             </div>
           )}
 
-          {isAdmin && (
+          {isAdmin && activeTab !== 'guru-profiles' && (
             <div className="mt-6 pt-5 border-t border-gray-100 dark:border-slate-700 flex justify-end">
               <button onClick={handleSave} disabled={saving} className="flex items-center gap-2 px-6 py-2.5 rounded-xl text-white text-sm font-medium disabled:opacity-50" style={{ background: '#2563eb' }}>
                 <Save className="w-4 h-4" /> {saving ? 'Menyimpan...' : 'Simpan Pengaturan'}

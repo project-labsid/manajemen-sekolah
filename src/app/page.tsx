@@ -23,6 +23,8 @@ const Pengumuman = dynamic(() => import('@/components/pengumuman/Pengumuman'), {
 const Pengaturan = dynamic(() => import('@/components/pengaturan/Pengaturan'), { ssr: false })
 const AuditLog = dynamic(() => import('@/components/audit/AuditLog'), { ssr: false })
 const Profil = dynamic(() => import('@/components/profil/Profil'), { ssr: false })
+const DataUser = dynamic(() => import('@/components/users/DataUser'), { ssr: false })
+const RiwayatLogin = dynamic(() => import('@/components/riwayat-login/RiwayatLogin'), { ssr: false })
 
 function PageContent({ page }: { page: PageKey }) {
   switch (page) {
@@ -30,12 +32,14 @@ function PageContent({ page }: { page: PageKey }) {
     case 'siswa': return <DataSiswa />
     case 'kelas': return <DataKelas />
     case 'mapel': return <DataMapel />
+    case 'users': return <DataUser />
     case 'nilai': return <InputNilai />
     case 'rekap-nilai': return <RekapNilai />
     case 'absensi-guru': return <AbsensiGuru />
     case 'absensi-siswa': return <AbsensiSiswa />
     case 'laporan': return <Laporan />
     case 'pengumuman': return <Pengumuman />
+    case 'riwayat-login': return <RiwayatLogin />
     case 'pengaturan': return <Pengaturan />
     case 'audit-log': return <AuditLog />
     case 'profil': return <Profil />
@@ -74,7 +78,7 @@ export default function Home() {
             <PageContent page={currentPage} />
           )}
         </main>
-        {currentPage === 'dashboard' && <AppFooter />}
+        <AppFooter />
       </div>
     </div>
   )

@@ -8,7 +8,6 @@ export default function LoginPage() {
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [showPw, setShowPw] = useState(false)
-  const [remember, setRemember] = useState(false)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const setToken = useAppStore((s) => s.setToken)
@@ -28,6 +27,8 @@ export default function LoginPage() {
       setLoading(false)
     }
   }
+
+  const currentYear = new Date().getFullYear()
 
   return (
     <div className="min-h-screen flex flex-col md:flex-row">
@@ -125,21 +126,6 @@ export default function LoginPage() {
                 </div>
               </div>
 
-              <div className="flex items-center justify-between">
-                <label className="flex items-center gap-2 cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={remember}
-                    onChange={(e) => setRemember(e.target.checked)}
-                    className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                  />
-                  <span className="text-sm" style={{ color: '#64748b' }}>Ingat saya</span>
-                </label>
-                <a href="#" className="text-sm font-medium hover:underline" style={{ color: '#2563eb' }}>
-                  Lupa password?
-                </a>
-              </div>
-
               <button
                 type="submit"
                 disabled={loading}
@@ -164,7 +150,7 @@ export default function LoginPage() {
           </div>
 
           <p className="text-center mt-6 text-xs" style={{ color: '#94a3b8' }}>
-            &copy; 2024 SIAKAD Sekolah v1.0.0
+            &copy; {currentYear} SIAKAD Sekolah v2.0.0
           </p>
         </div>
       </div>

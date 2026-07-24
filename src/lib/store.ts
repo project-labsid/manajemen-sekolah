@@ -15,6 +15,8 @@ export type PageKey =
   | 'pengaturan'
   | 'audit-log'
   | 'profil'
+  | 'users'
+  | 'riwayat-login'
 
 export interface User {
   id: string

@@ -3,7 +3,8 @@ import { useAppStore, type PageKey } from '@/lib/store'
 import {
   LayoutDashboard, Users, GraduationCap, School, BookOpen,
   FileText, ClipboardList, UserCheck, UserX, BarChart3,
-  Megaphone, Settings, Shield, UserCircle, LogOut, X, ChevronLeft, Sun, Moon
+  Megaphone, Settings, Shield, UserCircle, LogOut, X, Sun, Moon,
+  UserCog, History
 } from 'lucide-react'
 
 interface MenuItem {
@@ -19,12 +20,14 @@ const menuItems: MenuItem[] = [
   { key: 'siswa', label: 'Data Siswa', icon: <GraduationCap className="w-5 h-5" />, adminOnly: true },
   { key: 'kelas', label: 'Data Kelas', icon: <School className="w-5 h-5" />, adminOnly: true },
   { key: 'mapel', label: 'Mata Pelajaran', icon: <BookOpen className="w-5 h-5" />, adminOnly: true },
+  { key: 'users', label: 'Data User', icon: <UserCog className="w-5 h-5" />, adminOnly: true },
   { key: 'nilai', label: 'Nilai', icon: <FileText className="w-5 h-5" /> },
   { key: 'rekap-nilai', label: 'Rekap Nilai', icon: <ClipboardList className="w-5 h-5" /> },
   { key: 'absensi-guru', label: 'Absensi Guru', icon: <UserCheck className="w-5 h-5" /> },
   { key: 'absensi-siswa', label: 'Absensi Siswa', icon: <UserX className="w-5 h-5" /> },
   { key: 'laporan', label: 'Laporan', icon: <BarChart3 className="w-5 h-5" /> },
   { key: 'pengumuman', label: 'Pengumuman', icon: <Megaphone className="w-5 h-5" />, adminOnly: true },
+  { key: 'riwayat-login', label: 'Riwayat Login', icon: <History className="w-5 h-5" />, adminOnly: true },
   { key: 'pengaturan', label: 'Pengaturan', icon: <Settings className="w-5 h-5" />, adminOnly: true },
   { key: 'audit-log', label: 'Audit Log', icon: <Shield className="w-5 h-5" />, adminOnly: true },
   { key: 'profil', label: 'Profil', icon: <UserCircle className="w-5 h-5" /> },
