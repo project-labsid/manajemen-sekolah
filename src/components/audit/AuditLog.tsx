@@ -13,7 +13,7 @@ export default function AuditLog() {
   const limit = 20
 
   useEffect(() => {
-    const timer = setTimeout(() => { page === 1 ? load() : setPage(1) }, 400)
+    const timer = setTimeout(() => { if (page === 1) { load() } else { setPage(1) } }, 400)
     return () => clearTimeout(timer)
   }, [search])
 
