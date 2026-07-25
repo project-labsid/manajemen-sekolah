@@ -161,9 +161,3 @@ export async function DELETE(request: NextRequest) {
   }
 }
 
-async function createAuditLog(user: any, action: string, modul: string, detail: string) {
-  try {
-    const { createAuditLog } = await import('@/lib/rbac')
-    await createAuditLog(user, action, modul, detail)
-  } catch { /* ignore audit log errors */ }
-}

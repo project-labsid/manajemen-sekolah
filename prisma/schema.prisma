@@ -9,7 +9,7 @@ datasource db {
 
 model SettingSekolah {
   id                String   @id @default(cuid())
-  namaSekolah       String   @default("SMA Negeri 1 Contoh")
+  namaSekolah       String   @default("MIS AL ASY'ARIYAH")
   logo              String   @default("")
   alamat            String   @default("")
   npsn              String   @default("")

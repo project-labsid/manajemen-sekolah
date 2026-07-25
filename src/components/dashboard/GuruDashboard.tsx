@@ -132,7 +132,7 @@ export default function GuruDashboard() {
           </div>
           <div>
             <p className="text-blue-200 text-sm">{greeting()},</p>
-            <h2 className="text-xl md:text-2xl font-bold mt-1">{user?.nama}, {user?.nama?.split(',')[1]?.trim() || ''}</h2>
+            <h2 className="text-xl md:text-2xl font-bold mt-1">{user?.nama}</h2>
             <p className="text-blue-200/80 text-sm mt-1 italic">&quot;Bekerja dengan Hati, Mendidik Sepenuh Hati&quot;</p>
             <p className="text-blue-200/60 text-xs mt-2">{user?.jabatan || user?.roleName || 'Guru'}</p>
           </div>

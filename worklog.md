@@ -1,28 +1,26 @@
 ---
-Task ID: 1
+Task ID: 2
 Agent: Main Agent
-Task: Fix kelas and pelajaran not showing on guru account, fix hydration error, replace logos
+Task: Fix all three issues: hydration error, logo replacement, guru data
 
 Work Log:
-- Analyzed screenshot showing empty kelas dropdown on Absensi Siswa page for guru account
-- Identified root causes:
-  1. Dashboard API returned only global stats, not guru-specific data (no kelas, mapel associations)
-  2. Kelas API required 'kelas' permission which guru role doesn't have
-  3. Mapel API required 'mapel' permission which guru role doesn't have
-  4. Pengumuman API didn't return full 'isi' content in GET response
-- Modified /api/dashboard to return guru-specific data (myMapel, kelasList, totalKelas, totalSiswa, totalNilai)
-- Modified /api/kelas to allow guru role to access (filtered to their wali kelas + nilai kelas)
-- Modified /api/mata-pelajaran to allow guru role to access (filtered to their subjects)
-- Fixed /api/pengumuman to return full content (added 'isi' to select)
-- Rewrote GuruDashboard.tsx to display kelas diampu and mata pelajaran cards with real data
-- Fixed AbsensiGuru.tsx hydration error: changed <p> tags to <span> tags where Skeleton was nested inside
-- Downloaded new logo from Google Drive (aaQOWzG68OR6K01aN) and replaced /public/logo-tuweri.png
-- Verified all APIs return correct data via curl for both ahmad (guru) and sri (wali kelas)
-- Re-seeded database and confirmed data integrity
+- Verified AbsensiGuru.tsx hydration error was already fixed (p→span)
+- Used z-ai image-edit CLI to remove background from uploaded logo IMG_20260725_195538_070.png
+- Saved background-removed logo to /public/logo-no-bg.png
+- Replaced /public/logo-tuweri.png with the new logo (also copied as logo.svg for login page)
+- Updated Sidebar.tsx: changed logo path to /logo-no-bg.png, "TUWERI" → "MIS AL ASY'ARIYAH", subtitle → "Sistem Informasi Akademik"
+- Updated LoginPage.tsx: changed logo path to /logo-no-bg.png, text → "MIS AL ASY'ARIYAH", subtitle → "Sistem Informasi Akademik"
+- Updated Pengaturan.tsx: default school name → "MIS AL ASY'ARIYAH"
+- Updated Pengaturan API: default school name → "MIS AL ASY'ARIYAH"
+- Re-seeded database with correct data associations
+- Verified guru dashboard API returns myMapel and kelasList correctly for ahmad (Matematika) and sri (B. Indonesia + X-A kelas)
+- Verified all APIs work: dashboard, kelas, absensi-guru, pengumuman, nilai for guru role
+- Ran lint - no errors
+- Dev server running on port 3000, returns 200
 
 Stage Summary:
-- Guru dashboard now shows: real kelas count, siswa count, mapel list, kelas list, pengumuman
-- Kelas and Mapel APIs filter data for guru role based on name associations
-- No more <p> nesting <div> hydration error
-- Logo replaced with new TUWERI logo from Google Drive
-- All APIs verified with curl for guru accounts (ahmad/guru123, sri/guru123)
+- Background-removed logo deployed to /public/logo-no-bg.png and /public/logo-tuweri.png
+- All branding updated to "MIS AL ASY'ARIYAH" across Sidebar, LoginPage, Pengaturan
+- Guru dashboard correctly shows mapel and kelas data from dashboard API
+- All API endpoints verified working for guru role (ahmad/guru123)
+- No lint errors, server running cleanly

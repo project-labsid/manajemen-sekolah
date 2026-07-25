@@ -41,10 +41,10 @@ export default function LoginPage() {
         }} />
         <div className="relative z-10 flex flex-col items-center justify-center p-12 text-white text-center">
           <div className="w-28 h-28 rounded-2xl bg-white/10 backdrop-blur-sm flex items-center justify-center mb-8 border-2 border-white/20 overflow-hidden">
-            <Image src="/logo-tuweri.svg" alt="TUWERI Logo" width={96} height={96} className="object-contain" />
+            <Image src="/logo-no-bg.png" alt="MIS AL ASY'ARIYAH" width={96} height={96} className="object-contain" />
           </div>
-          <h1 className="text-3xl font-bold mb-3">TUWERI</h1>
-          <p className="text-lg font-medium opacity-90 mb-2">Sistem Informasi Akademik Sekolah</p>
+          <h1 className="text-3xl font-bold mb-3">MIS AL ASY'ARIYAH</h1>
+          <p className="text-lg font-medium opacity-90 mb-2">Sistem Informasi Akademik</p>
           <div className="w-16 h-1 bg-blue-400 rounded-full my-4" />
           <p className="text-sm opacity-70 max-w-sm leading-relaxed">
             Membangun Pendidikan Lebih Baik untuk Masa Depan
@@ -58,9 +58,9 @@ export default function LoginPage() {
           {/* Mobile Logo */}
           <div className="md:hidden flex flex-col items-center mb-8">
             <div className="w-20 h-20 rounded-2xl flex items-center justify-center mb-3 overflow-hidden" style={{ background: '#0a2540' }}>
-              <Image src="/logo-tuweri.svg" alt="TUWERI Logo" width={64} height={64} className="object-contain" />
+              <Image src="/logo-no-bg.png" alt="MIS AL ASY'ARIYAH" width={64} height={64} className="object-contain" />
             </div>
-            <h1 className="text-xl font-bold" style={{ color: '#0a2540' }}>TUWERI</h1>
+            <h1 className="text-xl font-bold" style={{ color: '#0a2540' }}>MIS AL ASY'ARIYAH</h1>
           </div>
 
           <div className="bg-white rounded-2xl shadow-lg p-8 md:p-10">
@@ -133,7 +133,7 @@ export default function LoginPage() {
           </div>
 
           <p className="text-center mt-6 text-xs" style={{ color: '#94a3b8' }}>
-            &copy; {currentYear} TUWERI SIAKAD v2.0.0
+            &copy; {currentYear} MIS AL ASY'ARIYAH SIAKAD v2.0.0
           </p>
         </div>
       </div>

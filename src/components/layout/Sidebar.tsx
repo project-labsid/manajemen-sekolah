@@ -58,10 +58,10 @@ export default function Sidebar() {
         <div className="flex items-center justify-between px-5 py-5 border-b border-white/10">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center overflow-hidden">
-              <Image src="/logo-tuweri.png" alt="TUWERI" width={32} height={32} className="object-contain" />
+              <Image src="/logo-no-bg.png" alt="MIS AL ASY'ARIYAH" width={32} height={32} className="object-contain" />
             </div>
             <div>
-              <h1 className="text-white font-bold text-base leading-tight">TUWERI</h1>
+              <h1 className="text-white font-bold text-sm leading-tight">MIS AL ASY'ARIYAH</h1>
               <p className="text-blue-300 text-[10px] opacity-70">Sistem Informasi Akademik</p>
             </div>
           </div>
