@@ -1,0 +1,6 @@
+{
+  "name": "keepalive",
+  "scripts": {
+    "dev": "bun --hot index.ts"
+  }
+}
