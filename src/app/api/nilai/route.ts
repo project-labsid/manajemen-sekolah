@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getUserFromRequest, isAdmin } from '@/lib/auth'
+import { authenticate, requirePermission, requireAnyPermission, createAuditLog, initAuth, AuthError } from '@/lib/rbac'
 import { db } from '@/lib/db'
 
 function hitungPredikat(nilaiAkhir: number): string {
@@ -20,10 +20,9 @@ function hitungNilaiAkhir(rataRata: number, pts: number, pas: number): number {
 
 export async function GET(request: NextRequest) {
   try {
-    const user = getUserFromRequest(request)
-    if (!user) {
-      return NextResponse.json({ error: 'Token tidak valid' }, { status: 401 })
-    }
+    await initAuth()
+    const user = authenticate(request)
+    await requirePermission(user, 'nilai')
 
     const url = new URL(request.url)
     const kelas = url.searchParams.get('kelas') || ''
@@ -58,6 +57,9 @@ export async function GET(request: NextRequest) {
           : 0,
     })
   } catch (error: unknown) {
+    if (error instanceof AuthError) {
+      return NextResponse.json({ error: error.message }, { status: error.statusCode })
+    }
     const message = error instanceof Error ? error.message : 'Terjadi kesalahan server'
     return NextResponse.json({ error: message }, { status: 500 })
   }
@@ -65,10 +67,9 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
-    const user = getUserFromRequest(request)
-    if (!user) {
-      return NextResponse.json({ error: 'Token tidak valid' }, { status: 401 })
-    }
+    await initAuth()
+    const user = authenticate(request)
+    await requireAnyPermission(user, ['nilai', 'nilai:edit'])
 
     const body = await request.json()
     const {
@@ -118,8 +119,19 @@ export async function POST(request: NextRequest) {
       })
     }
 
+    await createAuditLog({
+      user: user.nama,
+      role: user.role,
+      aktivitas: existing ? 'Update Nilai' : 'Tambah Nilai',
+      ip: request.headers.get('x-forwarded-for') || '',
+      detail: `${existing ? 'Mengupdate' : 'Menambahkan'} nilai ${nama || nis}, mapel ${mapel}, kelas ${kelas}`,
+    })
+
     return NextResponse.json({ data, message: 'Nilai berhasil disimpan' }, { status: 201 })
   } catch (error: unknown) {
+    if (error instanceof AuthError) {
+      return NextResponse.json({ error: error.message }, { status: error.statusCode })
+    }
     const message = error instanceof Error ? error.message : 'Terjadi kesalahan server'
     return NextResponse.json({ error: message }, { status: 500 })
   }
@@ -127,10 +139,9 @@ export async function POST(request: NextRequest) {
 
 export async function PUT(request: NextRequest) {
   try {
-    const user = getUserFromRequest(request)
-    if (!user) {
-      return NextResponse.json({ error: 'Token tidak valid' }, { status: 401 })
-    }
+    await initAuth()
+    const user = authenticate(request)
+    await requireAnyPermission(user, ['nilai', 'nilai:edit'])
 
     const body = await request.json()
     const { nilaiList } = body as { nilaiList: Array<Record<string, unknown>> }
@@ -180,8 +191,19 @@ export async function PUT(request: NextRequest) {
       }
     }
 
+    await createAuditLog({
+      user: user.nama,
+      role: user.role,
+      aktivitas: 'Batch Update Nilai',
+      ip: request.headers.get('x-forwarded-for') || '',
+      detail: `Mengupdate ${results.length} data nilai`,
+    })
+
     return NextResponse.json({ data: results, message: `${results.length} nilai berhasil disimpan` })
   } catch (error: unknown) {
+    if (error instanceof AuthError) {
+      return NextResponse.json({ error: error.message }, { status: error.statusCode })
+    }
     const message = error instanceof Error ? error.message : 'Terjadi kesalahan server'
     return NextResponse.json({ error: message }, { status: 500 })
   }

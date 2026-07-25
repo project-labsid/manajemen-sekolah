@@ -2,14 +2,32 @@
 import { useEffect, useState } from 'react'
 import { api } from '@/lib/api'
 import { useAppStore } from '@/lib/store'
-import { UserCheck, School, GraduationCap, FileCheck, Megaphone } from 'lucide-react'
+import { UserCheck, School, GraduationCap, FileCheck, Megaphone, LogIn, LogOut, Clock, MapPin, CheckCircle2, AlertCircle } from 'lucide-react'
+import { toast } from 'sonner'
 
 export default function GuruDashboard() {
   const user = useAppStore((s) => s.user)
+  const hasPerm = useAppStore((s) => s.hasPermission)
   const [absenToday, setAbsenToday] = useState<any>(null)
   const [stats, setStats] = useState<any>(null)
   const [pengumuman, setPengumuman] = useState<any[]>([])
   const [jadwal, setJadwal] = useState<any[]>([])
+  const [loadingMasuk, setLoadingMasuk] = useState(false)
+  const [loadingPulang, setLoadingPulang] = useState(false)
+  const [currentTime, setCurrentTime] = useState('')
+  const [currentDate, setCurrentDate] = useState('')
+
+  // Live clock
+  useEffect(() => {
+    function tick() {
+      const now = new Date()
+      setCurrentTime(now.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit' }))
+      setCurrentDate(now.toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }))
+    }
+    tick()
+    const interval = setInterval(tick, 1000)
+    return () => clearInterval(interval)
+  }, [])
 
   useEffect(() => {
     async function load() {
@@ -25,16 +43,43 @@ export default function GuruDashboard() {
         if (absenRes.data?.length > 0) {
           setAbsenToday(absenRes.data[0])
         }
-        // Generate mock jadwal for demo
-        setJadwal([
-          { jam: '07:30 - 09:00', kelas: '12A', mapel: 'Matematika' },
-          { jam: '09:15 - 10:45', kelas: '11B', mapel: 'Matematika' },
-          { jam: '11:00 - 12:30', kelas: '10A', mapel: 'Matematika Lanjutan' },
-        ])
       } catch (e) { console.error(e) }
     }
     if (user) load()
   }, [user])
+
+  const handleAbsenMasuk = async () => {
+    setLoadingMasuk(true)
+    try {
+      const res = await api.post<any>('/absensi-guru', {
+        namaGuru: user?.nama,
+        nip: user?.nip || '',
+        browser: navigator.userAgent,
+      })
+      setAbsenToday(res.data)
+      toast.success(`Absen masuk berhasil! Jam: ${res.data.jamMasuk}`)
+    } catch (err: any) {
+      toast.error(err.message || 'Gagal melakukan absen masuk')
+    } finally {
+      setLoadingMasuk(false)
+    }
+  }
+
+  const handleAbsenPulang = async () => {
+    if (!absenToday?.id) return
+    setLoadingPulang(true)
+    try {
+      const res = await api.put<any>('/absensi-guru', {
+        id: absenToday.id,
+      })
+      setAbsenToday(res.data)
+      toast.success(`Absen pulang berhasil! Jam: ${res.data.jamPulang} | Durasi: ${res.data.durasi}`)
+    } catch (err: any) {
+      toast.error(err.message || 'Gagal melakukan absen pulang')
+    } finally {
+      setLoadingPulang(false)
+    }
+  }
 
   const greeting = () => {
     const h = new Date().getHours()
@@ -45,6 +90,8 @@ export default function GuruDashboard() {
   }
 
   const firstName = user?.nama?.split(',')[0]?.split(' ')[0] || 'Bapak/Ibu'
+  const hasMasuk = !!absenToday?.jamMasuk
+  const hasPulang = !!absenToday?.jamPulang
 
   return (
     <div className="space-y-6 animate-fadeIn">
@@ -59,36 +106,101 @@ export default function GuruDashboard() {
             <p className="text-blue-200 text-sm">{greeting()},</p>
             <h2 className="text-xl md:text-2xl font-bold mt-1">{user?.nama}, {user?.nama?.split(',')[1]?.trim() || ''}</h2>
             <p className="text-blue-200/80 text-sm mt-1 italic">&quot;Bekerja dengan Hati, Mendidik Sepenuh Hati&quot;</p>
-            <p className="text-blue-200/60 text-xs mt-2">SMA Negeri 1 Contoh</p>
+            <p className="text-blue-200/60 text-xs mt-2">{user?.jabatan || user?.roleName || 'Guru'}</p>
           </div>
         </div>
       </div>
 
+      {/* Absen Section — Prominent Card */}
+      {(hasPerm('absensi-guru:clock-in') || hasPerm('absensi-guru:clock-out')) && (
+        <div className="bg-white dark:bg-slate-800 rounded-2xl p-6 shadow-sm border border-gray-100 dark:border-slate-700/50">
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-2">
+              <Clock className="w-5 h-5" style={{ color: '#0a2540' }} />
+              <h3 className="text-sm font-semibold" style={{ color: '#0a2540' }}>Absensi Hari Ini</h3>
+            </div>
+            <div className="text-right">
+              <div className="text-lg font-bold tabular-nums" style={{ color: '#0a2540' }}>{currentTime}</div>
+              <div className="text-[11px] text-muted-foreground">{currentDate}</div>
+            </div>
+          </div>
+
+          {/* Status Display */}
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-5">
+            <div className={`rounded-xl p-4 text-center ${hasMasuk ? 'bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800' : 'bg-gray-50 dark:bg-slate-700/50 border border-gray-200 dark:border-slate-600'}`}>
+              <div className={`w-10 h-10 mx-auto mb-2 rounded-full flex items-center justify-center ${hasMasuk ? 'bg-emerald-500 text-white' : 'bg-gray-300 dark:bg-slate-600 text-gray-500'}`}>
+                <LogIn className="w-5 h-5" />
+              </div>
+              <p className="text-xs text-muted-foreground">Jam Masuk</p>
+              <p className={`text-lg font-bold mt-1 ${hasMasuk ? 'text-emerald-600' : 'text-gray-400'}`}>{hasMasuk ? absenToday.jamMasuk : '--:--'}</p>
+            </div>
+            <div className={`rounded-xl p-4 text-center ${hasPulang ? 'bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800' : 'bg-gray-50 dark:bg-slate-700/50 border border-gray-200 dark:border-slate-600'}`}>
+              <div className={`w-10 h-10 mx-auto mb-2 rounded-full flex items-center justify-center ${hasPulang ? 'bg-blue-500 text-white' : 'bg-gray-300 dark:bg-slate-600 text-gray-500'}`}>
+                <LogOut className="w-5 h-5" />
+              </div>
+              <p className="text-xs text-muted-foreground">Jam Pulang</p>
+              <p className={`text-lg font-bold mt-1 ${hasPulang ? 'text-blue-600' : 'text-gray-400'}`}>{hasPulang ? absenToday.jamPulang : '--:--'}</p>
+            </div>
+            <div className={`rounded-xl p-4 text-center ${hasMasuk && hasPulang ? 'bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800' : 'bg-gray-50 dark:bg-slate-700/50 border border-gray-200 dark:border-slate-600'}`}>
+              <div className={`w-10 h-10 mx-auto mb-2 rounded-full flex items-center justify-center ${hasMasuk && hasPulang ? 'bg-amber-500 text-white' : 'bg-gray-300 dark:bg-slate-600 text-gray-500'}`}>
+                <Clock className="w-5 h-5" />
+              </div>
+              <p className="text-xs text-muted-foreground">Durasi</p>
+              <p className={`text-lg font-bold mt-1 ${hasMasuk && hasPulang ? 'text-amber-600' : 'text-gray-400'}`}>{hasMasuk && hasPulang ? absenToday.durasi : '--'}</p>
+            </div>
+          </div>
+
+          {/* Action Buttons */}
+          <div className="flex flex-col sm:flex-row gap-3">
+            {!hasMasuk && hasPerm('absensi-guru:clock-in') && (
+              <button
+                onClick={handleAbsenMasuk}
+                disabled={loadingMasuk}
+                className="flex-1 flex items-center justify-center gap-2 px-6 py-3 rounded-xl text-white font-semibold text-sm transition-all hover:opacity-90 disabled:opacity-50"
+                style={{ background: 'linear-gradient(135deg, #059669, #10b981)' }}
+              >
+                {loadingMasuk ? (
+                  <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                ) : (
+                  <LogIn className="w-5 h-5" />
+                )}
+                {loadingMasuk ? 'Memproses...' : 'Absen Masuk'}
+              </button>
+            )}
+            {hasMasuk && !hasPulang && hasPerm('absensi-guru:clock-out') && (
+              <button
+                onClick={handleAbsenPulang}
+                disabled={loadingPulang}
+                className="flex-1 flex items-center justify-center gap-2 px-6 py-3 rounded-xl text-white font-semibold text-sm transition-all hover:opacity-90 disabled:opacity-50"
+                style={{ background: 'linear-gradient(135deg, #dc2626, #ef4444)' }}
+              >
+                {loadingPulang ? (
+                  <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                ) : (
+                  <LogOut className="w-5 h-5" />
+                )}
+                {loadingPulang ? 'Memproses...' : 'Absen Pulang'}
+              </button>
+            )}
+            {hasMasuk && hasPulang && (
+              <div className="flex-1 flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800 text-emerald-600 font-semibold text-sm">
+                <CheckCircle2 className="w-5 h-5" />
+                Absensi hari ini lengkap
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
       {/* Status Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        {/* Absen Status */}
-        <div className="bg-white dark:bg-slate-800 rounded-2xl p-5 shadow-sm border border-gray-100 dark:border-slate-700/50">
-          <div className="flex items-center justify-between mb-3">
-            <p className="text-xs font-medium text-muted-foreground">Status Absen Hari Ini</p>
-            <UserCheck className="w-5 h-5 text-green-500" />
-          </div>
-          {absenToday?.jamMasuk ? (
-            <>
-              <p className="text-lg font-bold text-green-600">Hadir {absenToday.jamMasuk}</p>
-              {absenToday.jamPulang && <p className="text-xs text-muted-foreground mt-1">Pulang: {absenToday.jamPulang}</p>}
-            </>
-          ) : (
-            <p className="text-lg font-bold text-yellow-600">Belum Absen</p>
-          )}
-        </div>
-
         <div className="bg-white dark:bg-slate-800 rounded-2xl p-5 shadow-sm border border-gray-100 dark:border-slate-700/50">
           <div className="flex items-center justify-between mb-3">
             <p className="text-xs font-medium text-muted-foreground">Kelas Diampu</p>
             <School className="w-5 h-5 text-blue-500" />
           </div>
-          <p className="text-lg font-bold" style={{ color: '#2563eb' }}>3 Kelas</p>
-          <p className="text-xs text-muted-foreground mt-1">12A, 11B, 10A</p>
+          <p className="text-lg font-bold" style={{ color: '#2563eb' }}>{stats?.totalKelas || 3} Kelas</p>
+          <p className="text-xs text-muted-foreground mt-1">Mata pelajaran diampu</p>
         </div>
 
         <div className="bg-white dark:bg-slate-800 rounded-2xl p-5 shadow-sm border border-gray-100 dark:border-slate-700/50">
@@ -97,7 +209,7 @@ export default function GuruDashboard() {
             <GraduationCap className="w-5 h-5 text-purple-500" />
           </div>
           <p className="text-lg font-bold" style={{ color: '#8b5cf6' }}>{stats?.totalSiswa?.toLocaleString() || '90'} Siswa</p>
-          <p className="text-xs text-muted-foreground mt-1">Di 3 kelas</p>
+          <p className="text-xs text-muted-foreground mt-1">Di kelas yang diampu</p>
         </div>
 
         <div className="bg-white dark:bg-slate-800 rounded-2xl p-5 shadow-sm border border-gray-100 dark:border-slate-700/50">
@@ -108,48 +220,41 @@ export default function GuruDashboard() {
           <p className="text-lg font-bold" style={{ color: '#f59e0b' }}>{stats?.totalNilai || 0}</p>
           <p className="text-xs text-muted-foreground mt-1">Data nilai tersimpan</p>
         </div>
+
+        <div className="bg-white dark:bg-slate-800 rounded-2xl p-5 shadow-sm border border-gray-100 dark:border-slate-700/50">
+          <div className="flex items-center justify-between mb-3">
+            <p className="text-xs font-medium text-muted-foreground">Status Absen</p>
+            <UserCheck className="w-5 h-5 text-green-500" />
+          </div>
+          {hasMasuk ? (
+            <>
+              <p className="text-lg font-bold text-green-600">Hadir {absenToday.jamMasuk}</p>
+              {hasPulang && <p className="text-xs text-muted-foreground mt-1">Pulang: {absenToday.jamPulang}</p>}
+            </>
+          ) : (
+            <p className="text-lg font-bold text-yellow-600">Belum Absen</p>
+          )}
+        </div>
       </div>
 
-      {/* Jadwal & Pengumuman */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="bg-white dark:bg-slate-800 rounded-2xl p-6 shadow-sm border border-gray-100 dark:border-slate-700/50">
-          <h3 className="text-sm font-semibold mb-4" style={{ color: '#0a2540' }}>Jadwal Mengajar Hari Ini</h3>
-          <div className="space-y-3">
-            {jadwal.map((j, i) => (
-              <div key={i} className="flex items-center gap-4 p-3 rounded-xl bg-gray-50 dark:bg-slate-700/50">
-                <div className="text-center min-w-[80px]">
-                  <p className="text-xs font-bold" style={{ color: '#2563eb' }}>{j.jam.split(' - ')[0]}</p>
-                  <p className="text-[10px] text-muted-foreground">s/d</p>
-                  <p className="text-xs font-bold" style={{ color: '#2563eb' }}>{j.jam.split(' - ')[1]}</p>
-                </div>
-                <div className="w-px h-10 bg-gray-200 dark:bg-slate-600" />
-                <div>
-                  <p className="text-sm font-semibold">Kelas {j.kelas}</p>
-                  <p className="text-xs text-muted-foreground">{j.mapel}</p>
-                </div>
-              </div>
-            ))}
-          </div>
+      {/* Pengumuman */}
+      <div className="bg-white dark:bg-slate-800 rounded-2xl p-6 shadow-sm border border-gray-100 dark:border-slate-700/50">
+        <div className="flex items-center gap-2 mb-4">
+          <Megaphone className="w-4 h-4" style={{ color: '#0a2540' }} />
+          <h3 className="text-sm font-semibold" style={{ color: '#0a2540' }}>Pengumuman Terbaru</h3>
         </div>
-
-        <div className="bg-white dark:bg-slate-800 rounded-2xl p-6 shadow-sm border border-gray-100 dark:border-slate-700/50">
-          <div className="flex items-center gap-2 mb-4">
-            <Megaphone className="w-4 h-4" style={{ color: '#0a2540' }} />
-            <h3 className="text-sm font-semibold" style={{ color: '#0a2540' }}>Pengumuman Terbaru</h3>
-          </div>
-          <div className="space-y-3 max-h-[280px] overflow-y-auto">
-            {pengumuman.length === 0 ? (
-              <p className="text-sm text-muted-foreground text-center py-8">Belum ada pengumuman</p>
-            ) : (
-              pengumuman.map((p: any, i: number) => (
-                <div key={i} className="p-3 rounded-xl bg-gray-50 dark:bg-slate-700/50 border border-gray-100 dark:border-slate-600/50">
-                  <p className="text-xs font-semibold" style={{ color: '#1a1a2e' }}>{p.judul}</p>
-                  <p className="text-[11px] text-muted-foreground mt-1 line-clamp-2">{p.isi}</p>
-                  <p className="text-[10px] text-muted-foreground mt-1.5">{p.tanggal}</p>
-                </div>
-              ))
-            )}
-          </div>
+        <div className="space-y-3 max-h-[280px] overflow-y-auto">
+          {pengumuman.length === 0 ? (
+            <p className="text-sm text-muted-foreground text-center py-8">Belum ada pengumuman</p>
+          ) : (
+            pengumuman.map((p: any, i: number) => (
+              <div key={i} className="p-3 rounded-xl bg-gray-50 dark:bg-slate-700/50 border border-gray-100 dark:border-slate-600/50">
+                <p className="text-xs font-semibold" style={{ color: '#1a1a2e' }}>{p.judul}</p>
+                <p className="text-[11px] text-muted-foreground mt-1 line-clamp-2">{p.isi}</p>
+                <p className="text-[10px] text-muted-foreground mt-1.5">{p.tanggal}</p>
+              </div>
+            ))
+          )}
         </div>
       </div>
     </div>

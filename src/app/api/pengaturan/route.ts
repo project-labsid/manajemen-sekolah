@@ -1,13 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getUserFromRequest, isAdmin } from '@/lib/auth'
+import { authenticate, requirePermission, createAuditLog, initAuth, AuthError } from '@/lib/rbac'
 import { db } from '@/lib/db'
 
 export async function GET(request: NextRequest) {
   try {
-    const user = getUserFromRequest(request)
-    if (!user) {
-      return NextResponse.json({ error: 'Token tidak valid' }, { status: 401 })
-    }
+    await initAuth()
+    const user = authenticate(request)
+    await requirePermission(user, 'pengaturan')
 
     let setting = await db.settingSekolah.findFirst()
 
@@ -17,6 +16,9 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({ data: setting })
   } catch (error: unknown) {
+    if (error instanceof AuthError) {
+      return NextResponse.json({ error: error.message }, { status: error.statusCode })
+    }
     const message = error instanceof Error ? error.message : 'Terjadi kesalahan server'
     return NextResponse.json({ error: message }, { status: 500 })
   }
@@ -24,13 +26,9 @@ export async function GET(request: NextRequest) {
 
 export async function PUT(request: NextRequest) {
   try {
-    const user = getUserFromRequest(request)
-    if (!user) {
-      return NextResponse.json({ error: 'Token tidak valid' }, { status: 401 })
-    }
-    if (!isAdmin(user)) {
-      return NextResponse.json({ error: 'Akses ditolak' }, { status: 403 })
-    }
+    await initAuth()
+    const user = authenticate(request)
+    await requirePermission(user, 'pengaturan')
 
     const body = await request.json()
     const {
@@ -60,8 +58,19 @@ export async function PUT(request: NextRequest) {
       })
     }
 
+    await createAuditLog({
+      user: user.nama,
+      role: user.role,
+      aktivitas: 'Update Pengaturan',
+      ip: request.headers.get('x-forwarded-for') || '',
+      detail: 'Memperbarui pengaturan sekolah',
+    })
+
     return NextResponse.json({ data: setting, message: 'Pengaturan berhasil disimpan' })
   } catch (error: unknown) {
+    if (error instanceof AuthError) {
+      return NextResponse.json({ error: error.message }, { status: error.statusCode })
+    }
     const message = error instanceof Error ? error.message : 'Terjadi kesalahan server'
     return NextResponse.json({ error: message }, { status: 500 })
   }

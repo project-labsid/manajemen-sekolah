@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getUserFromRequest, isAdmin } from '@/lib/auth'
+import { authenticate, requirePermission, requireAnyPermission, createAuditLog, initAuth, AuthError } from '@/lib/rbac'
 import { db } from '@/lib/db'
 
 function getPaginationParams(request: NextRequest) {
@@ -12,10 +12,9 @@ function getPaginationParams(request: NextRequest) {
 
 export async function GET(request: NextRequest) {
   try {
-    const user = getUserFromRequest(request)
-    if (!user) {
-      return NextResponse.json({ error: 'Token tidak valid' }, { status: 401 })
-    }
+    await initAuth()
+    const user = authenticate(request)
+    await requirePermission(user, 'guru')
 
     const { page, limit, search, skip } = getPaginationParams(request)
 
@@ -53,6 +52,9 @@ export async function GET(request: NextRequest) {
       },
     })
   } catch (error: unknown) {
+    if (error instanceof AuthError) {
+      return NextResponse.json({ error: error.message }, { status: error.statusCode })
+    }
     const message = error instanceof Error ? error.message : 'Terjadi kesalahan server'
     return NextResponse.json({ error: message }, { status: 500 })
   }
@@ -60,13 +62,9 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
-    const user = getUserFromRequest(request)
-    if (!user) {
-      return NextResponse.json({ error: 'Token tidak valid' }, { status: 401 })
-    }
-    if (!isAdmin(user)) {
-      return NextResponse.json({ error: 'Akses ditolak' }, { status: 403 })
-    }
+    await initAuth()
+    const user = authenticate(request)
+    await requirePermission(user, 'guru')
 
     const body = await request.json()
     const { nip, nama, gelar, jenisKelamin, tempatLahir, tanggalLahir, alamat, email, noHP, mapel, status, foto } = body
@@ -84,8 +82,19 @@ export async function POST(request: NextRequest) {
       data: { nip, nama, gelar, jenisKelamin, tempatLahir, tanggalLahir, alamat, email, noHP, mapel, status: status || 'aktif', foto },
     })
 
+    await createAuditLog({
+      user: user.nama,
+      role: user.role,
+      aktivitas: 'Tambah Guru',
+      ip: request.headers.get('x-forwarded-for') || '',
+      detail: `Menambahkan guru: ${nama} (NIP: ${nip})`,
+    })
+
     return NextResponse.json({ data: guru, message: 'Data guru berhasil ditambahkan' }, { status: 201 })
   } catch (error: unknown) {
+    if (error instanceof AuthError) {
+      return NextResponse.json({ error: error.message }, { status: error.statusCode })
+    }
     const message = error instanceof Error ? error.message : 'Terjadi kesalahan server'
     return NextResponse.json({ error: message }, { status: 500 })
   }
@@ -93,13 +102,9 @@ export async function POST(request: NextRequest) {
 
 export async function PUT(request: NextRequest) {
   try {
-    const user = getUserFromRequest(request)
-    if (!user) {
-      return NextResponse.json({ error: 'Token tidak valid' }, { status: 401 })
-    }
-    if (!isAdmin(user)) {
-      return NextResponse.json({ error: 'Akses ditolak' }, { status: 403 })
-    }
+    await initAuth()
+    const user = authenticate(request)
+    await requirePermission(user, 'guru')
 
     const body = await request.json()
     const { id, nip, nama, gelar, jenisKelamin, tempatLahir, tanggalLahir, alamat, email, noHP, mapel, status, foto } = body
@@ -125,8 +130,19 @@ export async function PUT(request: NextRequest) {
       data: { nip, nama, gelar, jenisKelamin, tempatLahir, tanggalLahir, alamat, email, noHP, mapel, status, foto },
     })
 
+    await createAuditLog({
+      user: user.nama,
+      role: user.role,
+      aktivitas: 'Edit Guru',
+      ip: request.headers.get('x-forwarded-for') || '',
+      detail: `Mengedit guru: ${existing.nama} (NIP: ${existing.nip})`,
+    })
+
     return NextResponse.json({ data: guru, message: 'Data guru berhasil diperbarui' })
   } catch (error: unknown) {
+    if (error instanceof AuthError) {
+      return NextResponse.json({ error: error.message }, { status: error.statusCode })
+    }
     const message = error instanceof Error ? error.message : 'Terjadi kesalahan server'
     return NextResponse.json({ error: message }, { status: 500 })
   }
@@ -134,13 +150,9 @@ export async function PUT(request: NextRequest) {
 
 export async function DELETE(request: NextRequest) {
   try {
-    const user = getUserFromRequest(request)
-    if (!user) {
-      return NextResponse.json({ error: 'Token tidak valid' }, { status: 401 })
-    }
-    if (!isAdmin(user)) {
-      return NextResponse.json({ error: 'Akses ditolak' }, { status: 403 })
-    }
+    await initAuth()
+    const user = authenticate(request)
+    await requireAnyPermission(user, ['guru', 'guru:delete'])
 
     const { searchParams } = new URL(request.url)
     const id = searchParams.get('id')
@@ -159,8 +171,19 @@ export async function DELETE(request: NextRequest) {
       data: { status: 'dihapus' },
     })
 
+    await createAuditLog({
+      user: user.nama,
+      role: user.role,
+      aktivitas: 'Hapus Guru',
+      ip: request.headers.get('x-forwarded-for') || '',
+      detail: `Menghapus guru: ${existing.nama} (NIP: ${existing.nip})`,
+    })
+
     return NextResponse.json({ message: 'Data guru berhasil dihapus' })
   } catch (error: unknown) {
+    if (error instanceof AuthError) {
+      return NextResponse.json({ error: error.message }, { status: error.statusCode })
+    }
     const message = error instanceof Error ? error.message : 'Terjadi kesalahan server'
     return NextResponse.json({ error: message }, { status: 500 })
   }

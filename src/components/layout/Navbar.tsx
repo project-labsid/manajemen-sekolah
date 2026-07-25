@@ -78,7 +78,7 @@ export default function Navbar() {
               </div>
               <div className="hidden sm:block text-left">
                 <p className="text-sm font-medium leading-tight" style={{ color: '#1a1a2e' }}>{user?.nama || 'User'}</p>
-                <p className="text-[10px] capitalize" style={{ color: '#64748b' }}>{user?.role === 'admin' ? 'Administrator' : 'Guru'}</p>
+                <p className="text-[10px]" style={{ color: '#64748b' }}>{user?.roleName || user?.role || 'User'}</p>
               </div>
               <ChevronDown className="w-4 h-4 text-gray-400" />
             </button>

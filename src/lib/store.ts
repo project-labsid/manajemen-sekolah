@@ -23,11 +23,16 @@ export interface User {
   nama: string
   username: string
   role: string
+  roleName: string
   email: string
   noHP: string
   foto: string
   status: string
   lastLogin: string | null
+  nip: string
+  jabatan: string
+  permissions: string[]
+  isSuperAdmin: boolean
 }
 
 interface AppState {
@@ -43,9 +48,10 @@ interface AppState {
   setSidebarOpen: (o: boolean) => void
   setDarkMode: (d: boolean) => void
   logout: () => void
+  hasPermission: (slug: string) => boolean
 }
 
-export const useAppStore = create<AppState>((set) => ({
+export const useAppStore = create<AppState>((set, get) => ({
   token: typeof window !== 'undefined' ? localStorage.getItem('siakad_token') : null,
   user: typeof window !== 'undefined'
     ? JSON.parse(localStorage.getItem('siakad_user') || 'null')
@@ -78,5 +84,11 @@ export const useAppStore = create<AppState>((set) => ({
     localStorage.removeItem('siakad_token')
     localStorage.removeItem('siakad_user')
     set({ token: null, user: null, currentPage: 'dashboard' })
+  },
+  hasPermission: (slug: string) => {
+    const { user } = get()
+    if (!user) return false
+    if (user.isSuperAdmin || user.permissions.includes('*')) return true
+    return user.permissions.includes(slug)
   },
 }))

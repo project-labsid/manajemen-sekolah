@@ -1,5 +1,7 @@
 import crypto from 'crypto'
 import { NextRequest } from 'next/server'
+import { db } from '@/lib/db'
+import { loadPermissionCache, getUserPermissions, invalidatePermissionCache } from './rbac'
 
 const JWT_SECRET = process.env.JWT_SECRET || 'siakad-secret-key-2024'
 
@@ -38,6 +40,57 @@ export function getUserFromRequest(request: NextRequest): JwtPayload | null {
   return verifyToken(token)
 }
 
-export function isAdmin(user: JwtPayload): boolean {
-  return user.role === 'admin'
+/** Get full user data with role info and permissions */
+export async function getUserWithPermissions(payload: JwtPayload) {
+  const user = await db.user.findUnique({
+    where: { id: payload.userId },
+    include: {
+      userRoles: {
+        include: { role: { include: { permissions: { include: { permission: true } } } } },
+      },
+    },
+  })
+  if (!user) return null
+
+  // Get permissions
+  const perms = await getUserPermissions(user.role)
+  const isSuperAdmin = user.role === 'super-admin' || perms.includes('*')
+
+  // Get role name
+  const roleName = await db.role.findUnique({ where: { slug: user.role } })
+
+  return {
+    id: user.id,
+    nama: user.nama,
+    username: user.username,
+    role: user.role,
+    roleName: roleName?.nama || user.role,
+    email: user.email,
+    noHP: user.noHP,
+    foto: user.foto,
+    status: user.status,
+    lastLogin: user.lastLogin,
+    nip: user.nip,
+    jabatan: user.jabatan,
+    permissions: isSuperAdmin ? ['*'] : perms,
+    isSuperAdmin,
+  }
+}
+
+/** Initialize RBAC cache on server startup */
+export async function initAuth() {
+  await loadPermissionCache()
+}
+
+/** Check and refresh cache if needed */
+export async function ensureAuthCache() {
+  const { hasPermission } = await import('./rbac')
+  // Trigger cache load
+  await hasPermission('__check__', '__nonexistent__')
+}
+
+/** Reload permissions (after role/permission changes) */
+export async function reloadPermissions() {
+  invalidatePermissionCache()
+  await loadPermissionCache()
 }

@@ -1,13 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getUserFromRequest } from '@/lib/auth'
+import { authenticate, requirePermission, initAuth, AuthError } from '@/lib/rbac'
 import { db } from '@/lib/db'
 
 export async function GET(request: NextRequest) {
   try {
-    const user = getUserFromRequest(request)
-    if (!user) {
-      return NextResponse.json({ error: 'Token tidak valid' }, { status: 401 })
-    }
+    await initAuth()
+    const user = authenticate(request)
+    await requirePermission(user, 'laporan')
 
     const url = new URL(request.url)
     const tipe = url.searchParams.get('tipe') || 'nilai'
@@ -129,6 +128,9 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({ error: 'Tipe laporan tidak valid. Gunakan: nilai atau absensi' }, { status: 400 })
   } catch (error: unknown) {
+    if (error instanceof AuthError) {
+      return NextResponse.json({ error: error.message }, { status: error.statusCode })
+    }
     const message = error instanceof Error ? error.message : 'Terjadi kesalahan server'
     return NextResponse.json({ error: message }, { status: 500 })
   }

@@ -7,6 +7,7 @@ import LoginPage from '@/components/auth/LoginPage'
 import Sidebar from '@/components/layout/Sidebar'
 import Navbar from '@/components/layout/Navbar'
 import AppFooter from '@/components/layout/Footer'
+import { ShieldX } from 'lucide-react'
 
 const AdminDashboard = dynamic(() => import('@/components/dashboard/AdminDashboard'), { ssr: false, loading: () => <div className="flex items-center justify-center py-20"><div className="animate-spin w-8 h-8 border-4 border-blue-200 border-t-blue-600 rounded-full" /></div> })
 const GuruDashboard = dynamic(() => import('@/components/dashboard/GuruDashboard'), { ssr: false, loading: () => <div className="flex items-center justify-center py-20"><div className="animate-spin w-8 h-8 border-4 border-blue-200 border-t-blue-600 rounded-full" /></div> })
@@ -25,6 +26,26 @@ const AuditLog = dynamic(() => import('@/components/audit/AuditLog'), { ssr: fal
 const Profil = dynamic(() => import('@/components/profil/Profil'), { ssr: false })
 const DataUser = dynamic(() => import('@/components/users/DataUser'), { ssr: false })
 const RiwayatLogin = dynamic(() => import('@/components/riwayat-login/RiwayatLogin'), { ssr: false })
+
+// Map page keys to required permission slugs
+const PAGE_PERMISSIONS: Record<PageKey, string> = {
+  'dashboard': 'dashboard',
+  'users': 'users',
+  'guru': 'guru',
+  'siswa': 'siswa',
+  'kelas': 'kelas',
+  'mapel': 'mapel',
+  'nilai': 'nilai',
+  'rekap-nilai': 'rekap-nilai',
+  'absensi-guru': 'absensi-guru',
+  'absensi-siswa': 'absensi-siswa',
+  'laporan': 'laporan',
+  'pengumuman': 'pengumuman',
+  'riwayat-login': 'riwayat-login',
+  'pengaturan': 'pengaturan',
+  'audit-log': 'audit-log',
+  'profil': 'profil',
+}
 
 function PageContent({ page }: { page: PageKey }) {
   switch (page) {
@@ -54,7 +75,7 @@ function useMounted() {
 }
 
 export default function Home() {
-  const { token, user, currentPage, darkMode } = useAppStore()
+  const { token, user, currentPage, darkMode, hasPermission } = useAppStore()
   const mounted = useMounted()
 
   useEffect(() => {
@@ -72,7 +93,7 @@ export default function Home() {
     })
   }, [token, mounted])
 
-  // Prevent hydration mismatch — server always renders loading, client resolves after mount
+  // Prevent hydration mismatch
   if (!mounted) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-[#f4f6f9] dark:bg-slate-900">
@@ -83,6 +104,41 @@ export default function Home() {
 
   if (!token || !user) return <LoginPage />
 
+  // Check page-level permission
+  const requiredPermission = PAGE_PERMISSIONS[currentPage]
+  const canAccess = hasPermission(requiredPermission)
+
+  if (!canAccess) {
+    return (
+      <div className="min-h-screen flex bg-[#f4f6f9] dark:bg-slate-900">
+        <Sidebar />
+        <div className="flex-1 flex flex-col min-h-screen lg:ml-[270px]">
+          <Navbar />
+          <main className="flex-1 flex items-center justify-center p-4 lg:p-6">
+            <div className="text-center">
+              <ShieldX className="w-16 h-16 text-red-400 mx-auto mb-4" />
+              <h2 className="text-xl font-bold text-gray-800 dark:text-white mb-2">Akses Ditolak</h2>
+              <p className="text-sm text-muted-foreground mb-4">
+                Anda tidak memiliki izin untuk mengakses halaman ini.
+              </p>
+              <button
+                onClick={() => useAppStore.getState().setPage('dashboard')}
+                className="px-4 py-2 rounded-xl text-white text-sm font-medium"
+                style={{ background: '#2563eb' }}
+              >
+                Kembali ke Dashboard
+              </button>
+            </div>
+          </main>
+          <AppFooter />
+        </div>
+      </div>
+    )
+  }
+
+  // Super admin and admin get AdminDashboard, others get GuruDashboard
+  const showAdminDashboard = user.role === 'super-admin' || user.role === 'admin'
+
   return (
     <div className="min-h-screen flex bg-[#f4f6f9] dark:bg-slate-900">
       <Sidebar />
@@ -90,7 +146,7 @@ export default function Home() {
         <Navbar />
         <main className="flex-1 p-4 lg:p-6">
           {currentPage === 'dashboard' ? (
-            user.role === 'admin' ? <AdminDashboard /> : <GuruDashboard />
+            showAdminDashboard ? <AdminDashboard /> : <GuruDashboard />
           ) : (
             <PageContent page={currentPage} />
           )}

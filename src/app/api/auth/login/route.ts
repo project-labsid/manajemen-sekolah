@@ -1,10 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server'
 import bcrypt from 'bcryptjs'
 import { db } from '@/lib/db'
-import { signToken } from '@/lib/auth'
+import { signToken, getUserWithPermissions, initAuth, reloadPermissions } from '@/lib/auth'
+import { createAuditLog } from '@/lib/rbac'
 
 export async function POST(request: NextRequest) {
   try {
+    await initAuth()
+
     const { username, password } = await request.json()
 
     if (!username || !password) {
@@ -52,30 +55,22 @@ export async function POST(request: NextRequest) {
       },
     })
 
-    await db.auditLog.create({
-      data: {
-        tanggal: now.toISOString().split('T')[0],
-        user: user.nama,
-        role: user.role,
-        aktivitas: 'Login',
-        ip,
-        detail: `User ${user.username} berhasil login`,
-      },
+    await createAuditLog({
+      user: user.nama,
+      role: user.role,
+      aktivitas: 'Login',
+      ip,
+      detail: `User ${user.username} berhasil login`,
+    })
+
+    // Get permissions
+    const fullUser = await getUserWithPermissions({
+      userId: user.id, username: user.username, role: user.role, nama: user.nama, exp: 0,
     })
 
     return NextResponse.json({
       token,
-      user: {
-        id: user.id,
-        nama: user.nama,
-        username: user.username,
-        role: user.role,
-        email: user.email,
-        noHP: user.noHP,
-        foto: user.foto,
-        status: user.status,
-        lastLogin: user.lastLogin,
-      },
+      user: fullUser,
     })
   } catch (error: unknown) {
     const message = error instanceof Error ? error.message : 'Terjadi kesalahan server'

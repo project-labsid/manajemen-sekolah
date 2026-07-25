@@ -12,32 +12,32 @@ interface MenuItem {
   key: PageKey
   label: string
   icon: React.ReactNode
-  adminOnly?: boolean
+  permission: string  // RBAC permission slug
 }
 
 const menuItems: MenuItem[] = [
-  { key: 'dashboard', label: 'Dashboard', icon: <LayoutDashboard className="w-5 h-5" /> },
-  { key: 'guru', label: 'Data Guru', icon: <Users className="w-5 h-5" />, adminOnly: true },
-  { key: 'siswa', label: 'Data Siswa', icon: <GraduationCap className="w-5 h-5" />, adminOnly: true },
-  { key: 'kelas', label: 'Data Kelas', icon: <School className="w-5 h-5" />, adminOnly: true },
-  { key: 'mapel', label: 'Mata Pelajaran', icon: <BookOpen className="w-5 h-5" />, adminOnly: true },
-  { key: 'users', label: 'Data User', icon: <UserCog className="w-5 h-5" />, adminOnly: true },
-  { key: 'nilai', label: 'Nilai', icon: <FileText className="w-5 h-5" /> },
-  { key: 'rekap-nilai', label: 'Rekap Nilai', icon: <ClipboardList className="w-5 h-5" /> },
-  { key: 'absensi-guru', label: 'Absensi Guru', icon: <UserCheck className="w-5 h-5" /> },
-  { key: 'absensi-siswa', label: 'Absensi Siswa', icon: <UserX className="w-5 h-5" /> },
-  { key: 'laporan', label: 'Laporan', icon: <BarChart3 className="w-5 h-5" /> },
-  { key: 'pengumuman', label: 'Pengumuman', icon: <Megaphone className="w-5 h-5" />, adminOnly: true },
-  { key: 'riwayat-login', label: 'Riwayat Login', icon: <History className="w-5 h-5" />, adminOnly: true },
-  { key: 'pengaturan', label: 'Pengaturan', icon: <Settings className="w-5 h-5" />, adminOnly: true },
-  { key: 'audit-log', label: 'Audit Log', icon: <Shield className="w-5 h-5" />, adminOnly: true },
-  { key: 'profil', label: 'Profil', icon: <UserCircle className="w-5 h-5" /> },
+  { key: 'dashboard', label: 'Dashboard', icon: <LayoutDashboard className="w-5 h-5" />, permission: 'dashboard' },
+  { key: 'users', label: 'Data User', icon: <UserCog className="w-5 h-5" />, permission: 'users' },
+  { key: 'guru', label: 'Data Guru', icon: <Users className="w-5 h-5" />, permission: 'guru' },
+  { key: 'siswa', label: 'Data Siswa', icon: <GraduationCap className="w-5 h-5" />, permission: 'siswa' },
+  { key: 'kelas', label: 'Data Kelas', icon: <School className="w-5 h-5" />, permission: 'kelas' },
+  { key: 'mapel', label: 'Mata Pelajaran', icon: <BookOpen className="w-5 h-5" />, permission: 'mapel' },
+  { key: 'nilai', label: 'Nilai', icon: <FileText className="w-5 h-5" />, permission: 'nilai' },
+  { key: 'rekap-nilai', label: 'Rekap Nilai', icon: <ClipboardList className="w-5 h-5" />, permission: 'rekap-nilai' },
+  { key: 'absensi-guru', label: 'Absensi Guru', icon: <UserCheck className="w-5 h-5" />, permission: 'absensi-guru' },
+  { key: 'absensi-siswa', label: 'Absensi Siswa', icon: <UserX className="w-5 h-5" />, permission: 'absensi-siswa' },
+  { key: 'laporan', label: 'Laporan', icon: <BarChart3 className="w-5 h-5" />, permission: 'laporan' },
+  { key: 'pengumuman', label: 'Pengumuman', icon: <Megaphone className="w-5 h-5" />, permission: 'pengumuman' },
+  { key: 'riwayat-login', label: 'Riwayat Login', icon: <History className="w-5 h-5" />, permission: 'riwayat-login' },
+  { key: 'pengaturan', label: 'Pengaturan', icon: <Settings className="w-5 h-5" />, permission: 'pengaturan' },
+  { key: 'audit-log', label: 'Audit Log', icon: <Shield className="w-5 h-5" />, permission: 'audit-log' },
+  { key: 'profil', label: 'Profil', icon: <UserCircle className="w-5 h-5" />, permission: 'profil' },
 ]
 
 export default function Sidebar() {
-  const { currentPage, setPage, sidebarOpen, setSidebarOpen, user, darkMode, setDarkMode, logout } = useAppStore()
-  const role = user?.role || 'guru'
-  const filteredMenu = menuItems.filter((m) => !m.adminOnly || role === 'admin')
+  const { currentPage, setPage, sidebarOpen, setSidebarOpen, user, darkMode, setDarkMode, logout, hasPermission } = useAppStore()
+
+  const filteredMenu = menuItems.filter((m) => hasPermission(m.permission))
 
   return (
     <>
@@ -71,6 +71,19 @@ export default function Sidebar() {
           >
             <X className="w-5 h-5" />
           </button>
+        </div>
+
+        {/* User Info Badge */}
+        <div className="px-4 py-3 border-b border-white/10">
+          <div className="flex items-center gap-3">
+            <div className="w-9 h-9 rounded-full bg-blue-600 flex items-center justify-center text-white text-sm font-bold shrink-0">
+              {user?.nama?.charAt(0) || '?'}
+            </div>
+            <div className="min-w-0">
+              <p className="text-white text-xs font-medium truncate">{user?.nama || 'User'}</p>
+              <p className="text-blue-300/60 text-[10px] truncate">{user?.roleName || user?.role || ''}</p>
+            </div>
+          </div>
         </div>
 
         {/* Menu */}

@@ -1,16 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getUserFromRequest, isAdmin } from '@/lib/auth'
+import { authenticate, requirePermission, initAuth, AuthError } from '@/lib/rbac'
 import { db } from '@/lib/db'
 
 export async function GET(request: NextRequest) {
   try {
-    const user = getUserFromRequest(request)
-    if (!user) {
-      return NextResponse.json({ error: 'Token tidak valid' }, { status: 401 })
-    }
-    if (!isAdmin(user)) {
-      return NextResponse.json({ error: 'Akses ditolak. Hanya admin.' }, { status: 403 })
-    }
+    await initAuth()
+    const user = authenticate(request)
+    await requirePermission(user, 'audit-log')
 
     const url = new URL(request.url)
     const page = Math.max(1, parseInt(url.searchParams.get('page') || '1'))
@@ -47,6 +43,9 @@ export async function GET(request: NextRequest) {
       },
     })
   } catch (error: unknown) {
+    if (error instanceof AuthError) {
+      return NextResponse.json({ error: error.message }, { status: error.statusCode })
+    }
     const message = error instanceof Error ? error.message : 'Terjadi kesalahan server'
     return NextResponse.json({ error: message }, { status: 500 })
   }

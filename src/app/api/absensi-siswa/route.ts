@@ -1,13 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getUserFromRequest, isAdmin } from '@/lib/auth'
+import { authenticate, requirePermission, createAuditLog, initAuth, AuthError } from '@/lib/rbac'
 import { db } from '@/lib/db'
 
 export async function GET(request: NextRequest) {
   try {
-    const user = getUserFromRequest(request)
-    if (!user) {
-      return NextResponse.json({ error: 'Token tidak valid' }, { status: 401 })
-    }
+    await initAuth()
+    const user = authenticate(request)
+    await requirePermission(user, 'absensi-siswa')
 
     const url = new URL(request.url)
     const tanggal = url.searchParams.get('tanggal') || new Date().toISOString().split('T')[0]
@@ -33,6 +32,9 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({ data, summary, tanggal })
   } catch (error: unknown) {
+    if (error instanceof AuthError) {
+      return NextResponse.json({ error: error.message }, { status: error.statusCode })
+    }
     const message = error instanceof Error ? error.message : 'Terjadi kesalahan server'
     return NextResponse.json({ error: message }, { status: 500 })
   }
@@ -40,10 +42,9 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
-    const user = getUserFromRequest(request)
-    if (!user) {
-      return NextResponse.json({ error: 'Token tidak valid' }, { status: 401 })
-    }
+    await initAuth()
+    const user = authenticate(request)
+    await requirePermission(user, 'absensi-siswa')
 
     const body = await request.json()
     const { tanggal, kelas, nis, nama, status, keterangan, guru } = body
@@ -72,8 +73,19 @@ export async function POST(request: NextRequest) {
       },
     })
 
+    await createAuditLog({
+      user: user.nama,
+      role: user.role,
+      aktivitas: 'Tambah Absensi Siswa',
+      ip: request.headers.get('x-forwarded-for') || '',
+      detail: `Menambahkan absensi siswa NIS ${nis}, kelas ${kelas}, status ${status}`,
+    })
+
     return NextResponse.json({ data: absensi, message: 'Absensi siswa berhasil dicatat' }, { status: 201 })
   } catch (error: unknown) {
+    if (error instanceof AuthError) {
+      return NextResponse.json({ error: error.message }, { status: error.statusCode })
+    }
     const message = error instanceof Error ? error.message : 'Terjadi kesalahan server'
     return NextResponse.json({ error: message }, { status: 500 })
   }
@@ -81,10 +93,9 @@ export async function POST(request: NextRequest) {
 
 export async function PUT(request: NextRequest) {
   try {
-    const user = getUserFromRequest(request)
-    if (!user) {
-      return NextResponse.json({ error: 'Token tidak valid' }, { status: 401 })
-    }
+    await initAuth()
+    const user = authenticate(request)
+    await requirePermission(user, 'absensi-siswa')
 
     const body = await request.json()
     const { absensiList } = body as { absensiList: Array<Record<string, unknown>> }
@@ -139,8 +150,19 @@ export async function PUT(request: NextRequest) {
       }
     }
 
+    await createAuditLog({
+      user: user.nama,
+      role: user.role,
+      aktivitas: 'Update Absensi Siswa',
+      ip: request.headers.get('x-forwarded-for') || '',
+      detail: `Mengupdate ${results.length} data absensi siswa`,
+    })
+
     return NextResponse.json({ data: results, message: `${results.length} absensi berhasil disimpan` })
   } catch (error: unknown) {
+    if (error instanceof AuthError) {
+      return NextResponse.json({ error: error.message }, { status: error.statusCode })
+    }
     const message = error instanceof Error ? error.message : 'Terjadi kesalahan server'
     return NextResponse.json({ error: message }, { status: 500 })
   }

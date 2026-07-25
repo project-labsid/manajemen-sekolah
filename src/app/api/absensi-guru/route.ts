@@ -1,13 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getUserFromRequest } from '@/lib/auth'
+import { authenticate, requirePermission, createAuditLog, initAuth, AuthError } from '@/lib/rbac'
 import { db } from '@/lib/db'
 
 export async function GET(request: NextRequest) {
   try {
-    const user = getUserFromRequest(request)
-    if (!user) {
-      return NextResponse.json({ error: 'Token tidak valid' }, { status: 401 })
-    }
+    await initAuth()
+    const user = authenticate(request)
+    await requirePermission(user, 'absensi-guru')
 
     const url = new URL(request.url)
     const tanggal = url.searchParams.get('tanggal') || new Date().toISOString().split('T')[0]
@@ -25,6 +24,9 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({ data, tanggal })
   } catch (error: unknown) {
+    if (error instanceof AuthError) {
+      return NextResponse.json({ error: error.message }, { status: error.statusCode })
+    }
     const message = error instanceof Error ? error.message : 'Terjadi kesalahan server'
     return NextResponse.json({ error: message }, { status: 500 })
   }
@@ -32,10 +34,9 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
-    const user = getUserFromRequest(request)
-    if (!user) {
-      return NextResponse.json({ error: 'Token tidak valid' }, { status: 401 })
-    }
+    await initAuth()
+    const user = authenticate(request)
+    await requirePermission(user, 'absensi-guru:clock-in')
 
     const body = await request.json()
     const { namaGuru, nip, latitude, longitude, alamat, browser, device, keterangan } = body
@@ -77,8 +78,19 @@ export async function POST(request: NextRequest) {
       },
     })
 
+    await createAuditLog({
+      user: user.nama,
+      role: user.role,
+      aktivitas: 'Clock In Guru',
+      ip: request.headers.get('x-forwarded-for') || '',
+      detail: `Clock in absensi guru: ${namaGuru}`,
+    })
+
     return NextResponse.json({ data: absensi, message: 'Absensi masuk berhasil dicatat' }, { status: 201 })
   } catch (error: unknown) {
+    if (error instanceof AuthError) {
+      return NextResponse.json({ error: error.message }, { status: error.statusCode })
+    }
     const message = error instanceof Error ? error.message : 'Terjadi kesalahan server'
     return NextResponse.json({ error: message }, { status: 500 })
   }
@@ -86,10 +98,9 @@ export async function POST(request: NextRequest) {
 
 export async function PUT(request: NextRequest) {
   try {
-    const user = getUserFromRequest(request)
-    if (!user) {
-      return NextResponse.json({ error: 'Token tidak valid' }, { status: 401 })
-    }
+    await initAuth()
+    const user = authenticate(request)
+    await requirePermission(user, 'absensi-guru:clock-out')
 
     const body = await request.json()
     const { id, keterangan } = body
@@ -126,8 +137,19 @@ export async function PUT(request: NextRequest) {
       },
     })
 
+    await createAuditLog({
+      user: user.nama,
+      role: user.role,
+      aktivitas: 'Clock Out Guru',
+      ip: request.headers.get('x-forwarded-for') || '',
+      detail: `Clock out absensi guru: ${existing.namaGuru}`,
+    })
+
     return NextResponse.json({ data: absensi, message: 'Absensi pulang berhasil dicatat' })
   } catch (error: unknown) {
+    if (error instanceof AuthError) {
+      return NextResponse.json({ error: error.message }, { status: error.statusCode })
+    }
     const message = error instanceof Error ? error.message : 'Terjadi kesalahan server'
     return NextResponse.json({ error: message }, { status: 500 })
   }
