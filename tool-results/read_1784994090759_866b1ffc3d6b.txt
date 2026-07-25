@@ -1,0 +1,655 @@
+    80→    80→  ph2: string
+    81→    81→  ph3: string
+    82→    82→  ph4: string
+    83→    83→  pts: string
+    84→    84→  pas: string
+    85→    85→}
+    86→    86→
+    87→    87→// ── Helpers ──────────────────────────────────────────────────────────────────
+    88→    88→
+    89→    89→const TAHUN_AJARAN_LIST = ['2022/2023', '2023/2024', '2024/2025']
+    90→    90→const SEMESTER_LIST = ['Ganjil', 'Genap']
+    91→    91→
+    92→    92→function parseNum(val: string): number {
+    93→    93→  const n = parseFloat(val)
+    94→    94→  return isNaN(n) ? 0 : n
+    95→    95→}
+    96→    96→
+    97→    97→function clampScore(val: string): string {
+    98→    98→  const n = parseFloat(val)
+    99→    99→  if (val === '' || isNaN(n)) return ''
+   100→   100→  if (n < 0) return '0'
+   101→   101→  if (n > 100) return '100'
+   102→   102→  return String(Math.round(n))
+   103→   103→}
+   104→   104→
+   105→   105→function hitungRataRata(ph1: number, ph2: number, ph3: number, ph4: number): number {
+   106→   106→  return Math.round(((ph1 + ph2 + ph3 + ph4) / 4) * 100) / 100
+   107→   107→}
+   108→   108→
+   109→   109→function hitungNilaiAkhir(rataRata: number, pts: number, pas: number): number {
+   110→   110→  return Math.round((rataRata * 0.4 + pts * 0.3 + pas * 0.3) * 100) / 100
+   111→   111→}
+   112→   112→
+   113→   113→function hitungPredikat(nilaiAkhir: number): string {
+   114→   114→  if (nilaiAkhir >= 90) return 'A'
+   115→   115→  if (nilaiAkhir >= 80) return 'B+'
+   116→   116→  if (nilaiAkhir >= 70) return 'B'
+   117→   117→  if (nilaiAkhir >= 60) return 'C'
+   118→   118→  return 'D'
+   119→   119→}
+   120→   120→
+   121→   121→function predikatBadgeClass(predikat: string): string {
+   122→   122→  switch (predikat) {
+   123→   123→    case 'A':
+   124→   124→      return 'bg-green-100 text-green-700 border-green-200'
+   125→   125→    case 'B+':
+   126→   126→      return 'bg-blue-100 text-blue-700 border-blue-200'
+   127→   127→    case 'B':
+   128→   128→      return 'bg-yellow-100 text-yellow-700 border-yellow-200'
+   129→   129→    case 'C':
+   130→   130→      return 'bg-orange-100 text-orange-700 border-orange-200'
+   131→   131→    case 'D':
+   132→   132→      return 'bg-red-100 text-red-700 border-red-200'
+   133→   133→    default:
+   134→   134→      return 'bg-gray-100 text-gray-500 border-gray-200'
+   135→   135→  }
+   136→   136→}
+   137→   137→
+   138→   138→// ── Component ────────────────────────────────────────────────────────────────
+   139→   139→
+   140→   140→export default function InputNilai() {
+   141→   141→  const user = useAppStore((s) => s.user)
+   142→   142→
+   143→   143→  // ── Filter state ──────────────────────────────────────────────────────────
+   144→   144→  const [tahunAjaran, setTahunAjaran] = useState('2024/2025')
+   145→   145→  const [semester, setSemester] = useState('Ganjil')
+   146→   146→  const [kelas, setKelas] = useState('')
+   147→   147→  const [mapel, setMapel] = useState('')
+   148→   148→
+   149→   149→  // ── Reference data ────────────────────────────────────────────────────────
+   150→   150→  const [kelasList, setKelasList] = useState<KelasItem[]>([])
+   151→   151→  const [mapelList, setMapelList] = useState<MapelItem[]>([])
+   152→   152→
+   153→   153→  // ── Table data ────────────────────────────────────────────────────────────
+   154→   154→  const [rows, setRows] = useState<SiswaRow[]>([])
+   155→   155→  const [loaded, setLoaded] = useState(false)
+   156→   156→
+   157→   157→  // ── UI state ──────────────────────────────────────────────────────────────
+   158→   158→  const [loadingFilters, setLoadingFilters] = useState(true)
+   159→   159→  const [loadingData, setLoadingData] = useState(false)
+   160→   160→  const [saving, setSaving] = useState(false)
+   161→   161→
+   162→   162→  // ── Fetch kelas & mapel on mount ──────────────────────────────────────────
+   163→   163→  useEffect(() => {
+   164→   164→    async function loadRefData() {
+   165→   165→      setLoadingFilters(true)
+   166→   166→      try {
+   167→   167→        const [kelasRes, mapelRes] = await Promise.all([
+   168→   168→          api.get<{ data: KelasItem[] }>('/kelas'),
+   169→   169→          api.get<{ data: MapelItem[] }>('/mapel'),
+   170→   170→        ])
+   171→   171→        setKelasList(kelasRes.data ?? [])
+   172→   172→        setMapelList(mapelRes.data ?? [])
+   173→   173→      } catch (err: unknown) {
+   174→   174→        const msg = err instanceof Error ? err.message : 'Gagal memuat data referensi'
+   175→   175→        toast.error(msg)
+   176→   176→      } finally {
+   177→   177→        setLoadingFilters(false)
+   178→   178→      }
+   179→   179→    }
+   180→   180→    loadRefData()
+   181→   181→  }, [])
+   182→   182→
+   183→   183→  // ── Load siswa & existing nilai ───────────────────────────────────────────
+   184→   184→  const handleTampilkan = useCallback(async () => {
+   185→   185→    if (!kelas || !mapel) {
+   186→   186→      toast.warning('Pilih Kelas dan Mata Pelajaran terlebih dahulu')
+   187→   187→      return
+   188→   188→    }
+   189→   189→    setLoadingData(true)
+   190→   190→    setLoaded(false)
+   191→   191→    try {
+   192→   192→      // Fetch siswa with limit=100 to get all in one page
+   193→   193→      const siswaRes = await api.get<{
+   194→   194→        data: SiswaItem[]
+   195→   195→        pagination: { total: number; totalPages: number }
+   196→   196→      }>(`/siswa?kelas=${encodeURIComponent(kelas)}&limit=100`)
+   197→   197→
+   198→   198→      const siswaData = siswaRes.data ?? []
+   199→   199→
+   200→   200→      if (siswaData.length === 0) {
+   201→   201→        setRows([])
+   202→   202→        setLoaded(true)
+   203→   203→        setLoadingData(false)
+   204→   204→        toast.info('Tidak ada siswa di kelas ini')
+   205→   205→        return
+   206→   206→      }
+   207→   207→
+   208→   208→      // Fetch existing nilai for this combination
+   209→   209→      const nilaiRes = await api.get<{ data: NilaiItem[] }>(
+   210→   210→        `/nilai?kelas=${encodeURIComponent(kelas)}&mapel=${encodeURIComponent(mapel)}&semester=${encodeURIComponent(semester)}&tahunAjaran=${encodeURIComponent(tahunAjaran)}`
+   211→   211→      )
+   212→   212→      const nilaiData = nilaiRes.data ?? []
+   213→   213→
+   214→   214→      // Build a lookup by NIS
+   215→   215→      const nilaiMap = new Map<string, NilaiItem>()
+   216→   216→      for (const n of nilaiData) {
+   217→   217→        nilaiMap.set(n.nis, n)
+   218→   218→      }
+   219→   219→
+   220→   220→      // Merge siswa with existing nilai
+   221→   221→      const merged: SiswaRow[] = siswaData.map((s) => {
+   222→   222→        const existing = nilaiMap.get(s.nis)
+   223→   223→        return {
+   224→   224→          nis: s.nis,
+   225→   225→          nama: s.nama,
+   226→   226→          existingId: existing?.id ?? null,
+   227→   227→          ph1: existing ? String(existing.ph1) : '',
+   228→   228→          ph2: existing ? String(existing.ph2) : '',
+   229→   229→          ph3: existing ? String(existing.ph3) : '',
+   230→   230→          ph4: existing ? String(existing.ph4) : '',
+   231→   231→          pts: existing ? String(existing.pts) : '',
+   232→   232→          pas: existing ? String(existing.pas) : '',
+   233→   233→        }
+   234→   234→      })
+   235→   235→
+   236→   236→      setRows(merged)
+   237→   237→      setLoaded(true)
+   238→   238→    } catch (err: unknown) {
+   239→   239→      const msg = err instanceof Error ? err.message : 'Gagal memuat data siswa'
+   240→   240→      toast.error(msg)
+   241→   241→    } finally {
+   242→   242→      setLoadingData(false)
+   243→   243→    }
+   244→   244→  }, [kelas, mapel, semester, tahunAjaran])
+   245→   245→
+   246→   246→  // ── Score change handler ──────────────────────────────────────────────────
+   247→   247→  const handleScoreChange = useCallback(
+   248→   248→    (index: number, field: keyof Pick<SiswaRow, 'ph1' | 'ph2' | 'ph3' | 'ph4' | 'pts' | 'pas'>, raw: string) => {
+   249→   249→      // Allow empty, or clamp to 0-100 integers
+   250→   250→      let val = raw
+   251→   251→      if (val !== '') {
+   252→   252→        val = clampScore(val)
+   253→   253→      }
+   254→   254→      setRows((prev) => {
+   255→   255→        const next = [...prev]
+   256→   256→        next[index] = { ...next[index], [field]: val }
+   257→   257→        return next
+   258→   258→      })
+   259→   259→    },
+   260→   260→    []
+   261→   261→  )
+   262→   262→
+   263→   263→  // ── Computed row values ───────────────────────────────────────────────────
+   264→   264→  const computedRows = useMemo(() => {
+   265→   265→    return rows.map((r) => {
+   266→   266→      const p1 = parseNum(r.ph1)
+   267→   267→      const p2 = parseNum(r.ph2)
+   268→   268→      const p3 = parseNum(r.ph3)
+   269→   269→      const p4 = parseNum(r.ph4)
+   270→   270→      const pts = parseNum(r.pts)
+   271→   271→      const pas = parseNum(r.pas)
+   272→   272→
+   273→   273→      const hasAny = r.ph1 !== '' || r.ph2 !== '' || r.ph3 !== '' || r.ph4 !== '' || r.pts !== '' || r.pas !== ''
+   274→   274→      const rataRata = hasAny ? hitungRataRata(p1, p2, p3, p4) : 0
+   275→   275→      const nilaiAkhir = hasAny ? hitungNilaiAkhir(rataRata, pts, pas) : 0
+   276→   276→      const predikat = hasAny ? hitungPredikat(nilaiAkhir) : ''
+   277→   277→
+   278→   278→      return { ...r, rataRata, nilaiAkhir, predikat }
+   279→   279→    })
+   280→   280→  }, [rows])
+   281→   281→
+   282→   282→  // ── Simpan (Save) ─────────────────────────────────────────────────────────
+   283→   283→  const handleSimpan = useCallback(async () => {
+   284→   284→    if (rows.length === 0) {
+   285→   285→      toast.warning('Belum ada data untuk disimpan')
+   286→   286→      return
+   287→   287→    }
+   288→   288→
+   289→   289→    setSaving(true)
+   290→   290→    try {
+   291→   291→      const nilaiList = computedRows.map((r) => ({
+   292→   292→        id: r.existingId,
+   293→   293→        tahunAjaran,
+   294→   294→        semester,
+   295→   295→        kelas,
+   296→   296→        mapel,
+   297→   297→        guru: user?.nama ?? '',
+   298→   298→        nis: r.nis,
+   299→   299→        nama: r.nama,
+   300→   300→        ph1: parseNum(r.ph1),
+   301→   301→        ph2: parseNum(r.ph2),
+   302→   302→        ph3: parseNum(r.ph3),
+   303→   303→        ph4: parseNum(r.ph4),
+   304→   304→        pts: parseNum(r.pts),
+   305→   305→        pas: parseNum(r.pas),
+   306→   306→      }))
+   307→   307→
+   308→   308→      const res = await api.put<{ data: NilaiItem[]; message: string }>('/nilai', { nilaiList })
+   309→   309→      toast.success(res.message || 'Nilai berhasil disimpan')
+   310→   310→
+   311→   311→      // Refresh to get IDs
+   312→   312→      await handleTampilkan()
+   313→   313→    } catch (err: unknown) {
+   314→   314→      const msg = err instanceof Error ? err.message : 'Gagal menyimpan nilai'
+   315→   315→      toast.error(msg)
+   316→   316→    } finally {
+   317→   317→      setSaving(false)
+   318→   318→    }
+   319→   319→  }, [rows, computedRows, tahunAjaran, semester, kelas, mapel, user, handleTampilkan])
+   320→   320→
+   321→   321→  // ── Reset ─────────────────────────────────────────────────────────────────
+   322→   322→  const handleReset = useCallback(() => {
+   323→   323→    setRows((prev) =>
+   324→   324→      prev.map((r) => ({
+   325→   325→        ...r,
+   326→   326→        ph1: '',
+   327→   327→        ph2: '',
+   328→   328→        ph3: '',
+   329→   329→        ph4: '',
+   330→   330→        pts: '',
+   331→   331→        pas: '',
+   332→   332→      }))
+   333→   333→    )
+   334→   334→    toast.info('Semua nilai telah direset')
+   335→   335→  }, [])
+   336→   336→
+   337→   337→  // ── Export Excel (CSV) ────────────────────────────────────────────────────
+   338→   338→  const handleExport = useCallback(() => {
+   339→   339→    if (computedRows.length === 0) {
+   340→   340→      toast.warning('Tidak ada data untuk diekspor')
+   341→   341→      return
+   342→   342→    }
+   343→   343→
+   344→   344→    const headers = [
+   345→   345→      'No',
+   346→   346→      'NIS',
+   347→   347→      'Nama',
+   348→   348→      'PH1',
+   349→   349→      'PH2',
+   350→   350→      'PH3',
+   351→   351→      'PH4',
+   352→   352→      'PTS',
+   353→   353→      'PAS',
+   354→   354→      'Rata-Rata',
+   355→   355→      'Nilai Akhir',
+   356→   356→      'Predikat',
+   357→   357→    ]
+   358→   358→
+   359→   359→    const csvRows = computedRows.map((r, i) => {
+   360→   360→      return [
+   361→   361→        i + 1,
+   362→   362→        r.nis,
+   363→   363→        r.nama,
+   364→   364→        r.ph1,
+   365→   365→        r.ph2,
+   366→   366→        r.ph3,
+   367→   367→        r.ph4,
+   368→   368→        r.pts,
+   369→   369→        r.pas,
+   370→   370→        r.rataRata,
+   371→   371→        r.nilaiAkhir,
+   372→   372→        r.predikat,
+   373→   373→      ].join(',')
+   374→   374→    })
+   375→   375→
+   376→   376→    const csv = [headers.join(','), ...csvRows].join('\n')
+   377→   377→    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
+   378→   378→    const url = URL.createObjectURL(blob)
+   379→   379→    const link = document.createElement('a')
+   380→   380→    link.href = url
+   381→   381→    link.download = `Nilai_${kelas}_${mapel}_${semester}_${tahunAjaran}.csv`
+   382→   382→    document.body.appendChild(link)
+   383→   383→    link.click()
+   384→   384→    document.body.removeChild(link)
+   385→   385→    URL.revokeObjectURL(url)
+   386→   386→    toast.success('Data berhasil diekspor')
+   387→   387→  }, [computedRows, kelas, mapel, semester, tahunAjaran])
+   388→   388→
+   389→   389→  // ── Render helpers ────────────────────────────────────────────────────────
+   390→   390→  const renderScoreInput = (
+   391→   391→    index: number,
+   392→   392→    field: keyof Pick<SiswaRow, 'ph1' | 'ph2' | 'ph3' | 'ph4' | 'pts' | 'pas'>
+   393→   393→  ) => (
+   394→   394→    <input
+   395→   395→      type="number"
+   396→   396→      min={0}
+   397→   397→      max={100}
+   398→   398→      step={1}
+   399→   399→      value={rows[index][field]}
+   400→   400→      onChange={(e) => handleScoreChange(index, field, e.target.value)}
+   401→   401→      className="w-16 h-8 text-center text-sm border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-400 bg-white transition-colors [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+   402→   402→    />
+   403→   403→  )
+   404→   404→
+   405→   405→  // ── Loading skeleton for filter bar ───────────────────────────────────────
+   406→   406→  if (loadingFilters) {
+   407→   407→    return (
+   408→   408→      <div className="p-6 space-y-6">
+   409→   409→        <div className="bg-white rounded-2xl shadow-sm p-6">
+   410→   410→          <div className="flex flex-wrap gap-4 items-end">
+   411→   411→            {Array.from({ length: 4 }).map((_, i) => (
+   412→   412→              <div key={i} className="flex-1 min-w-[160px]">
+   413→   413→                <Skeleton className="h-4 w-24 mb-2" />
+   414→   414→                <Skeleton className="h-9 w-full" />
+   415→   415→              </div>
+   416→   416→            ))}
+   417→   417→            <Skeleton className="h-9 w-28" />
+   418→   418→          </div>
+   419→   419→        </div>
+   420→   420→        <Skeleton className="h-96 w-full rounded-2xl" />
+   421→   421→      </div>
+   422→   422→    )
+   423→   423→  }
+   424→   424→
+   425→   425→  // ── Main render ───────────────────────────────────────────────────────────
+   426→   426→  return (
+   427→   427→    <div className="p-4 md:p-6 space-y-6" style={{ backgroundColor: '#f4f6f9', minHeight: '100%' }}>
+   428→   428→      {/* ── Filter Bar ────────────────────────────────────────────────────── */}
+   429→   429→      <div className="bg-white rounded-2xl shadow-sm p-4 md:p-6">
+   430→   430→        <div className="flex items-center gap-2 mb-4">
+   431→   431→          <Filter className="w-5 h-5 text-blue-600" />
+   432→   432→          <h2 className="text-base font-semibold text-gray-800">Filter Data Nilai</h2>
+   433→   433→        </div>
+   434→   434→        <div className="flex flex-wrap gap-4 items-end">
+   435→   435→          {/* Tahun Ajaran */}
+   436→   436→          <div className="flex-1 min-w-[160px]">
+   437→   437→            <label className="block text-sm font-medium text-gray-600 mb-1.5">
+   438→   438→              Tahun Ajaran
+   439→   439→            </label>
+   440→   440→            <Select value={tahunAjaran} onValueChange={setTahunAjaran}>
+   441→   441→              <SelectTrigger className="w-full">
+   442→   442→                <SelectValue placeholder="Pilih Tahun Ajaran" />
+   443→   443→              </SelectTrigger>
+   444→   444→              <SelectContent>
+   445→   445→                {TAHUN_AJARAN_LIST.map((ta) => (
+   446→   446→                  <SelectItem key={ta} value={ta}>
+   447→   447→                    {ta}
+   448→   448→                  </SelectItem>
+   449→   449→                ))}
+   450→   450→              </SelectContent>
+   451→   451→            </Select>
+   452→   452→          </div>
+   453→   453→
+   454→   454→          {/* Semester */}
+   455→   455→          <div className="flex-1 min-w-[140px]">
+   456→   456→            <label className="block text-sm font-medium text-gray-600 mb-1.5">Semester</label>
+   457→   457→            <Select value={semester} onValueChange={setSemester}>
+   458→   458→              <SelectTrigger className="w-full">
+   459→   459→                <SelectValue placeholder="Pilih Semester" />
+   460→   460→              </SelectTrigger>
+   461→   461→              <SelectContent>
+   462→   462→                {SEMESTER_LIST.map((s) => (
+   463→   463→                  <SelectItem key={s} value={s}>
+   464→   464→                    {s}
+   465→   465→                  </SelectItem>
+   466→   466→                ))}
+   467→   467→              </SelectContent>
+   468→   468→            </Select>
+   469→   469→          </div>
+   470→   470→
+   471→   471→          {/* Kelas */}
+   472→   472→          <div className="flex-1 min-w-[160px]">
+   473→   473→            <label className="block text-sm font-medium text-gray-600 mb-1.5">Kelas</label>
+   474→   474→            <Select value={kelas} onValueChange={setKelas}>
+   475→   475→              <SelectTrigger className="w-full">
+   476→   476→                <SelectValue placeholder="Pilih Kelas" />
+   477→   477→              </SelectTrigger>
+   478→   478→              <SelectContent>
+   479→   479→                {kelasList.map((k) => (
+   480→   480→                  <SelectItem key={k.kodeKelas} value={k.kodeKelas}>
+   481→   481→                    {k.namaKelas}
+   482→   482→                  </SelectItem>
+   483→   483→                ))}
+   484→   484→              </SelectContent>
+   485→   485→            </Select>
+   486→   486→          </div>
+   487→   487→
+   488→   488→          {/* Mapel */}
+   489→   489→          <div className="flex-1 min-w-[180px]">
+   490→   490→            <label className="block text-sm font-medium text-gray-600 mb-1.5">
+   491→   491→              Mata Pelajaran
+   492→   492→            </label>
+   493→   493→            <Select value={mapel} onValueChange={setMapel}>
+   494→   494→              <SelectTrigger className="w-full">
+   495→   495→                <SelectValue placeholder="Pilih Mapel" />
+   496→   496→              </SelectTrigger>
+   497→   497→              <SelectContent>
+   498→   498→                {mapelList.map((m) => (
+   499→   499→                  <SelectItem key={m.kodeMapel} value={m.kodeMapel}>
+   500→   500→                    {m.namaMapel}
+   501→   501→                  </SelectItem>
+   502→   502→                ))}
+   503→   503→              </SelectContent>
+   504→   504→            </Select>
+   505→   505→          </div>
+   506→   506→
+   507→   507→          {/* Tampilkan Button */}
+   508→   508→          <div>
+   509→   509→            <Button
+   510→   510→              onClick={handleTampilkan}
+   511→   511→              disabled={loadingData}
+   512→   512→              className="bg-blue-600 hover:bg-blue-700 text-white h-9 px-5"
+   513→   513→            >
+   514→   514→              {loadingData ? (
+   515→   515→                <Loader2 className="w-4 h-4 animate-spin mr-1.5" />
+   516→   516→              ) : (
+   517→   517→                <Filter className="w-4 h-4 mr-1.5" />
+   518→   518→              )}
+   519→   519→              Tampilkan
+   520→   520→            </Button>
+   521→   521→          </div>
+   522→   522→        </div>
+   523→   523→      </div>
+   524→   524→
+   525→   525→      {/* ── Table Card ────────────────────────────────────────────────────── */}
+   526→   526→      <div className="bg-white rounded-2xl shadow-sm p-4 md:p-6">
+   527→   527→        {/* Table Header Info */}
+   528→   528→        <div className="flex items-center justify-between mb-4">
+   529→   529→          <div className="flex items-center gap-2">
+   530→   530→            <GraduationCap className="w-5 h-5 text-blue-600" />
+   531→   531→            <h2 className="text-base font-semibold text-gray-800">
+   532→   532→              Input Nilai Siswa
+   533→   533→            </h2>
+   534→   534→            {loaded && rows.length > 0 && (
+   535→   535→              <Badge variant="secondary" className="ml-2">
+   536→   536→                {rows.length} siswa
+   537→   537→              </Badge>
+   538→   538→            )}
+   539→   539→          </div>
+   540→   540→          <div className="flex items-center gap-1.5 text-xs text-gray-400">
+   541→   541→            <Calculator className="w-3.5 h-3.5" />
+   542→   542→            <span>Rata-Rata = 40% × Rata PH + 30% × PTS + 30% × PAS</span>
+   543→   543→          </div>
+   544→   544→        </div>
+   545→   545→
+   546→   546→        {/* Loading State */}
+   547→   547→        {loadingData && (
+   548→   548→          <div className="flex flex-col items-center justify-center py-16 gap-3">
+   549→   549→            <Loader2 className="w-10 h-10 text-blue-500 animate-spin" />
+   550→   550→            <p className="text-sm text-gray-500">Memuat data siswa...</p>
+   551→   551→          </div>
+   552→   552→        )}
+   553→   553→
+   554→   554→        {/* Empty State — not yet loaded */}
+   555→   555→        {!loadingData && !loaded && (
+   556→   556→          <div className="flex flex-col items-center justify-center py-16 gap-3 text-gray-400">
+   557→   557→            <Inbox className="w-16 h-16" />
+   558→   558→            <p className="text-sm font-medium">Pilih filter dan klik &quot;Tampilkan&quot; untuk memuat data</p>
+   559→   559→            <p className="text-xs">Data siswa akan ditampilkan sesuai kelas dan mata pelajaran yang dipilih</p>
+   560→   560→          </div>
+   561→   561→        )}
+   562→   562→
+   563→   563→        {/* Empty State — loaded but no students */}
+   564→   564→        {!loadingData && loaded && rows.length === 0 && (
+   565→   565→          <div className="flex flex-col items-center justify-center py-16 gap-3 text-gray-400">
+   566→   566→            <Inbox className="w-16 h-16" />
+   567→   567→            <p className="text-sm font-medium">Tidak ada data siswa untuk kelas ini</p>
+   568→   568→            <p className="text-xs">Pastikan kelas yang dipilih memiliki siswa terdaftar</p>
+   569→   569→          </div>
+   570→   570→        )}
+   571→   571→
+   572→   572→        {/* Table */}
+   573→   573→        {!loadingData && loaded && rows.length > 0 && (
+   574→   574→          <div className="overflow-x-auto max-h-[70vh] overflow-y-auto">
+   575→   575→            <table className="siadak-table w-full text-sm border-collapse">
+   576→   576→              <thead className="sticky top-0 z-10">
+   577→   577→                <tr className="bg-gray-50">
+   578→   578→                  <th className="px-3 py-3 text-center text-xs font-semibold text-gray-600 border-b border-gray-200 min-w-[40px]">
+   579→   579→                    No
+   580→   580→                  </th>
+   581→   581→                  <th className="px-3 py-3 text-left text-xs font-semibold text-gray-600 border-b border-gray-200 min-w-[80px]">
+   582→   582→                    NIS
+   583→   583→                  </th>
+   584→   584→                  <th className="px-3 py-3 text-left text-xs font-semibold text-gray-600 border-b border-gray-200 min-w-[180px]">
+   585→   585→                    Nama
+   586→   586→                  </th>
+   587→   587→                  <th className="px-3 py-3 text-center text-xs font-semibold text-blue-600 border-b border-gray-200 min-w-[72px]">
+   588→   588→                    PH1
+   589→   589→                  </th>
+   590→   590→                  <th className="px-3 py-3 text-center text-xs font-semibold text-blue-600 border-b border-gray-200 min-w-[72px]">
+   591→   591→                    PH2
+   592→   592→                  </th>
+   593→   593→                  <th className="px-3 py-3 text-center text-xs font-semibold text-blue-600 border-b border-gray-200 min-w-[72px]">
+   594→   594→                    PH3
+   595→   595→                  </th>
+   596→   596→                  <th className="px-3 py-3 text-center text-xs font-semibold text-blue-600 border-b border-gray-200 min-w-[72px]">
+   597→   597→                    PH4
+   598→   598→                  </th>
+   599→   599→                  <th className="px-3 py-3 text-center text-xs font-semibold text-purple-600 border-b border-gray-200 min-w-[72px]">
+   600→   600→                    PTS
+   601→   601→                  </th>
+   602→   602→                  <th className="px-3 py-3 text-center text-xs font-semibold text-purple-600 border-b border-gray-200 min-w-[72px]">
+   603→   603→                    PAS
+   604→   604→                  </th>
+   605→   605→                  <th className="px-3 py-3 text-center text-xs font-semibold text-gray-600 border-b border-gray-200 min-w-[85px]">
+   606→   606→                    Rata-Rata
+   607→   607→                  </th>
+   608→   608→                  <th className="px-3 py-3 text-center text-xs font-semibold text-gray-700 border-b border-gray-200 min-w-[85px]">
+   609→   609→                    Nilai Akhir
+   610→   610→                  </th>
+   611→   611→                  <th className="px-3 py-3 text-center text-xs font-semibold text-gray-700 border-b border-gray-200 min-w-[70px]">
+   612→   612→                    Predikat
+   613→   613→                  </th>
+   614→   614→                </tr>
+   615→   615→              </thead>
+   616→   616→              <tbody>
+   617→   617→                {computedRows.map((row, idx) => (
+   618→   618→                  <tr
+   619→   619→                    key={row.nis}
+   620→   620→                    className={idx % 2 === 0 ? 'bg-white' : 'bg-gray-50/50'}
+   621→   621→                  >
+   622→   622→                    {/* No */}
+   623→   623→                    <td className="px-3 py-2.5 text-center text-gray-500 border-b border-gray-100">
+   624→   624→                      {idx + 1}
+   625→   625→                    </td>
+   626→   626→
+   627→   627→                    {/* NIS */}
+   628→   628→                    <td className="px-3 py-2.5 text-left font-mono text-gray-700 border-b border-gray-100">
+   629→   629→                      {row.nis}
+   630→   630→                    </td>
+   631→   631→
+   632→   632→                    {/* Nama */}
+   633→   633→                    <td className="px-3 py-2.5 text-left font-medium text-gray-800 border-b border-gray-100">
+   634→   634→                      {row.nama}
+   635→   635→                    </td>
+   636→   636→
+   637→   637→                    {/* PH1 - PH4 */}
+   638→   638→                    <td className="px-3 py-1.5 text-center border-b border-gray-100">
+   639→   639→                      {renderScoreInput(idx, 'ph1')}
+   640→   640→                    </td>
+   641→   641→                    <td className="px-3 py-1.5 text-center border-b border-gray-100">
+   642→   642→                      {renderScoreInput(idx, 'ph2')}
+   643→   643→                    </td>
+   644→   644→                    <td className="px-3 py-1.5 text-center border-b border-gray-100">
+   645→   645→                      {renderScoreInput(idx, 'ph3')}
+   646→   646→                    </td>
+   647→   647→                    <td className="px-3 py-1.5 text-center border-b border-gray-100">
+   648→   648→                      {renderScoreInput(idx, 'ph4')}
+   649→   649→                    </td>
+   650→   650→
+   651→   651→                    {/* PTS */}
+   652→   652→                    <td className="px-3 py-1.5 text-center border-b border-gray-100">
+   653→   653→                      {renderScoreInput(idx, 'pts')}
+   654→   654→                    </td>
+   655→   655→
+   656→   656→                    {/* PAS */}
+   657→   657→                    <td className="px-3 py-1.5 text-center border-b border-gray-100">
+   658→   658→                      {renderScoreInput(idx, 'pas')}
+   659→   659→                    </td>
+   660→   660→
+   661→   661→                    {/* Rata-Rata */}
+   662→   662→                    <td className="px-3 py-2.5 text-center font-medium text-gray-700 border-b border-gray-100">
+   663→   663→                      {row.predikat ? row.rataRata : <span className="text-gray-300">-</span>}
+   664→   664→                    </td>
+   665→   665→
+   666→   666→                    {/* Nilai Akhir */}
+   667→   667→                    <td className="px-3 py-2.5 text-center font-bold text-gray-800 border-b border-gray-100">
+   668→   668→                      {row.predikat ? row.nilaiAkhir : <span className="text-gray-300">-</span>}
+   669→   669→                    </td>
+   670→   670→
+   671→   671→                    {/* Predikat */}
+   672→   672→                    <td className="px-3 py-2.5 text-center border-b border-gray-100">
+   673→   673→                      {row.predikat ? (
+   674→   674→                        <Badge
+   675→   675→                          variant="outline"
+   676→   676→                          className={`font-bold text-xs px-2.5 py-0.5 ${predikatBadgeClass(row.predikat)}`}
+   677→   677→                        >
+   678→   678→                          {row.predikat}
+   679→   679→                        </Badge>
+   680→   680→                      ) : (
+   681→   681→                        <span className="text-gray-300">-</span>
+   682→   682→                      )}
+   683→   683→                    </td>
+   684→   684→                  </tr>
+   685→   685→                ))}
+   686→   686→              </tbody>
+   687→   687→            </table>
+   688→   688→          </div>
+   689→   689→        )}
+   690→   690→      </div>
+   691→   691→
+   692→   692→      {/* ── Bottom Action Bar ─────────────────────────────────────────────── */}
+   693→   693→      {loaded && rows.length > 0 && (
+   694→   694→        <div className="bg-white rounded-2xl shadow-sm p-4 md:p-6">
+   695→   695→          <div className="flex flex-wrap gap-3 justify-end">
+   696→   696→            <Button
+   697→   697→              variant="outline"
+   698→   698→              onClick={handleReset}
+   699→   699→              disabled={saving}
+   700→   700→              className="text-red-600 border-red-200 hover:bg-red-50 hover:text-red-700 gap-1.5"
+   701→   701→            >
+   702→   702→              <RotateCcw className="w-4 h-4" />
+   703→   703→              Reset
+   704→   704→            </Button>
+   705→   705→
+   706→   706→            <Button
+   707→   707→              variant="outline"
+   708→   708→              onClick={handleExport}
+   709→   709→              disabled={saving}
+   710→   710→              className="text-green-600 border-green-200 hover:bg-green-50 hover:text-green-700 gap-1.5"
+   711→   711→            >
+   712→   712→              <Download className="w-4 h-4" />
+   713→   713→              Export Excel
+   714→   714→            </Button>
+   715→   715→
+   716→   716→            <Button
+   717→   717→              onClick={handleSimpan}
+   718→   718→              disabled={saving}
+   719→   719→              className="bg-blue-600 hover:bg-blue-700 text-white gap-1.5 min-w-[120px]"
+   720→   720→            >
+   721→   721→              {saving ? (
+   722→   722→                <Loader2 className="w-4 h-4 animate-spin" />
+   723→   723→              ) : (
+   724→   724→                <Save className="w-4 h-4" />
+   725→   725→              )}
+   726→   726→              Simpan
+   727→   727→            </Button>
+   728→   728→          </div>
+   729→   729→        </div>
+   730→   730→      )}
+   731→   731→    </div>
+   732→   732→  )
+   733→   733→}
+   734→   734→

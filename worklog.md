@@ -24,3 +24,22 @@ Stage Summary:
 - Guru dashboard correctly shows mapel and kelas data from dashboard API
 - All API endpoints verified working for guru role (ahmad/guru123)
 - No lint errors, server running cleanly
+---
+Task ID: 1
+Agent: main
+Task: Fix kelas and pelajaran not selectable by non-admin/superadmin roles
+
+Work Log:
+- Analyzed RBAC permissions: guru role lacked mapel permission, kelas API had overly restrictive data filtering
+- Updated /api/mapel GET: broadened permissions to requireAnyPermission with mapel, nilai, absensi-siswa, rekap-nilai
+- Added role-based filtering: guru/wali-kelas see only assigned mapel, other roles see all
+- Updated /api/kelas GET: broadened permissions, non-admin roles now get all active kelas
+- Fixed span nesting div (Skeleton) in AbsensiGuru.tsx
+- Verified via agent-browser with 3 different role accounts
+
+Stage Summary:
+- Mapel API accessible by all non-admin roles that need it
+- Kelas API returns all active kelas to all authenticated roles
+- HTML nesting hydration error fixed
+- Logo already correctly set up from previous session
+

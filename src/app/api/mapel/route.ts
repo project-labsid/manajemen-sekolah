@@ -1,16 +1,30 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { authenticate, requirePermission, createAuditLog, initAuth, AuthError } from '@/lib/rbac'
+import { authenticate, requirePermission, requireAnyPermission, createAuditLog, initAuth, AuthError } from '@/lib/rbac'
 import { db } from '@/lib/db'
 
 export async function GET(request: NextRequest) {
   try {
     await initAuth()
     const user = authenticate(request)
-    await requirePermission(user, 'mapel')
+    // Allow mapel, nilai, absensi-siswa, rekap-nilai permissions to read mapel
+    await requireAnyPermission(user, ['mapel', 'nilai', 'absensi-siswa', 'rekap-nilai'])
 
-    const data = await db.mataPelajaran.findMany({
-      orderBy: { namaMapel: 'asc' },
-    })
+    const isAdminLike = user.role === 'super-admin' || user.role === 'admin' || user.role === 'operator'
+    const isGuruRole = user.role === 'guru' || user.role === 'wali-kelas'
+
+    let data
+    if (isGuruRole) {
+      // For guru: return only mapel assigned to them
+      data = await db.mataPelajaran.findMany({
+        where: { guru: user.nama || '' },
+        orderBy: { namaMapel: 'asc' },
+      })
+    } else {
+      // Admin and other roles see all mapel
+      data = await db.mataPelajaran.findMany({
+        orderBy: { namaMapel: 'asc' },
+      })
+    }
 
     return NextResponse.json({ data })
   } catch (error: unknown) {

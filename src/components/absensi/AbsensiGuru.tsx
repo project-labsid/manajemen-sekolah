@@ -386,9 +386,9 @@ export default function AbsensiGuru() {
             </div>
             <div className="min-w-0">
               <p className="text-xs font-medium text-muted-foreground">Jam Masuk</p>
-              <span className="text-lg sm:text-xl font-bold text-foreground truncate block">
+              <div className="text-lg sm:text-xl font-bold text-foreground truncate">
                 {loading ? <Skeleton className="h-6 w-16 inline-block" /> : ownJamMasuk}
-              </span>
+              </div>
             </div>
           </div>
 
@@ -399,9 +399,9 @@ export default function AbsensiGuru() {
             </div>
             <div className="min-w-0">
               <p className="text-xs font-medium text-muted-foreground">Jam Pulang</p>
-              <span className="text-lg sm:text-xl font-bold text-foreground truncate block">
+              <div className="text-lg sm:text-xl font-bold text-foreground truncate">
                 {loading ? <Skeleton className="h-6 w-16 inline-block" /> : ownJamPulang}
-              </span>
+              </div>
             </div>
           </div>
 
@@ -412,9 +412,9 @@ export default function AbsensiGuru() {
             </div>
             <div className="min-w-0">
               <p className="text-xs font-medium text-muted-foreground">Durasi Kerja</p>
-              <span className="text-lg sm:text-xl font-bold text-foreground truncate block">
+              <div className="text-lg sm:text-xl font-bold text-foreground truncate">
                 {loading ? <Skeleton className="h-6 w-20 inline-block" /> : ownDurasi}
-              </span>
+              </div>
             </div>
           </div>
 

@@ -6,42 +6,17 @@ export async function GET(request: NextRequest) {
   try {
     await initAuth()
     const user = authenticate(request)
-    // Allow guru to read kelas for absensi-siswa purposes
-    await requireAnyPermission(user, ['kelas', 'absensi-siswa'])
+    // Allow broader access: kelas, nilai, absensi-siswa, rekap-nilai, guru, siswa
+    await requireAnyPermission(user, ['kelas', 'nilai', 'absensi-siswa', 'rekap-nilai', 'guru', 'siswa'])
 
-    const isGuruRole = user.role !== 'super-admin' && user.role !== 'admin' && user.role !== 'operator'
+    const isAdminLike = user.role === 'super-admin' || user.role === 'admin' || user.role === 'operator'
 
-    if (isGuruRole) {
-      // For guru: return only kelas where they are wali kelas or have nilai records
-      const userNama = user.nama || ''
-
-      const [waliKelas, nilaiKelas] = await Promise.all([
-        db.kelas.findMany({
-          where: { waliKelas: userNama, status: 'aktif' },
-        }),
-        db.nilai.findMany({
-          where: { guru: userNama },
-          select: { kelas: true },
-          distinct: ['kelas'],
-        }),
-      ])
-
-      const allKodeKelas = [
-        ...waliKelas.map(k => k.kodeKelas),
-        ...nilaiKelas.map(n => n.kelas),
-      ]
-
-      const uniqueKodeKelas = [...new Set(allKodeKelas)]
-
-      if (uniqueKodeKelas.length === 0) {
-        return NextResponse.json({ data: [] })
-      }
-
+    if (!isAdminLike) {
+      // For non-admin roles: return all active kelas (they need to select for absensi/nilai)
       const kelas = await db.kelas.findMany({
-        where: { kodeKelas: { in: uniqueKodeKelas }, status: 'aktif' },
+        where: { status: 'aktif' },
         orderBy: { kodeKelas: 'asc' },
       })
-
       return NextResponse.json({ data: kelas })
     }
 
