@@ -206,7 +206,7 @@ export default function Laporan() {
   const [tahunAjaran, setTahunAjaran] = useState('2024/2025')
   const [semester, setSemester] = useState('Ganjil')
   const [nilaiKelas, setNilaiKelas] = useState('')
-  const [nilaiMapel, setNilaiMapel] = useState('')
+  const [nilaiMapel, setNilaiMapel] = useState('all')
 
   // ── Absensi filter state ──
   const [absensiKelas, setAbsensiKelas] = useState('')
@@ -267,7 +267,7 @@ export default function Laporan() {
         const params = new URLSearchParams({
           tipe: 'nilai',
           kelas: nilaiKelas,
-          ...(nilaiMapel ? { mapel: nilaiMapel } : {}),
+          ...(nilaiMapel && nilaiMapel !== 'all' ? { mapel: nilaiMapel } : {}),
           semester,
           tahunAjaran,
         })
@@ -526,7 +526,7 @@ export default function Laporan() {
                   <SelectValue placeholder={loadingDropdowns ? 'Memuat...' : 'Semua Mapel'} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">Semua Mapel</SelectItem>
+                  <SelectItem value="all">Semua Mapel</SelectItem>
                   {mapelList.map((m) => (
                     <SelectItem key={m.kodeMapel} value={m.kodeMapel}>
                       {m.namaMapel}

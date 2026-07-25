@@ -49,20 +49,6 @@ export default function LoginPage() {
           <p className="text-sm opacity-70 max-w-sm leading-relaxed">
             Membangun Pendidikan Lebih Baik untuk Masa Depan
           </p>
-          <div className="mt-12 grid grid-cols-3 gap-6 text-center">
-            <div>
-              <div className="text-2xl font-bold">128</div>
-              <div className="text-xs opacity-60 mt-1">Guru</div>
-            </div>
-            <div>
-              <div className="text-2xl font-bold">1,560</div>
-              <div className="text-xs opacity-60 mt-1">Siswa</div>
-            </div>
-            <div>
-              <div className="text-2xl font-bold">48</div>
-              <div className="text-xs opacity-60 mt-1">Kelas</div>
-            </div>
-          </div>
         </div>
       </div>
 

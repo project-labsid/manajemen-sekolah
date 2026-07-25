@@ -1,6 +1,6 @@
 'use client'
 import dynamic from 'next/dynamic'
-import { useEffect } from 'react'
+import { useEffect, useSyncExternalStore } from 'react'
 import { useAppStore, type PageKey } from '@/lib/store'
 import { api } from '@/lib/api'
 import LoginPage from '@/components/auth/LoginPage'
@@ -47,22 +47,39 @@ function PageContent({ page }: { page: PageKey }) {
   }
 }
 
+// Returns false on server, true on client — avoids hydration mismatch
+const emptySubscribe = () => () => {}
+function useMounted() {
+  return useSyncExternalStore(emptySubscribe, () => true, () => false)
+}
+
 export default function Home() {
   const { token, user, currentPage, darkMode } = useAppStore()
+  const mounted = useMounted()
 
   useEffect(() => {
+    if (!mounted) return
     if (darkMode) document.documentElement.classList.add('dark')
     else document.documentElement.classList.remove('dark')
-  }, [darkMode])
+  }, [darkMode, mounted])
 
   useEffect(() => {
-    if (!token) return
+    if (!mounted || !token) return
     api.get<{ user: any }>('/auth/me').then((res) => {
       useAppStore.getState().setUser(res.user)
     }).catch(() => {
       useAppStore.getState().logout()
     })
-  }, [token])
+  }, [token, mounted])
+
+  // Prevent hydration mismatch — server always renders loading, client resolves after mount
+  if (!mounted) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-[#f4f6f9] dark:bg-slate-900">
+        <div className="animate-spin w-8 h-8 border-4 border-blue-200 border-t-blue-600 rounded-full" />
+      </div>
+    )
+  }
 
   if (!token || !user) return <LoginPage />
 

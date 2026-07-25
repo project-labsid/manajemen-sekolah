@@ -1,0 +1,859 @@
+     1→'use client'
+     2→
+     3→import React, { useCallback, useEffect, useState } from 'react'
+     4→import {
+     5→  BarChart3,
+     6→  Download,
+     7→  FileText,
+     8→  Filter,
+     9→  Loader2,
+    10→  Inbox,
+    11→  CheckCircle2,
+    12→  XCircle,
+    13→  CalendarDays,
+    14→  Users,
+    15→  TrendingUp,
+    16→} from 'lucide-react'
+    17→import { api } from '@/lib/api'
+    18→import { toast } from 'sonner'
+    19→import { Button } from '@/components/ui/button'
+    20→import { Badge } from '@/components/ui/badge'
+    21→import { Skeleton } from '@/components/ui/skeleton'
+    22→import { Label } from '@/components/ui/label'
+    23→import { Input } from '@/components/ui/input'
+    24→import {
+    25→  Select,
+    26→  SelectContent,
+    27→  SelectItem,
+    28→  SelectTrigger,
+    29→  SelectValue,
+    30→} from '@/components/ui/select'
+    31→import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
+    32→
+    33→/* ------------------------------------------------------------------ */
+    34→/*  Types                                                              */
+    35→/* ------------------------------------------------------------------ */
+    36→
+    37→type TipeLaporan = 'nilai' | 'absensi'
+    38→
+    39→interface KelasItem {
+    40→  id: string
+    41→  kodeKelas: string
+    42→  namaKelas: string
+    43→  waliKelas: string
+    44→  status: string
+    45→}
+    46→
+    47→interface MapelItem {
+    48→  id: string
+    49→  kodeMapel: string
+    50→  namaMapel: string
+    51→  kkm: number
+    52→  guru: string
+    53→  status: string
+    54→}
+    55→
+    56→interface NilaiPerSiswa {
+    57→  nis: string
+    58→  nama: string
+    59→  kelas: string
+    60→  jumlahMapel: number
+    61→  rataRata: number
+    62→  nilaiTertinggi: number
+    63→  nilaiTerendah: number
+    64→  mapelLulus: number
+    65→  mapelTidakLulus: number
+    66→  detailNilai: {
+    67→    id: string
+    68→    mapel: string
+    69→    nilaiAkhir: number
+    70→    predikat: string
+    71→    rataRata: number
+    72→  }[]
+    73→}
+    74→
+    75→interface NilaiStats {
+    76→  rataRataKeseluruhan: number
+    77→  nilaiTertinggi: number
+    78→  nilaiTerendah: number
+    79→  lulus: number
+    80→  tidakLulus: number
+    81→  totalSiswa: number
+    82→}
+    83→
+    84→interface NilaiLaporanResponse {
+    85→  tipe: 'nilai'
+    86→  data: NilaiPerSiswa[]
+    87→  stats: NilaiStats
+    88→  filters: {
+    89→    kelas: string
+    90→    mapel: string
+    91→    semester: string
+    92→    tahunAjaran: string
+    93→  }
+    94→}
+    95→
+    96→interface AbsensiPerSiswa {
+    97→  nis: string
+    98→  nama: string
+    99→  kelas: string
+   100→  hadir: number
+   101→  sakit: number
+   102→  izin: number
+   103→  alpha: number
+   104→  totalHari: number
+   105→  persentaseKehadiran: number
+   106→}
+   107→
+   108→interface AbsensiSummary {
+   109→  total: number
+   110→  hadir: number
+   111→  sakit: number
+   112→  izin: number
+   113→  alpha: number
+   114→}
+   115→
+   116→interface AbsensiLaporanResponse {
+   117→  tipe: 'absensi'
+   118→  data: AbsensiPerSiswa[]
+   119→  summary: AbsensiSummary
+   120→  filters: {
+   121→    kelas: string
+   122→    tanggalMulai: string
+   123→    tanggalSelesai: string
+   124→  }
+   125→}
+   126→
+   127→type LaporanResponse = NilaiLaporanResponse | AbsensiLaporanResponse
+   128→
+   129→interface KelasResponse {
+   130→  data: KelasItem[]
+   131→}
+   132→
+   133→interface MapelResponse {
+   134→  data: MapelItem[]
+   135→}
+   136→
+   137→/* ------------------------------------------------------------------ */
+   138→/*  Constants                                                          */
+   139→/* ------------------------------------------------------------------ */
+   140→
+   141→const TAHUN_AJARAN_OPTIONS = [
+   142→  '2024/2025',
+   143→  '2023/2024',
+   144→  '2022/2023',
+   145→  '2021/2022',
+   146→  '2020/2021',
+   147→]
+   148→
+   149→const SEMESTER_OPTIONS = ['Ganjil', 'Genap']
+   150→
+   151→/* ------------------------------------------------------------------ */
+   152→/*  Helpers                                                            */
+   153→/* ------------------------------------------------------------------ */
+   154→
+   155→function getPredikatFromRataRata(rata: number): string {
+   156→  if (rata >= 90) return 'A'
+   157→  if (rata >= 80) return 'B'
+   158→  if (rata >= 70) return 'C'
+   159→  return 'D'
+   160→}
+   161→
+   162→function getPredikatBadge(predikat: string) {
+   163→  const colors: Record<string, string> = {
+   164→    A: 'bg-emerald-100 text-emerald-700 hover:bg-emerald-100 border-0',
+   165→    B: 'bg-blue-100 text-blue-700 hover:bg-blue-100 border-0',
+   166→    C: 'bg-amber-100 text-amber-700 hover:bg-amber-100 border-0',
+   167→    D: 'bg-red-100 text-red-600 hover:bg-red-100 border-0',
+   168→  }
+   169→  return (
+   170→    <Badge className={colors[predikat] || 'bg-gray-100 text-gray-600 hover:bg-gray-100 border-0'}>
+   171→      {predikat}
+   172→    </Badge>
+   173→  )
+   174→}
+   175→
+   176→function getStatusLulusBadge(lulus: boolean) {
+   177→  if (lulus) {
+   178→    return (
+   179→      <Badge className="bg-emerald-100 text-emerald-700 hover:bg-emerald-100 border-0">
+   180→        Lulus
+   181→      </Badge>
+   182→    )
+   183→  }
+   184→  return (
+   185→    <Badge className="bg-red-100 text-red-600 hover:bg-red-100 border-0">
+   186→      Tidak Lulus
+   187→    </Badge>
+   188→  )
+   189→}
+   190→
+   191→function getPersentaseColor(pct: number): string {
+   192→  if (pct >= 80) return 'text-emerald-600'
+   193→  if (pct >= 60) return 'text-amber-600'
+   194→  return 'text-red-600'
+   195→}
+   196→
+   197→/* ------------------------------------------------------------------ */
+   198→/*  Component                                                          */
+   199→/* ------------------------------------------------------------------ */
+   200→
+   201→export default function Laporan() {
+   202→  // ── Report type ──
+   203→  const [tipe, setTipe] = useState<TipeLaporan>('nilai')
+   204→
+   205→  // ── Nilai filter state ──
+   206→  const [tahunAjaran, setTahunAjaran] = useState('2024/2025')
+   207→  const [semester, setSemester] = useState('Ganjil')
+   208→  const [nilaiKelas, setNilaiKelas] = useState('')
+   209→  const [nilaiMapel, setNilaiMapel] = useState('')
+   210→
+   211→  // ── Absensi filter state ──
+   212→  const [absensiKelas, setAbsensiKelas] = useState('')
+   213→  const [tanggalMulai, setTanggalMulai] = useState('')
+   214→  const [tanggalSelesai, setTanggalSelesai] = useState('')
+   215→
+   216→  // ── Dropdown data ──
+   217→  const [kelasList, setKelasList] = useState<KelasItem[]>([])
+   218→  const [mapelList, setMapelList] = useState<MapelItem[]>([])
+   219→  const [loadingDropdowns, setLoadingDropdowns] = useState(true)
+   220→
+   221→  // ── Result state ──
+   222→  const [loading, setLoading] = useState(false)
+   223→  const [hasSearched, setHasSearched] = useState(false)
+   224→  const [nilaiResult, setNilaiResult] = useState<NilaiLaporanResponse | null>(null)
+   225→  const [absensiResult, setAbsensiResult] = useState<AbsensiLaporanResponse | null>(null)
+   226→
+   227→  // ── Fetch kelas & mapel dropdowns ──
+   228→  const fetchDropdowns = useCallback(async () => {
+   229→    setLoadingDropdowns(true)
+   230→    try {
+   231→      const [kelasRes, mapelRes] = await Promise.all([
+   232→        api.get<KelasResponse>('/kelas'),
+   233→        api.get<MapelResponse>('/mapel'),
+   234→      ])
+   235→      const kelasData = (kelasRes as KelasResponse).data
+   236→      const mapelData = (mapelRes as MapelResponse).data
+   237→      setKelasList(Array.isArray(kelasData) ? kelasData : [])
+   238→      setMapelList(Array.isArray(mapelData) ? mapelData : [])
+   239→    } catch {
+   240→      toast.error('Gagal memuat data referensi')
+   241→    } finally {
+   242→      setLoadingDropdowns(false)
+   243→    }
+   244→  }, [])
+   245→
+   246→  useEffect(() => {
+   247→    fetchDropdowns()
+   248→  }, [fetchDropdowns])
+   249→
+   250→  // ── Reset results on type change ──
+   251→  useEffect(() => {
+   252→    setHasSearched(false)
+   253→    setNilaiResult(null)
+   254→    setAbsensiResult(null)
+   255→  }, [tipe])
+   256→
+   257→  // ── Validate & fetch ──
+   258→  const handleTampilkan = useCallback(async () => {
+   259→    if (tipe === 'nilai') {
+   260→      if (!nilaiKelas) {
+   261→        toast.error('Pilih Kelas terlebih dahulu')
+   262→        return
+   263→      }
+   264→      setLoading(true)
+   265→      setHasSearched(true)
+   266→      try {
+   267→        const params = new URLSearchParams({
+   268→          tipe: 'nilai',
+   269→          kelas: nilaiKelas,
+   270→          ...(nilaiMapel ? { mapel: nilaiMapel } : {}),
+   271→          semester,
+   272→          tahunAjaran,
+   273→        })
+   274→        const res = await api.get<NilaiLaporanResponse>(`/laporan?${params.toString()}`)
+   275→        setNilaiResult(res as NilaiLaporanResponse)
+   276→      } catch {
+   277→        toast.error('Gagal memuat laporan nilai')
+   278→        setNilaiResult(null)
+   279→      } finally {
+   280→        setLoading(false)
+   281→      }
+   282→    } else {
+   283→      if (!absensiKelas) {
+   284→        toast.error('Pilih Kelas terlebih dahulu')
+   285→        return
+   286→      }
+   287→      if (!tanggalMulai || !tanggalSelesai) {
+   288→        toast.error('Tanggal Mulai dan Tanggal Selesai wajib diisi')
+   289→        return
+   290→      }
+   291→      if (tanggalMulai > tanggalSelesai) {
+   292→        toast.error('Tanggal Mulai tidak boleh lebih dari Tanggal Selesai')
+   293→        return
+   294→      }
+   295→      setLoading(true)
+   296→      setHasSearched(true)
+   297→      try {
+   298→        const params = new URLSearchParams({
+   299→          tipe: 'absensi',
+   300→          kelas: absensiKelas,
+   301→          tanggalMulai,
+   302→          tanggalSelesai,
+   303→        })
+   304→        const res = await api.get<AbsensiLaporanResponse>(`/laporan?${params.toString()}`)
+   305→        setAbsensiResult(res as AbsensiLaporanResponse)
+   306→      } catch {
+   307→        toast.error('Gagal memuat laporan absensi')
+   308→        setAbsensiResult(null)
+   309→      } finally {
+   310→        setLoading(false)
+   311→      }
+   312→    }
+   313→  }, [tipe, tahunAjaran, semester, nilaiKelas, nilaiMapel, absensiKelas, tanggalMulai, tanggalSelesai])
+   314→
+   315→  // ── Export Excel (CSV) ──
+   316→  const handleExportExcel = useCallback(() => {
+   317→    if (tipe === 'nilai') {
+   318→      if (!nilaiResult || nilaiResult.data.length === 0) {
+   319→        toast.error('Tidak ada data untuk diekspor')
+   320→        return
+   321→      }
+   322→      const headers = ['No', 'NIS', 'Nama', 'Kelas', 'Jumlah Mapel', 'Rata-Rata', 'Nilai Tertinggi', 'Nilai Terendah', 'Mapel Lulus', 'Mapel Tidak Lulus', 'Predikat', 'Status Lulus']
+   323→      const rows = nilaiResult.data.map((item, idx) => [
+   324→        idx + 1,
+   325→        item.nis,
+   326→        item.nama,
+   327→        item.kelas,
+   328→        item.jumlahMapel,
+   329→        item.rataRata,
+   330→        item.nilaiTertinggi,
+   331→        item.nilaiTerendah,
+   332→        item.mapelLulus,
+   333→        item.mapelTidakLulus,
+   334→        getPredikatFromRataRata(item.rataRata),
+   335→        item.mapelTidakLulus === 0 ? 'Lulus' : 'Tidak Lulus',
+   336→      ])
+   337→      const csvContent = [
+   338→        headers.join(','),
+   339→        ...rows.map((row) =>
+   340→          row.map((cell) => {
+   341→            const str = String(cell)
+   342→            return str.includes(',') || str.includes('"') || str.includes('\n')
+   343→              ? `"${str.replace(/"/g, '""')}"`
+   344→              : str
+   345→          }).join(','),
+   346→        ),
+   347→      ].join('\n')
+   348→      const blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' })
+   349→      const url = URL.createObjectURL(blob)
+   350→      const link = document.createElement('a')
+   351→      link.href = url
+   352→      link.download = `Laporan_Nilai_${nilaiKelas}_${semester}_${tahunAjaran.replace('/', '-')}.csv`
+   353→      document.body.appendChild(link)
+   354→      link.click()
+   355→      document.body.removeChild(link)
+   356→      URL.revokeObjectURL(url)
+   357→    } else {
+   358→      if (!absensiResult || absensiResult.data.length === 0) {
+   359→        toast.error('Tidak ada data untuk diekspor')
+   360→        return
+   361→      }
+   362→      const headers = ['No', 'NIS', 'Nama', 'Kelas', 'Hadir', 'Sakit', 'Izin', 'Alpha', 'Total', 'Persentase Kehadiran (%)']
+   363→      const rows = absensiResult.data.map((item, idx) => [
+   364→        idx + 1,
+   365→        item.nis,
+   366→        item.nama,
+   367→        item.kelas,
+   368→        item.hadir,
+   369→        item.sakit,
+   370→        item.izin,
+   371→        item.alpha,
+   372→        item.totalHari,
+   373→        item.persentaseKehadiran,
+   374→      ])
+   375→      const csvContent = [
+   376→        headers.join(','),
+   377→        ...rows.map((row) =>
+   378→          row.map((cell) => {
+   379→            const str = String(cell)
+   380→            return str.includes(',') || str.includes('"') || str.includes('\n')
+   381→              ? `"${str.replace(/"/g, '""')}"`
+   382→              : str
+   383→          }).join(','),
+   384→        ),
+   385→      ].join('\n')
+   386→      const blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' })
+   387→      const url = URL.createObjectURL(blob)
+   388→      const link = document.createElement('a')
+   389→      link.href = url
+   390→      link.download = `Laporan_Absensi_${absensiKelas}_${tanggalMulai}_sd_${tanggalSelesai}.csv`
+   391→      document.body.appendChild(link)
+   392→      link.click()
+   393→      document.body.removeChild(link)
+   394→      URL.revokeObjectURL(url)
+   395→    }
+   396→    toast.success('Data berhasil diekspor ke Excel')
+   397→  }, [tipe, nilaiResult, absensiResult, nilaiKelas, semester, tahunAjaran, absensiKelas, tanggalMulai, tanggalSelesai])
+   398→
+   399→  // ── Export PDF (placeholder) ──
+   400→  const handleExportPDF = useCallback(() => {
+   401→    toast.info('Fitur export PDF akan segera tersedia. Gunakan Export Excel sebagai alternatif.')
+   402→  }, [])
+   403→
+   404→  // ── Derived data ──
+   405→  const nilaiData = nilaiResult?.data ?? []
+   406→  const absensiData = absensiResult?.data ?? []
+   407→  const hasData = tipe === 'nilai' ? nilaiData.length > 0 : absensiData.length > 0
+   408→
+   409→  // ── Render ──
+   410→  return (
+   411→    <div className="space-y-6 animate-fadeIn">
+   412→      {/* ── Report Type Selector ── */}
+   413→      <div className="bg-white rounded-2xl shadow-sm p-4 sm:p-6">
+   414→        <div className="flex items-center gap-2 mb-4">
+   415→          <BarChart3 className="h-5 w-5 text-[#2563eb]" />
+   416→          <h2 className="text-lg font-semibold text-foreground">Laporan SIAKAD</h2>
+   417→        </div>
+   418→
+   419→        <RadioGroup
+   420→          value={tipe}
+   421→          onValueChange={(v) => setTipe(v as TipeLaporan)}
+   422→          className="flex flex-col sm:flex-row gap-3"
+   423→        >
+   424→          <label
+   425→            htmlFor="tipe-nilai"
+   426→            className={[
+   427→              'flex items-center gap-3 px-5 py-3 rounded-xl border-2 cursor-pointer transition-all',
+   428→              tipe === 'nilai'
+   429→                ? 'border-[#2563eb] bg-blue-50'
+   430→                : 'border-border bg-white hover:border-muted-foreground/30',
+   431→            ].join(' ')}
+   432→          >
+   433→            <RadioGroupItem value="nilai" id="tipe-nilai" />
+   434→            <div className="flex items-center gap-2">
+   435→              <BarChart3 className={`h-5 w-5 ${tipe === 'nilai' ? 'text-[#2563eb]' : 'text-muted-foreground'}`} />
+   436→              <span className={`font-medium ${tipe === 'nilai' ? 'text-[#2563eb]' : 'text-muted-foreground'}`}>
+   437→                Laporan Nilai
+   438→              </span>
+   439→            </div>
+   440→          </label>
+   441→
+   442→          <label
+   443→            htmlFor="tipe-absensi"
+   444→            className={[
+   445→              'flex items-center gap-3 px-5 py-3 rounded-xl border-2 cursor-pointer transition-all',
+   446→              tipe === 'absensi'
+   447→                ? 'border-[#2563eb] bg-blue-50'
+   448→                : 'border-border bg-white hover:border-muted-foreground/30',
+   449→            ].join(' ')}
+   450→          >
+   451→            <RadioGroupItem value="absensi" id="tipe-absensi" />
+   452→            <div className="flex items-center gap-2">
+   453→              <CalendarDays className={`h-5 w-5 ${tipe === 'absensi' ? 'text-[#2563eb]' : 'text-muted-foreground'}`} />
+   454→              <span className={`font-medium ${tipe === 'absensi' ? 'text-[#2563eb]' : 'text-muted-foreground'}`}>
+   455→                Laporan Absensi
+   456→              </span>
+   457→            </div>
+   458→          </label>
+   459→        </RadioGroup>
+   460→      </div>
+   461→
+   462→      {/* ── Filter Card ── */}
+   463→      <div className="bg-white rounded-2xl shadow-sm p-4 sm:p-6">
+   464→        <div className="flex items-center gap-2 mb-4">
+   465→          <Filter className="h-5 w-5 text-[#2563eb]" />
+   466→          <h2 className="text-lg font-semibold text-foreground">
+   467→            Filter {tipe === 'nilai' ? 'Laporan Nilai' : 'Laporan Absensi'}
+   468→          </h2>
+   469→        </div>
+   470→
+   471→        {tipe === 'nilai' ? (
+   472→          /* ── Nilai Filters ── */
+   473→          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
+   474→            <div className="space-y-1.5">
+   475→              <Label className="text-xs font-medium text-muted-foreground">Tahun Ajaran</Label>
+   476→              <Select value={tahunAjaran} onValueChange={setTahunAjaran}>
+   477→                <SelectTrigger className="w-full">
+   478→                  <SelectValue placeholder="Pilih Tahun Ajaran" />
+   479→                </SelectTrigger>
+   480→                <SelectContent>
+   481→                  {TAHUN_AJARAN_OPTIONS.map((ta) => (
+   482→                    <SelectItem key={ta} value={ta}>
+   483→                      {ta}
+   484→                    </SelectItem>
+   485→                  ))}
+   486→                </SelectContent>
+   487→              </Select>
+   488→            </div>
+   489→
+   490→            <div className="space-y-1.5">
+   491→              <Label className="text-xs font-medium text-muted-foreground">Semester</Label>
+   492→              <Select value={semester} onValueChange={setSemester}>
+   493→                <SelectTrigger className="w-full">
+   494→                  <SelectValue placeholder="Pilih Semester" />
+   495→                </SelectTrigger>
+   496→                <SelectContent>
+   497→                  {SEMESTER_OPTIONS.map((s) => (
+   498→                    <SelectItem key={s} value={s}>
+   499→                      {s}
+   500→                    </SelectItem>
+   501→                  ))}
+   502→                </SelectContent>
+   503→              </Select>
+   504→            </div>
+   505→
+   506→            <div className="space-y-1.5">
+   507→              <Label className="text-xs font-medium text-muted-foreground">Kelas</Label>
+   508→              <Select value={nilaiKelas} onValueChange={setNilaiKelas}>
+   509→                <SelectTrigger className="w-full" disabled={loadingDropdowns}>
+   510→                  <SelectValue placeholder={loadingDropdowns ? 'Memuat...' : 'Pilih Kelas'} />
+   511→                </SelectTrigger>
+   512→                <SelectContent>
+   513→                  {kelasList.map((k) => (
+   514→                    <SelectItem key={k.kodeKelas} value={k.kodeKelas}>
+   515→                      {k.namaKelas}
+   516→                    </SelectItem>
+   517→                  ))}
+   518→                </SelectContent>
+   519→              </Select>
+   520→            </div>
+   521→
+   522→            <div className="space-y-1.5">
+   523→              <Label className="text-xs font-medium text-muted-foreground">Mata Pelajaran</Label>
+   524→              <Select value={nilaiMapel} onValueChange={setNilaiMapel}>
+   525→                <SelectTrigger className="w-full" disabled={loadingDropdowns}>
+   526→                  <SelectValue placeholder={loadingDropdowns ? 'Memuat...' : 'Semua Mapel'} />
+   527→                </SelectTrigger>
+   528→                <SelectContent>
+   529→                  <SelectItem value="">Semua Mapel</SelectItem>
+   530→                  {mapelList.map((m) => (
+   531→                    <SelectItem key={m.kodeMapel} value={m.kodeMapel}>
+   532→                      {m.namaMapel}
+   533→                    </SelectItem>
+   534→                  ))}
+   535→                </SelectContent>
+   536→              </Select>
+   537→            </div>
+   538→
+   539→            <div className="space-y-1.5 flex items-end">
+   540→              <Button
+   541→                onClick={handleTampilkan}
+   542→                disabled={loading || loadingDropdowns}
+   543→                className="w-full bg-[#2563eb] hover:bg-[#1d4ed8] text-white"
+   544→              >
+   545→                {loading ? (
+   546→                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+   547→                ) : (
+   548→                  <Filter className="h-4 w-4 mr-2" />
+   549→                )}
+   550→                Tampilkan
+   551→              </Button>
+   552→            </div>
+   553→          </div>
+   554→        ) : (
+   555→          /* ── Absensi Filters ── */
+   556→          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
+   557→            <div className="space-y-1.5">
+   558→              <Label className="text-xs font-medium text-muted-foreground">Kelas</Label>
+   559→              <Select value={absensiKelas} onValueChange={setAbsensiKelas}>
+   560→                <SelectTrigger className="w-full" disabled={loadingDropdowns}>
+   561→                  <SelectValue placeholder={loadingDropdowns ? 'Memuat...' : 'Pilih Kelas'} />
+   562→                </SelectTrigger>
+   563→                <SelectContent>
+   564→                  {kelasList.map((k) => (
+   565→                    <SelectItem key={k.kodeKelas} value={k.kodeKelas}>
+   566→                      {k.namaKelas}
+   567→                    </SelectItem>
+   568→                  ))}
+   569→                </SelectContent>
+   570→              </Select>
+   571→            </div>
+   572→
+   573→            <div className="space-y-1.5">
+   574→              <Label className="text-xs font-medium text-muted-foreground">Tanggal Mulai</Label>
+   575→              <Input
+   576→                type="date"
+   577→                value={tanggalMulai}
+   578→                onChange={(e) => setTanggalMulai(e.target.value)}
+   579→              />
+   580→            </div>
+   581→
+   582→            <div className="space-y-1.5">
+   583→              <Label className="text-xs font-medium text-muted-foreground">Tanggal Selesai</Label>
+   584→              <Input
+   585→                type="date"
+   586→                value={tanggalSelesai}
+   587→                onChange={(e) => setTanggalSelesai(e.target.value)}
+   588→              />
+   589→            </div>
+   590→
+   591→            <div className="lg:col-span-2 space-y-1.5 flex items-end">
+   592→              <Button
+   593→                onClick={handleTampilkan}
+   594→                disabled={loading || loadingDropdowns}
+   595→                className="w-full sm:w-auto bg-[#2563eb] hover:bg-[#1d4ed8] text-white"
+   596→              >
+   597→                {loading ? (
+   598→                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+   599→                ) : (
+   600→                  <Filter className="h-4 w-4 mr-2" />
+   601→                )}
+   602→                Tampilkan
+   603→              </Button>
+   604→            </div>
+   605→          </div>
+   606→        )}
+   607→      </div>
+   608→
+   609→      {/* ── Nilai: Summary Stats ── */}
+   610→      {tipe === 'nilai' && hasSearched && !loading && nilaiResult && nilaiData.length > 0 && (
+   611→        <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
+   612→          <div className="bg-white rounded-2xl shadow-sm p-4 sm:p-5 flex items-center gap-4">
+   613→            <div className="flex-shrink-0 h-12 w-12 rounded-xl bg-blue-50 flex items-center justify-center">
+   614→              <Users className="h-6 w-6 text-[#2563eb]" />
+   615→            </div>
+   616→            <div>
+   617→              <p className="text-xs font-medium text-muted-foreground">Total Siswa</p>
+   618→              <p className="text-2xl font-bold text-[#2563eb]">{nilaiResult.stats.totalSiswa}</p>
+   619→            </div>
+   620→          </div>
+   621→
+   622→          <div className="bg-white rounded-2xl shadow-sm p-4 sm:p-5 flex items-center gap-4">
+   623→            <div className="flex-shrink-0 h-12 w-12 rounded-xl bg-emerald-50 flex items-center justify-center">
+   624→              <TrendingUp className="h-6 w-6 text-[#10b981]" />
+   625→            </div>
+   626→            <div>
+   627→              <p className="text-xs font-medium text-muted-foreground">Rata-Rata</p>
+   628→              <p className="text-2xl font-bold text-[#10b981]">{nilaiResult.stats.rataRataKeseluruhan}</p>
+   629→            </div>
+   630→          </div>
+   631→
+   632→          <div className="bg-white rounded-2xl shadow-sm p-4 sm:p-5 flex items-center gap-4">
+   633→            <div className="flex-shrink-0 h-12 w-12 rounded-xl bg-blue-50 flex items-center justify-center">
+   634→              <BarChart3 className="h-6 w-6 text-[#2563eb]" />
+   635→            </div>
+   636→            <div>
+   637→              <p className="text-xs font-medium text-muted-foreground">Nilai Tertinggi</p>
+   638→              <p className="text-2xl font-bold text-[#2563eb]">{nilaiResult.stats.nilaiTertinggi}</p>
+   639→            </div>
+   640→          </div>
+   641→
+   642→          <div className="bg-white rounded-2xl shadow-sm p-4 sm:p-5 flex items-center gap-4">
+   643→            <div className="flex-shrink-0 h-12 w-12 rounded-xl bg-red-50 flex items-center justify-center">
+   644→              <XCircle className="h-6 w-6 text-[#ef4444]" />
+   645→            </div>
+   646→            <div>
+   647→              <p className="text-xs font-medium text-muted-foreground">Nilai Terendah</p>
+   648→              <p className="text-2xl font-bold text-[#ef4444]">{nilaiResult.stats.nilaiTerendah}</p>
+   649→            </div>
+   650→          </div>
+   651→
+   652→          <div className="bg-white rounded-2xl shadow-sm p-4 sm:p-5 flex items-center gap-4">
+   653→            <div className="flex-shrink-0 h-12 w-12 rounded-xl bg-emerald-50 flex items-center justify-center">
+   654→              <CheckCircle2 className="h-6 w-6 text-[#10b981]" />
+   655→            </div>
+   656→            <div>
+   657→              <p className="text-xs font-medium text-muted-foreground">Siswa Lulus</p>
+   658→              <p className="text-2xl font-bold text-[#10b981]">
+   659→                {nilaiResult.stats.lulus}/{nilaiResult.stats.totalSiswa}
+   660→              </p>
+   661→            </div>
+   662→          </div>
+   663→        </div>
+   664→      )}
+   665→
+   666→      {/* ── Absensi: Summary Stats ── */}
+   667→      {tipe === 'absensi' && hasSearched && !loading && absensiResult && absensiData.length > 0 && (
+   668→        <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
+   669→          <div className="bg-white rounded-2xl shadow-sm p-4 sm:p-5 flex items-center gap-4">
+   670→            <div className="flex-shrink-0 h-12 w-12 rounded-xl bg-blue-50 flex items-center justify-center">
+   671→              <CalendarDays className="h-6 w-6 text-[#2563eb]" />
+   672→            </div>
+   673→            <div>
+   674→              <p className="text-xs font-medium text-muted-foreground">Total Hari</p>
+   675→              <p className="text-2xl font-bold text-[#2563eb]">{absensiResult.summary.total}</p>
+   676→            </div>
+   677→          </div>
+   678→
+   679→          <div className="bg-white rounded-2xl shadow-sm p-4 sm:p-5 flex items-center gap-4">
+   680→            <div className="flex-shrink-0 h-12 w-12 rounded-xl bg-emerald-50 flex items-center justify-center">
+   681→              <CheckCircle2 className="h-6 w-6 text-[#10b981]" />
+   682→            </div>
+   683→            <div>
+   684→              <p className="text-xs font-medium text-muted-foreground">Hadir</p>
+   685→              <p className="text-2xl font-bold text-[#10b981]">{absensiResult.summary.hadir}</p>
+   686→            </div>
+   687→          </div>
+   688→
+   689→          <div className="bg-white rounded-2xl shadow-sm p-4 sm:p-5 flex items-center gap-4">
+   690→            <div className="flex-shrink-0 h-12 w-12 rounded-xl bg-amber-50 flex items-center justify-center">
+   691→              <FileText className="h-6 w-6 text-[#f59e0b]" />
+   692→            </div>
+   693→            <div>
+   694→              <p className="text-xs font-medium text-muted-foreground">Sakit</p>
+   695→              <p className="text-2xl font-bold text-[#f59e0b]">{absensiResult.summary.sakit}</p>
+   696→            </div>
+   697→          </div>
+   698→
+   699→          <div className="bg-white rounded-2xl shadow-sm p-4 sm:p-5 flex items-center gap-4">
+   700→            <div className="flex-shrink-0 h-12 w-12 rounded-xl bg-orange-50 flex items-center justify-center">
+   701→              <FileText className="h-6 w-6 text-[#f97316]" />
+   702→            </div>
+   703→            <div>
+   704→              <p className="text-xs font-medium text-muted-foreground">Izin</p>
+   705→              <p className="text-2xl font-bold text-[#f97316]">{absensiResult.summary.izin}</p>
+   706→            </div>
+   707→          </div>
+   708→
+   709→          <div className="bg-white rounded-2xl shadow-sm p-4 sm:p-5 flex items-center gap-4">
+   710→            <div className="flex-shrink-0 h-12 w-12 rounded-xl bg-red-50 flex items-center justify-center">
+   711→              <XCircle className="h-6 w-6 text-[#ef4444]" />
+   712→            </div>
+   713→            <div>
+   714→              <p className="text-xs font-medium text-muted-foreground">Alpha</p>
+   715→              <p className="text-2xl font-bold text-[#ef4444]">{absensiResult.summary.alpha}</p>
+   716→            </div>
+   717→          </div>
+   718→        </div>
+   719→      )}
+   720→
+   721→      {/* ── Results Table Card ── */}
+   722→      <div className="bg-white rounded-2xl shadow-sm p-4 sm:p-6">
+   723→        <div className="overflow-x-auto max-h-[70vh] overflow-y-auto">
+   724→          {loading ? (
+   725→            /* ── Skeleton ── */
+   726→            <div className="space-y-3">
+   727→              <Skeleton className="h-10 w-full" />
+   728→              {Array.from({ length: 6 }).map((_, i) => (
+   729→                <Skeleton key={i} className="h-12 w-full" />
+   730→              ))}
+   731→            </div>
+   732→          ) : !hasSearched ? (
+   733→            /* ── Initial state ── */
+   734→            <div className="flex flex-col items-center justify-center py-20 text-muted-foreground">
+   735→              <BarChart3 className="h-16 w-16 mb-4 opacity-40" />
+   736→              <p className="text-lg font-medium">Pilih Filter Terlebih Dahulu</p>
+   737→              <p className="text-sm mt-1 text-center">
+   738→                Pilih jenis laporan, atur filter, lalu klik &quot;Tampilkan&quot; untuk melihat data
+   739→              </p>
+   740→            </div>
+   741→          ) : !hasData ? (
+   742→            /* ── Empty state ── */
+   743→            <div className="flex flex-col items-center justify-center py-20 text-muted-foreground">
+   744→              <Inbox className="h-16 w-16 mb-4 opacity-40" />
+   745→              <p className="text-lg font-medium">Data Tidak Ditemukan</p>
+   746→              <p className="text-sm mt-1">Belum ada data untuk filter yang dipilih</p>
+   747→            </div>
+   748→          ) : tipe === 'nilai' ? (
+   749→            /* ── Nilai Table ── */
+   750→            <table className="siadak-table">
+   751→              <thead className="sticky top-0 z-10">
+   752→                <tr>
+   753→                  <th>No</th>
+   754→                  <th>NIS</th>
+   755→                  <th>Nama</th>
+   756→                  <th>Rata-Rata</th>
+   757→                  <th>Nilai Akhir</th>
+   758→                  <th>Predikat</th>
+   759→                  <th>Status Lulus</th>
+   760→                </tr>
+   761→              </thead>
+   762→              <tbody>
+   763→                {nilaiData.map((item, idx) => {
+   764→                  const predikat = getPredikatFromRataRata(item.rataRata)
+   765→                  const lulus = item.mapelTidakLulus === 0
+   766→                  return (
+   767→                    <tr key={item.nis}>
+   768→                      <td className="font-medium">{idx + 1}</td>
+   769→                      <td className="font-mono text-sm">{item.nis}</td>
+   770→                      <td className="font-medium">{item.nama}</td>
+   771→                      <td className="font-semibold">{item.rataRata}</td>
+   772→                      <td className="font-semibold">{item.nilaiTertinggi}</td>
+   773→                      <td>{getPredikatBadge(predikat)}</td>
+   774→                      <td>{getStatusLulusBadge(lulus)}</td>
+   775→                    </tr>
+   776→                  )
+   777→                })}
+   778→              </tbody>
+   779→            </table>
+   780→          ) : (
+   781→            /* ── Absensi Table ── */
+   782→            <table className="siadak-table">
+   783→              <thead className="sticky top-0 z-10">
+   784→                <tr>
+   785→                  <th>No</th>
+   786→                  <th>NIS</th>
+   787→                  <th>Nama</th>
+   788→                  <th>Hadir</th>
+   789→                  <th>Sakit</th>
+   790→                  <th>Izin</th>
+   791→                  <th>Alpha</th>
+   792→                  <th>Total</th>
+   793→                  <th>Persentase</th>
+   794→                </tr>
+   795→              </thead>
+   796→              <tbody>
+   797→                {absensiData.map((item, idx) => (
+   798→                  <tr key={item.nis}>
+   799→                    <td className="font-medium">{idx + 1}</td>
+   800→                    <td className="font-mono text-sm">{item.nis}</td>
+   801→                    <td className="font-medium">{item.nama}</td>
+   802→                    <td>
+   803→                      <span className="text-emerald-600 font-semibold">{item.hadir}</span>
+   804→                    </td>
+   805→                    <td>
+   806→                      <span className="text-amber-600 font-semibold">{item.sakit}</span>
+   807→                    </td>
+   808→                    <td>
+   809→                      <span className="text-orange-600 font-semibold">{item.izin}</span>
+   810→                    </td>
+   811→                    <td>
+   812→                      <span className="text-red-600 font-semibold">{item.alpha}</span>
+   813→                    </td>
+   814→                    <td className="font-semibold">{item.totalHari}</td>
+   815→                    <td>
+   816→                      <span className={`font-bold ${getPersentaseColor(item.persentaseKehadiran)}`}>
+   817→                        {item.persentaseKehadiran}%
+   818→                      </span>
+   819→                    </td>
+   820→                  </tr>
+   821→                ))}
+   822→              </tbody>
+   823→            </table>
+   824→          )}
+   825→        </div>
+   826→
+   827→        {/* Bottom Actions */}
+   828→        {hasSearched && !loading && hasData && (
+   829→          <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 mt-6 pt-4 border-t border-border">
+   830→            <p className="text-sm text-muted-foreground">
+   831→              Menampilkan{' '}
+   832→              <span className="font-semibold text-foreground">
+   833→                {tipe === 'nilai' ? nilaiData.length : absensiData.length}
+   834→              </span>{' '}
+   835→              data {tipe === 'nilai' ? 'nilai' : 'absensi'}
+   836→            </p>
+   837→            <div className="flex items-center gap-3">
+   838→              <Button
+   839→                onClick={handleExportExcel}
+   840→                className="bg-[#10b981] hover:bg-[#059669] text-white"
+   841→              >
+   842→                <Download className="h-4 w-4 mr-2" />
+   843→                Export Excel
+   844→              </Button>
+   845→              <Button
+   846→                onClick={handleExportPDF}
+   847→                className="bg-[#ef4444] hover:bg-[#dc2626] text-white"
+   848→              >
+   849→                <FileText className="h-4 w-4 mr-2" />
+   850→                Export PDF
+   851→              </Button>
+   852→            </div>
+   853→          </div>
+   854→        )}
+   855→      </div>
+   856→    </div>
+   857→  )
+   858→}
+   859→
