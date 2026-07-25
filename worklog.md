@@ -1,33 +1,28 @@
-# Worklog - SIAKAD TUWERI RBAC Implementation
-
 ---
 Task ID: 1
-Agent: main
-Task: Implement full RBAC system + guru absen masuk/pulang + fix prior bugs
+Agent: Main Agent
+Task: Fix kelas and pelajaran not showing on guru account, fix hydration error, replace logos
 
 Work Log:
-- Fixed hydration mismatch in page.tsx using useSyncExternalStore
-- Fixed SelectItem empty value error in Laporan.tsx (value="" → value="all")
-- Removed demo content (128 Guru, 1560 Siswa, 48 Kelas) from login page
-- Added Role, Permission, RolePermission, UserRole tables to Prisma schema
-- Created src/lib/rbac.ts with permission cache, authenticate(), requirePermission(), requireAnyPermission(), createAuditLog(), withAuth() helper
-- Updated src/lib/auth.ts with getUserWithPermissions(), initAuth(), reloadPermissions()
-- Wrote comprehensive seed with 35 permissions, 10 roles, 8 users, 15 guru, 6 kelas, 12 mapel, 24 siswa
-- Updated all 16 API routes with RBAC permission checks + audit logging
-- Updated Zustand store with permissions[], isSuperAdmin, hasPermission() method
-- Updated Sidebar with permission-based menu filtering (each menu item has a permission slug)
-- Added user info badge in sidebar showing name + role name
-- Built guru absen masuk/pulang UI on GuruDashboard with live clock, status cards, action buttons
-- Added page-level access control in page.tsx (403 page with "Kembali ke Dashboard" button)
-- Updated Navbar to show roleName from RBAC instead of hardcoded text
-- Fixed super-admin wildcard permission (wildcard-all in DB → * in frontend)
-- Verified RBAC via API tests: Super Admin=200, Guru users=403, Guru absen=201, Kepsek dashboard=200
+- Analyzed screenshot showing empty kelas dropdown on Absensi Siswa page for guru account
+- Identified root causes:
+  1. Dashboard API returned only global stats, not guru-specific data (no kelas, mapel associations)
+  2. Kelas API required 'kelas' permission which guru role doesn't have
+  3. Mapel API required 'mapel' permission which guru role doesn't have
+  4. Pengumuman API didn't return full 'isi' content in GET response
+- Modified /api/dashboard to return guru-specific data (myMapel, kelasList, totalKelas, totalSiswa, totalNilai)
+- Modified /api/kelas to allow guru role to access (filtered to their wali kelas + nilai kelas)
+- Modified /api/mata-pelajaran to allow guru role to access (filtered to their subjects)
+- Fixed /api/pengumuman to return full content (added 'isi' to select)
+- Rewrote GuruDashboard.tsx to display kelas diampu and mata pelajaran cards with real data
+- Fixed AbsensiGuru.tsx hydration error: changed <p> tags to <span> tags where Skeleton was nested inside
+- Downloaded new logo from Google Drive (aaQOWzG68OR6K01aN) and replaced /public/logo-tuweri.png
+- Verified all APIs return correct data via curl for both ahmad (guru) and sri (wali kelas)
+- Re-seeded database and confirmed data integrity
 
 Stage Summary:
-- Full RBAC with 10 roles and 35+ permissions stored in database
-- All API routes protected with permission checks, returning 403 when unauthorized
-- All mutations logged to AuditLog
-- Guru can absen masuk/pulang directly from dashboard with live time display
-- Sidebar dynamically shows only menus user has permission for
-- Login accounts: admin/admin123 (Super Admin), adminsekolah/admin123, ahmad/guru123, kepsek/kepsek123, etc.
-- Lint passes clean
+- Guru dashboard now shows: real kelas count, siswa count, mapel list, kelas list, pengumuman
+- Kelas and Mapel APIs filter data for guru role based on name associations
+- No more <p> nesting <div> hydration error
+- Logo replaced with new TUWERI logo from Google Drive
+- All APIs verified with curl for guru accounts (ahmad/guru123, sri/guru123)

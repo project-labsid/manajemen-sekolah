@@ -2,8 +2,21 @@
 import { useEffect, useState } from 'react'
 import { api } from '@/lib/api'
 import { useAppStore } from '@/lib/store'
-import { UserCheck, School, GraduationCap, FileCheck, Megaphone, LogIn, LogOut, Clock, MapPin, CheckCircle2, AlertCircle } from 'lucide-react'
+import { UserCheck, School, GraduationCap, FileCheck, Megaphone, LogIn, LogOut, Clock, CheckCircle2, BookOpen, Users } from 'lucide-react'
 import { toast } from 'sonner'
+
+interface MapelItem {
+  kodeMapel: string
+  namaMapel: string
+  guru: string
+  kkm: number
+}
+
+interface KelasItem {
+  kodeKelas: string
+  namaKelas: string
+  waliKelas?: string
+}
 
 export default function GuruDashboard() {
   const user = useAppStore((s) => s.user)
@@ -11,7 +24,8 @@ export default function GuruDashboard() {
   const [absenToday, setAbsenToday] = useState<any>(null)
   const [stats, setStats] = useState<any>(null)
   const [pengumuman, setPengumuman] = useState<any[]>([])
-  const [jadwal, setJadwal] = useState<any[]>([])
+  const [myMapel, setMyMapel] = useState<MapelItem[]>([])
+  const [myKelas, setMyKelas] = useState<KelasItem[]>([])
   const [loadingMasuk, setLoadingMasuk] = useState(false)
   const [loadingPulang, setLoadingPulang] = useState(false)
   const [currentTime, setCurrentTime] = useState('')
@@ -38,12 +52,26 @@ export default function GuruDashboard() {
           api.get<{ data: any[] }>(`/absensi-guru?tanggal=${today}&nama=${encodeURIComponent(user?.nama || '')}`),
           api.get<{ data: any[] }>('/pengumuman?limit=5'),
         ])
-        setStats(dashRes.stats)
-        setPengumuman(pgmRes.data?.slice(0, 5) || dashRes.recentPengumuman || [])
-        if (absenRes.data?.length > 0) {
+
+        // Guru-specific data from dashboard API
+        const s = dashRes.stats || {}
+        setStats(s)
+        setMyMapel(s.myMapel || [])
+        setMyKelas(s.kelasList || [])
+
+        // Pengumuman - use dashboard response if it includes full data, else use pengumuman API
+        const pgmData = pgmRes.data?.slice(0, 5) || dashRes.recentPengumuman || []
+        setPengumuman(pgmData)
+
+        // Absen today
+        if (dashRes.myAbsenToday) {
+          setAbsenToday(dashRes.myAbsenToday)
+        } else if (absenRes.data?.length > 0) {
           setAbsenToday(absenRes.data[0])
         }
-      } catch (e) { console.error(e) }
+      } catch (e) {
+        console.error(e)
+      }
     }
     if (user) load()
   }, [user])
@@ -56,8 +84,8 @@ export default function GuruDashboard() {
         nip: user?.nip || '',
         browser: navigator.userAgent,
       })
-      setAbsenToday(res.data)
-      toast.success(`Absen masuk berhasil! Jam: ${res.data.jamMasuk}`)
+      setAbsenToday(res.data || res)
+      toast.success(`Absen masuk berhasil! Jam: ${res.data?.jamMasuk || res.jamMasuk || ''}`)
     } catch (err: any) {
       toast.error(err.message || 'Gagal melakukan absen masuk')
     } finally {
@@ -72,8 +100,8 @@ export default function GuruDashboard() {
       const res = await api.put<any>('/absensi-guru', {
         id: absenToday.id,
       })
-      setAbsenToday(res.data)
-      toast.success(`Absen pulang berhasil! Jam: ${res.data.jamPulang} | Durasi: ${res.data.durasi}`)
+      setAbsenToday(res.data || res)
+      toast.success(`Absen pulang berhasil!`)
     } catch (err: any) {
       toast.error(err.message || 'Gagal melakukan absen pulang')
     } finally {
@@ -132,21 +160,21 @@ export default function GuruDashboard() {
                 <LogIn className="w-5 h-5" />
               </div>
               <p className="text-xs text-muted-foreground">Jam Masuk</p>
-              <p className={`text-lg font-bold mt-1 ${hasMasuk ? 'text-emerald-600' : 'text-gray-400'}`}>{hasMasuk ? absenToday.jamMasuk : '--:--'}</p>
+              <span className={`text-lg font-bold mt-1 block ${hasMasuk ? 'text-emerald-600' : 'text-gray-400'}`}>{hasMasuk ? absenToday.jamMasuk : '--:--'}</span>
             </div>
             <div className={`rounded-xl p-4 text-center ${hasPulang ? 'bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800' : 'bg-gray-50 dark:bg-slate-700/50 border border-gray-200 dark:border-slate-600'}`}>
               <div className={`w-10 h-10 mx-auto mb-2 rounded-full flex items-center justify-center ${hasPulang ? 'bg-blue-500 text-white' : 'bg-gray-300 dark:bg-slate-600 text-gray-500'}`}>
                 <LogOut className="w-5 h-5" />
               </div>
               <p className="text-xs text-muted-foreground">Jam Pulang</p>
-              <p className={`text-lg font-bold mt-1 ${hasPulang ? 'text-blue-600' : 'text-gray-400'}`}>{hasPulang ? absenToday.jamPulang : '--:--'}</p>
+              <span className={`text-lg font-bold mt-1 block ${hasPulang ? 'text-blue-600' : 'text-gray-400'}`}>{hasPulang ? absenToday.jamPulang : '--:--'}</span>
             </div>
             <div className={`rounded-xl p-4 text-center ${hasMasuk && hasPulang ? 'bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800' : 'bg-gray-50 dark:bg-slate-700/50 border border-gray-200 dark:border-slate-600'}`}>
               <div className={`w-10 h-10 mx-auto mb-2 rounded-full flex items-center justify-center ${hasMasuk && hasPulang ? 'bg-amber-500 text-white' : 'bg-gray-300 dark:bg-slate-600 text-gray-500'}`}>
                 <Clock className="w-5 h-5" />
               </div>
               <p className="text-xs text-muted-foreground">Durasi</p>
-              <p className={`text-lg font-bold mt-1 ${hasMasuk && hasPulang ? 'text-amber-600' : 'text-gray-400'}`}>{hasMasuk && hasPulang ? absenToday.durasi : '--'}</p>
+              <span className={`text-lg font-bold mt-1 block ${hasMasuk && hasPulang ? 'text-amber-600' : 'text-gray-400'}`}>{hasMasuk && hasPulang ? absenToday.durasi : '--'}</span>
             </div>
           </div>
 
@@ -199,8 +227,8 @@ export default function GuruDashboard() {
             <p className="text-xs font-medium text-muted-foreground">Kelas Diampu</p>
             <School className="w-5 h-5 text-blue-500" />
           </div>
-          <p className="text-lg font-bold" style={{ color: '#2563eb' }}>{stats?.totalKelas || 3} Kelas</p>
-          <p className="text-xs text-muted-foreground mt-1">Mata pelajaran diampu</p>
+          <span className="text-lg font-bold block" style={{ color: '#2563eb' }}>{stats?.totalKelas || 0} Kelas</span>
+          <p className="text-xs text-muted-foreground mt-1">Kelas yang diampu</p>
         </div>
 
         <div className="bg-white dark:bg-slate-800 rounded-2xl p-5 shadow-sm border border-gray-100 dark:border-slate-700/50">
@@ -208,7 +236,7 @@ export default function GuruDashboard() {
             <p className="text-xs font-medium text-muted-foreground">Jumlah Siswa</p>
             <GraduationCap className="w-5 h-5 text-purple-500" />
           </div>
-          <p className="text-lg font-bold" style={{ color: '#8b5cf6' }}>{stats?.totalSiswa?.toLocaleString() || '90'} Siswa</p>
+          <span className="text-lg font-bold block" style={{ color: '#8b5cf6' }}>{stats?.totalSiswa?.toLocaleString() || 0} Siswa</span>
           <p className="text-xs text-muted-foreground mt-1">Di kelas yang diampu</p>
         </div>
 
@@ -217,7 +245,7 @@ export default function GuruDashboard() {
             <p className="text-xs font-medium text-muted-foreground">Nilai Diinput</p>
             <FileCheck className="w-5 h-5 text-orange-500" />
           </div>
-          <p className="text-lg font-bold" style={{ color: '#f59e0b' }}>{stats?.totalNilai || 0}</p>
+          <span className="text-lg font-bold block" style={{ color: '#f59e0b' }}>{stats?.totalNilai || 0}</span>
           <p className="text-xs text-muted-foreground mt-1">Data nilai tersimpan</p>
         </div>
 
@@ -228,12 +256,65 @@ export default function GuruDashboard() {
           </div>
           {hasMasuk ? (
             <>
-              <p className="text-lg font-bold text-green-600">Hadir {absenToday.jamMasuk}</p>
+              <span className="text-lg font-bold text-green-600 block">Hadir {absenToday.jamMasuk}</span>
               {hasPulang && <p className="text-xs text-muted-foreground mt-1">Pulang: {absenToday.jamPulang}</p>}
             </>
           ) : (
-            <p className="text-lg font-bold text-yellow-600">Belum Absen</p>
+            <span className="text-lg font-bold text-yellow-600 block">Belum Absen</span>
           )}
+        </div>
+      </div>
+
+      {/* Kelas & Mapel Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {/* Kelas List */}
+        <div className="bg-white dark:bg-slate-800 rounded-2xl p-6 shadow-sm border border-gray-100 dark:border-slate-700/50">
+          <div className="flex items-center gap-2 mb-4">
+            <School className="w-4 h-4" style={{ color: '#0a2540' }} />
+            <h3 className="text-sm font-semibold" style={{ color: '#0a2540' }}>Kelas Diampu</h3>
+          </div>
+          <div className="space-y-2 max-h-[200px] overflow-y-auto">
+            {myKelas.length === 0 ? (
+              <p className="text-sm text-muted-foreground text-center py-4">Belum ada kelas yang diampu</p>
+            ) : (
+              myKelas.map((k: KelasItem) => (
+                <div key={k.kodeKelas} className="flex items-center gap-3 p-3 rounded-xl bg-gray-50 dark:bg-slate-700/50 border border-gray-100 dark:border-slate-600/50">
+                  <div className="w-9 h-9 rounded-lg bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center shrink-0">
+                    <School className="w-4 h-4 text-blue-600" />
+                  </div>
+                  <div className="min-w-0">
+                    <span className="text-sm font-semibold block" style={{ color: '#1a1a2e' }}>{k.namaKelas}</span>
+                    <span className="text-[11px] text-muted-foreground block">{k.kodeKelas}</span>
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+        </div>
+
+        {/* Mapel List */}
+        <div className="bg-white dark:bg-slate-800 rounded-2xl p-6 shadow-sm border border-gray-100 dark:border-slate-700/50">
+          <div className="flex items-center gap-2 mb-4">
+            <BookOpen className="w-4 h-4" style={{ color: '#0a2540' }} />
+            <h3 className="text-sm font-semibold" style={{ color: '#0a2540' }}>Mata Pelajaran</h3>
+          </div>
+          <div className="space-y-2 max-h-[200px] overflow-y-auto">
+            {myMapel.length === 0 ? (
+              <p className="text-sm text-muted-foreground text-center py-4">Belum ada mata pelajaran</p>
+            ) : (
+              myMapel.map((m: MapelItem) => (
+                <div key={m.kodeMapel} className="flex items-center gap-3 p-3 rounded-xl bg-gray-50 dark:bg-slate-700/50 border border-gray-100 dark:border-slate-600/50">
+                  <div className="w-9 h-9 rounded-lg bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center shrink-0">
+                    <BookOpen className="w-4 h-4 text-emerald-600" />
+                  </div>
+                  <div className="min-w-0">
+                    <span className="text-sm font-semibold block" style={{ color: '#1a1a2e' }}>{m.namaMapel}</span>
+                    <span className="text-[11px] text-muted-foreground block">KKM: {m.kkm} • {m.kodeMapel}</span>
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
         </div>
       </div>
 

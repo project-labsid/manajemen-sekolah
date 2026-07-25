@@ -41,7 +41,7 @@ export default function LoginPage() {
         }} />
         <div className="relative z-10 flex flex-col items-center justify-center p-12 text-white text-center">
           <div className="w-28 h-28 rounded-2xl bg-white/10 backdrop-blur-sm flex items-center justify-center mb-8 border-2 border-white/20 overflow-hidden">
-            <Image src="/logo-tuweri.png" alt="TUWERI Logo" width={96} height={96} className="object-contain" />
+            <Image src="/logo-tuweri.svg" alt="TUWERI Logo" width={96} height={96} className="object-contain" />
           </div>
           <h1 className="text-3xl font-bold mb-3">TUWERI</h1>
           <p className="text-lg font-medium opacity-90 mb-2">Sistem Informasi Akademik Sekolah</p>
@@ -58,7 +58,7 @@ export default function LoginPage() {
           {/* Mobile Logo */}
           <div className="md:hidden flex flex-col items-center mb-8">
             <div className="w-20 h-20 rounded-2xl flex items-center justify-center mb-3 overflow-hidden" style={{ background: '#0a2540' }}>
-              <Image src="/logo-tuweri.png" alt="TUWERI Logo" width={64} height={64} className="object-contain" />
+              <Image src="/logo-tuweri.svg" alt="TUWERI Logo" width={64} height={64} className="object-contain" />
             </div>
             <h1 className="text-xl font-bold" style={{ color: '#0a2540' }}>TUWERI</h1>
           </div>
