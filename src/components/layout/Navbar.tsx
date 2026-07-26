@@ -62,7 +62,11 @@ export default function Navbar() {
 
         <div className="flex items-center gap-3">
           {/* Notification Bell */}
-          <button className="relative p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-800 transition-colors">
+          <button
+            onClick={() => setPage('pengumuman')}
+            className="relative p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-800 transition-colors"
+            title="Pengumuman"
+          >
             <Bell className="w-5 h-5 text-gray-500 dark:text-gray-400" />
             <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full" />
           </button>

@@ -238,6 +238,8 @@ export default function AbsensiSiswa() {
     try {
       const absensiList = rows.map((row) => ({
         siswaId: row.siswaId,
+        nis: row.nis,
+        nama: row.nama,
         tanggal,
         kelas: selectedKelas,
         status: row.status,

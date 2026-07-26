@@ -2,7 +2,7 @@
 import { useEffect, useState } from 'react'
 import { api } from '@/lib/api'
 import { useAppStore } from '@/lib/store'
-import { UserCheck, School, GraduationCap, FileCheck, Megaphone, LogIn, LogOut, Clock, CheckCircle2, BookOpen, Users } from 'lucide-react'
+import { UserCheck, School, GraduationCap, FileCheck, Megaphone, LogIn, LogOut, Clock, CheckCircle2, BookOpen, Users, CalendarDays } from 'lucide-react'
 import { toast } from 'sonner'
 
 interface MapelItem {
@@ -26,6 +26,7 @@ export default function GuruDashboard() {
   const [pengumuman, setPengumuman] = useState<any[]>([])
   const [myMapel, setMyMapel] = useState<MapelItem[]>([])
   const [myKelas, setMyKelas] = useState<KelasItem[]>([])
+  const [jadwalMapel, setJadwalMapel] = useState<any[]>([])
   const [loadingMasuk, setLoadingMasuk] = useState(false)
   const [loadingPulang, setLoadingPulang] = useState(false)
   const [currentTime, setCurrentTime] = useState('')
@@ -58,6 +59,32 @@ export default function GuruDashboard() {
         setStats(s)
         setMyMapel(s.myMapel || [])
         setMyKelas(s.kelasList || [])
+
+        // Build jadwal: mapel with associated kelas from nilai data
+        const mapelList = s.myMapel || []
+        if (mapelList.length > 0) {
+          try {
+            const nilaiData = await api.get<{ data: any[] }>(
+              `/nilai?guru=${encodeURIComponent(user?.nama || '')}`
+            )
+            const nilaiItems = nilaiData.data || []
+            // Group kelas by mapel
+            const jadwal: any[] = mapelList.map((m: any) => {
+              const kelasSet = new Set<string>()
+              for (const n of nilaiItems) {
+                if (n.mapel === m.kodeMapel && n.kelas) kelasSet.add(n.kelas)
+              }
+              // Also check kelasList for wali kelas association
+              return {
+                ...m,
+                kelasList: Array.from(kelasSet),
+              }
+            })
+            setJadwalMapel(jadwal)
+          } catch {
+            setJadwalMapel(mapelList.map((m: any) => ({ ...m, kelasList: [] })))
+          }
+        }
 
         // Pengumuman - use dashboard response if it includes full data, else use pengumuman API
         const pgmData = pgmRes.data?.slice(0, 5) || dashRes.recentPengumuman || []
@@ -317,6 +344,43 @@ export default function GuruDashboard() {
           </div>
         </div>
       </div>
+
+      {/* Jadwal Pelajaran Saya */}
+      {jadwalMapel.length > 0 && (
+        <div className="bg-white dark:bg-slate-800 rounded-2xl p-6 shadow-sm border border-gray-100 dark:border-slate-700/50">
+          <div className="flex items-center gap-2 mb-4">
+            <CalendarDays className="w-4 h-4" style={{ color: '#0a2540' }} />
+            <h3 className="text-sm font-semibold" style={{ color: '#0a2540' }}>Jadwal Pelajaran Saya</h3>
+          </div>
+          <div className="space-y-3 max-h-[300px] overflow-y-auto">
+            {jadwalMapel.map((j: any) => (
+              <div key={j.kodeMapel} className="p-4 rounded-xl bg-gray-50 dark:bg-slate-700/50 border border-gray-100 dark:border-slate-600/50">
+                <div className="flex items-center gap-3 mb-2">
+                  <div className="w-9 h-9 rounded-lg bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center shrink-0">
+                    <BookOpen className="w-4 h-4 text-emerald-600" />
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <span className="text-sm font-semibold block" style={{ color: '#1a1a2e' }}>{j.namaMapel}</span>
+                    <span className="text-[11px] text-muted-foreground block">KKM: {j.kkm} &middot; {j.kodeMapel}</span>
+                  </div>
+                </div>
+                {j.kelasList && j.kelasList.length > 0 ? (
+                  <div className="flex flex-wrap gap-1.5 ml-12">
+                    {j.kelasList.map((k: string) => (
+                      <span key={k} className="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-medium bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300">
+                        <School className="w-3 h-3 mr-1" />
+                        {k}
+                      </span>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-[11px] text-muted-foreground ml-12 italic">Belum ada jadwal kelas</p>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Pengumuman */}
       <div className="bg-white dark:bg-slate-800 rounded-2xl p-6 shadow-sm border border-gray-100 dark:border-slate-700/50">

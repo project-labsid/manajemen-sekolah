@@ -22,7 +22,7 @@ export async function GET(request: NextRequest) {
   try {
     await initAuth()
     const user = authenticate(request)
-    await requirePermission(user, 'nilai')
+    await requireAnyPermission(user, ['nilai', 'rekap-nilai'])
 
     const url = new URL(request.url)
     const kelas = url.searchParams.get('kelas') || ''
@@ -30,6 +30,7 @@ export async function GET(request: NextRequest) {
     const semester = url.searchParams.get('semester') || ''
     const tahunAjaran = url.searchParams.get('tahunAjaran') || ''
     const nis = url.searchParams.get('nis') || ''
+    const guru = url.searchParams.get('guru') || ''
 
     const where: Record<string, unknown> = {}
     if (kelas) where.kelas = kelas
@@ -37,6 +38,7 @@ export async function GET(request: NextRequest) {
     if (semester) where.semester = semester
     if (tahunAjaran) where.tahunAjaran = tahunAjaran
     if (nis) where.nis = nis
+    if (guru) where.guru = guru
 
     const data = await db.nilai.findMany({
       where,

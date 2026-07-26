@@ -1,12 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { authenticate, requirePermission, createAuditLog, initAuth, AuthError } from '@/lib/rbac'
+import { authenticate, requireAnyPermission, createAuditLog, initAuth, AuthError } from '@/lib/rbac'
 import { db } from '@/lib/db'
 
 export async function GET(request: NextRequest) {
   try {
     await initAuth()
     const user = authenticate(request)
-    await requirePermission(user, 'absensi-siswa')
+    await requireAnyPermission(user, ['absensi-siswa', 'absensi-siswa:view'])
 
     const url = new URL(request.url)
     const tanggal = url.searchParams.get('tanggal') || new Date().toISOString().split('T')[0]
@@ -44,7 +44,7 @@ export async function POST(request: NextRequest) {
   try {
     await initAuth()
     const user = authenticate(request)
-    await requirePermission(user, 'absensi-siswa')
+    await requireAnyPermission(user, ['absensi-siswa', 'absensi-siswa:view'])
 
     const body = await request.json()
     const { tanggal, kelas, nis, nama, status, keterangan, guru } = body
@@ -95,7 +95,7 @@ export async function PUT(request: NextRequest) {
   try {
     await initAuth()
     const user = authenticate(request)
-    await requirePermission(user, 'absensi-siswa')
+    await requireAnyPermission(user, ['absensi-siswa', 'absensi-siswa:view'])
 
     const body = await request.json()
     const { absensiList } = body as { absensiList: Array<Record<string, unknown>> }

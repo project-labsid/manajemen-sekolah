@@ -13,6 +13,7 @@ import {
   UserCheck,
   AlertCircle,
   CheckCircle2,
+  AlertTriangle,
 } from 'lucide-react'
 import { format } from 'date-fns'
 import { id as localeId } from 'date-fns/locale'
@@ -181,6 +182,12 @@ export default function AbsensiGuru() {
   const [pulangRecordId, setPulangRecordId] = useState<string | null>(null)
   const [pulangJam, setPulangJam] = useState('')
 
+  // ── Sakit/Izin dialog ──
+  const [sakitIzinDialogOpen, setSakitIzinDialogOpen] = useState(false)
+  const [sakitIzinStatus, setSakitIzinStatus] = useState<'Sakit' | 'Izin'>('Sakit')
+  const [sakitIzinKeterangan, setSakitIzinKeterangan] = useState('')
+  const [submittingSakitIzin, setSubmittingSakitIzin] = useState(false)
+
   // ── Compute: today string for the selected date ──
   const selectedDateStr = useMemo(
     () => format(selectedDate, 'yyyy-MM-dd'),
@@ -209,6 +216,8 @@ export default function AbsensiGuru() {
   const canAbsenMasuk = isToday && !myTodayRecord && !isAdmin
   // ── Can absen pulang? ──
   const canAbsenPulang = isToday && myTodayRecord && !myTodayRecord.jamPulang && !isAdmin
+  // ── Can sakit/izin? ──
+  const canSakitIzin = isToday && !myTodayRecord && !isAdmin
 
   // ── Geolocation ──
   const getGeolocation = useCallback((): Promise<{ latitude: string; longitude: string }> => {
@@ -327,12 +336,41 @@ export default function AbsensiGuru() {
     }
   }, [pulangRecordId, pulangKeterangan, fetchRecords])
 
+  // ── Handle Sakit/Izin Submit ──
+  const handleSakitIzin = useCallback(async () => {
+    if (!user) return
+    if (!sakitIzinKeterangan.trim()) {
+      toast.error('Keterangan wajib diisi untuk Sakit/Izin')
+      return
+    }
+
+    setSubmittingSakitIzin(true)
+    try {
+      await api.post('/absensi-guru', {
+        namaGuru: user.nama,
+        nip: user.username || '',
+        status: sakitIzinStatus,
+        keterangan: sakitIzinKeterangan.trim(),
+      })
+
+      toast.success(`Absen ${sakitIzinStatus.toLowerCase()} berhasil dicatat!`)
+      setSakitIzinDialogOpen(false)
+      setSakitIzinKeterangan('')
+      fetchRecords()
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : `Gagal melakukan absen ${sakitIzinStatus.toLowerCase()}`
+      toast.error(message)
+    } finally {
+      setSubmittingSakitIzin(false)
+    }
+  }, [user, sakitIzinStatus, sakitIzinKeterangan, fetchRecords])
+
   // ── Render ──
   return (
     <div className="space-y-6 animate-fadeIn">
       {/* ── Action Buttons (Guru only, today only) ── */}
       {!isAdmin && (
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           {/* Absen Masuk Button */}
           <button
             type="button"
@@ -381,6 +419,36 @@ export default function AbsensiGuru() {
             {!canAbsenPulang && !submittingPulang && myTodayRecord?.jamPulang && (
               <span className="absolute top-2 right-3 text-xs font-normal opacity-80">
                 Sudah pulang
+              </span>
+            )}
+          </button>
+
+          {/* Sakit/Izin Button */}
+          <button
+            type="button"
+            disabled={!canSakitIzin || submittingSakitIzin}
+            onClick={() => {
+              setSakitIzinStatus('Sakit')
+              setSakitIzinKeterangan('')
+              setSakitIzinDialogOpen(true)
+            }}
+            className={
+              'relative flex items-center justify-center gap-3 rounded-2xl p-5 sm:p-6 text-white font-semibold text-base transition-all shadow-sm '
+              +
+              (canSakitIzin && !submittingSakitIzin
+                ? 'bg-[#f59e0b] hover:bg-[#d97706] hover:shadow-md active:scale-[0.98]'
+                : 'bg-gray-300 cursor-not-allowed opacity-60')
+            }
+          >
+            {submittingSakitIzin ? (
+              <Loader2 className="h-6 w-6 animate-spin" />
+            ) : (
+              <AlertTriangle className="h-6 w-6" />
+            )}
+            <span>{submittingSakitIzin ? 'Memproses...' : 'Sakit / Izin'}</span>
+            {!canSakitIzin && !submittingSakitIzin && myTodayRecord && (
+              <span className="absolute top-2 right-3 text-xs font-normal opacity-80">
+                Sudah absen
               </span>
             )}
           </button>
@@ -675,6 +743,90 @@ export default function AbsensiGuru() {
                 <LogOut className="h-4 w-4 mr-2" />
               )}
               {submittingPulang ? 'Memproses...' : 'Absen Pulang'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* ── Sakit/Izin Dialog ── */}
+      <Dialog open={sakitIzinDialogOpen} onOpenChange={setSakitIzinDialogOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <AlertTriangle className="h-5 w-5 text-[#f59e0b]" />
+              Absen Sakit / Izin
+            </DialogTitle>
+            <DialogDescription>
+              Pilih status dan isi keterangan wajib untuk mencatat ketidakhadiran Anda.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-4 py-2">
+            {/* Status selection */}
+            <div className="grid grid-cols-2 gap-3">
+              <button
+                type="button"
+                onClick={() => setSakitIzinStatus('Sakit')}
+                className={`p-4 rounded-xl border-2 text-center font-semibold transition-all ${
+                  sakitIzinStatus === 'Sakit'
+                    ? 'border-amber-500 bg-amber-50 text-amber-700'
+                    : 'border-gray-200 hover:border-gray-300 text-gray-600'
+                }`}
+              >
+                <p className="text-lg">🤒</p>
+                <p className="text-sm mt-1">Sakit</p>
+              </button>
+              <button
+                type="button"
+                onClick={() => setSakitIzinStatus('Izin')}
+                className={`p-4 rounded-xl border-2 text-center font-semibold transition-all ${
+                  sakitIzinStatus === 'Izin'
+                    ? 'border-blue-500 bg-blue-50 text-blue-700'
+                    : 'border-gray-200 hover:border-gray-300 text-gray-600'
+                }`}
+              >
+                <p className="text-lg">📋</p>
+                <p className="text-sm mt-1">Izin</p>
+              </button>
+            </div>
+
+            {/* Keterangan (mandatory) */}
+            <div className="space-y-2">
+              <Label htmlFor="sakit-izin-keterangan">
+                Keterangan <span className="text-red-500">*</span>
+              </Label>
+              <Textarea
+                id="sakit-izin-keterangan"
+                placeholder={`Alasan ${sakitIzinStatus.toLowerCase()} Anda...`}
+                value={sakitIzinKeterangan}
+                onChange={(e) => setSakitIzinKeterangan(e.target.value)}
+                rows={3}
+              />
+              <p className="text-xs text-muted-foreground">
+                Keterangan wajib diisi untuk status {sakitIzinStatus}
+              </p>
+            </div>
+          </div>
+
+          <DialogFooter className="gap-2 sm:gap-0">
+            <Button
+              variant="outline"
+              onClick={() => setSakitIzinDialogOpen(false)}
+              disabled={submittingSakitIzin}
+            >
+              Batal
+            </Button>
+            <Button
+              onClick={handleSakitIzin}
+              disabled={submittingSakitIzin || !sakitIzinKeterangan.trim()}
+              className="bg-[#f59e0b] hover:bg-[#d97706] text-white"
+            >
+              {submittingSakitIzin ? (
+                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+              ) : (
+                <AlertTriangle className="h-4 w-4 mr-2" />
+              )}
+              {submittingSakitIzin ? 'Memproses...' : `Kirim ${sakitIzinStatus}`}
             </Button>
           </DialogFooter>
         </DialogContent>

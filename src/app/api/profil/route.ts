@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { authenticate, requirePermission, createAuditLog, initAuth, AuthError } from '@/lib/rbac'
+import { authenticate, createAuditLog, initAuth, AuthError } from '@/lib/rbac'
 import { db } from '@/lib/db'
 import bcrypt from 'bcryptjs'
 
@@ -7,7 +7,7 @@ export async function GET(request: NextRequest) {
   try {
     await initAuth()
     const user = authenticate(request)
-    await requirePermission(user, 'profil')
+    // All authenticated users can view their own profile
 
     const profile = await db.user.findUnique({
       where: { id: user.userId },
@@ -44,7 +44,7 @@ export async function PUT(request: NextRequest) {
   try {
     await initAuth()
     const user = authenticate(request)
-    await requirePermission(user, 'profil')
+    // All authenticated users can edit their own profile
 
     const body = await request.json()
     const { nama, email, noHP, foto, passwordOld, passwordNew } = body

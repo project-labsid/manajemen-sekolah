@@ -1,8 +1,9 @@
 'use client'
 import { useState, useEffect, useCallback } from 'react'
 import { api } from '@/lib/api'
+import { useAppStore } from '@/lib/store'
 import { toast } from 'sonner'
-import { History, Search, Clock, Globe, Users, Loader2 } from 'lucide-react'
+import { History, Search, Clock, Globe, Users, Loader2, Trash2 } from 'lucide-react'
 
 interface RiwayatRecord {
   id: string; user: string; role: string; waktuLogin: string; ipAddress: string; userAgent: string; createdAt: string
@@ -18,11 +19,14 @@ function parseUA(ua: string): string {
 }
 
 export default function RiwayatLogin() {
+  const user = useAppStore((s) => s.user)
+  const isSuperAdmin = user?.role === 'super-admin'
   const [data, setData] = useState<RiwayatRecord[]>([])
   const [total, setTotal] = useState(0)
   const [page, setPage] = useState(1)
   const [search, setSearch] = useState('')
   const [loading, setLoading] = useState(true)
+  const [deletingId, setDeletingId] = useState<string | null>(null)
   const limit = 20
 
   const fetchData = useCallback(async () => {
@@ -38,6 +42,20 @@ export default function RiwayatLogin() {
   }, [page, search])
 
   useEffect(() => { fetchData() }, [fetchData])
+
+  const handleDelete = useCallback(async (id: string) => {
+    if (!confirm('Yakin ingin menghapus riwayat login ini?')) return
+    setDeletingId(id)
+    try {
+      await api.del(`/riwayat-login?id=${id}`)
+      toast.success('Riwayat login berhasil dihapus')
+      fetchData()
+    } catch {
+      toast.error('Gagal menghapus riwayat login')
+    } finally {
+      setDeletingId(null)
+    }
+  }, [fetchData])
 
   const today = new Date().toDateString()
   const weekAgo = new Date(Date.now() - 7 * 86400000)
@@ -75,10 +93,10 @@ export default function RiwayatLogin() {
       <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-700/50 overflow-hidden">
         <div className="overflow-x-auto max-h-[500px] overflow-y-auto">
           <table className="siadak-table">
-            <thead className="sticky top-0 z-10"><tr><th>No</th><th>User</th><th>Role</th><th>Waktu Login</th><th>IP Address</th><th>Browser/Device</th></tr></thead>
+            <thead className="sticky top-0 z-10"><tr><th>No</th><th>User</th><th>Role</th><th>Waktu Login</th><th>IP Address</th><th>Browser/Device</th>{isSuperAdmin && <th>Aksi</th>}</tr></thead>
             <tbody>
-              {loading ? <tr><td colSpan={6} className="text-center py-12"><Loader2 className="w-6 h-6 animate-spin mx-auto text-blue-500" /></td></tr>
-              : data.length === 0 ? <tr><td colSpan={6} className="text-center py-12 text-muted-foreground">Tidak ada data</td></tr>
+              {loading ? <tr><td colSpan={isSuperAdmin ? 7 : 6} className="text-center py-12"><Loader2 className="w-6 h-6 animate-spin mx-auto text-blue-500" /></td></tr>
+              : data.length === 0 ? <tr><td colSpan={isSuperAdmin ? 7 : 6} className="text-center py-12 text-muted-foreground">Tidak ada data</td></tr>
               : data.map((r, i) => (
                 <tr key={r.id}>
                   <td className="text-center">{(page - 1) * limit + i + 1}</td>
@@ -87,6 +105,18 @@ export default function RiwayatLogin() {
                   <td className="text-sm">{(new Date(r.waktuLogin)).toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' })}</td>
                   <td><code className="text-xs bg-gray-100 dark:bg-slate-700 px-2 py-1 rounded">{r.ipAddress || '-'}</code></td>
                   <td className="text-sm">{parseUA(r.userAgent)}</td>
+                  {isSuperAdmin && (
+                    <td>
+                      <button
+                        onClick={() => handleDelete(r.id)}
+                        disabled={deletingId === r.id}
+                        className="p-1.5 rounded-lg text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors disabled:opacity-50"
+                        title="Hapus"
+                      >
+                        {deletingId === r.id ? <Loader2 className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />}
+                      </button>
+                    </td>
+                  )}
                 </tr>
               ))}
             </tbody>

@@ -15,10 +15,33 @@ export async function GET(request: NextRequest) {
     let data
     if (isGuruRole) {
       // For guru: return only mapel assigned to them
-      data = await db.mataPelajaran.findMany({
-        where: { guru: user.nama || '' },
-        orderBy: { namaMapel: 'asc' },
-      })
+      // Try multiple name matching strategies
+      const userRecord = await db.user.findUnique({ where: { id: user.userId }, select: { nama: true, nip: true, username: true } })
+      const guruNames = new Set<string>()
+      if (user.nama) guruNames.add(user.nama)
+      if (userRecord?.nama && userRecord.nama !== user.nama) guruNames.add(userRecord.nama)
+      // Try matching via NIP in Guru table
+      const identifiers = [userRecord?.nip, userRecord?.username, user.username].filter(Boolean) as string[]
+      if (identifiers.length > 0) {
+        const gurus = await db.guru.findMany({
+          where: { OR: identifiers.map(id => ({ nip: id })) },
+          select: { nama: true },
+        })
+        for (const g of gurus) guruNames.add(g.nama)
+      }
+      // Also try by exact nama in Guru table
+      if (user.nama) {
+        const guruByName = await db.guru.findFirst({ where: { nama: user.nama }, select: { nama: true } })
+        if (guruByName) guruNames.add(guruByName.nama)
+      }
+
+      const namesArr = Array.from(guruNames).filter(Boolean)
+      data = namesArr.length > 0
+        ? await db.mataPelajaran.findMany({
+            where: { guru: { in: namesArr } },
+            orderBy: { namaMapel: 'asc' },
+          })
+        : []
     } else {
       // Admin and other roles see all mapel
       data = await db.mataPelajaran.findMany({

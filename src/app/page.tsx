@@ -44,7 +44,7 @@ const PAGE_PERMISSIONS: Record<PageKey, string> = {
   'riwayat-login': 'riwayat-login',
   'pengaturan': 'pengaturan',
   'audit-log': 'audit-log',
-  'profil': 'profil',
+  'profil': 'dashboard', // Fallback, actual check bypassed in code
 }
 
 function PageContent({ page }: { page: PageKey }) {
@@ -104,9 +104,9 @@ export default function Home() {
 
   if (!token || !user) return <LoginPage />
 
-  // Check page-level permission
+  // Check page-level permission (profil is accessible to all authenticated users)
   const requiredPermission = PAGE_PERMISSIONS[currentPage]
-  const canAccess = hasPermission(requiredPermission)
+  const canAccess = currentPage === 'profil' || hasPermission(requiredPermission)
 
   if (!canAccess) {
     return (

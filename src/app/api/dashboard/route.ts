@@ -16,10 +16,23 @@ export async function GET(request: NextRequest) {
 
     if (isGuruRole) {
       // ── Guru-specific dashboard data ──
+      // Build list of possible guru names for matching
+      const userRecord = await db.user.findUnique({ where: { id: user.userId }, select: { nama: true, nip: true, username: true } })
+      const guruNames = new Set<string>()
+      if (userNama) guruNames.add(userNama)
+      if (userRecord?.nama && userRecord.nama !== userNama) guruNames.add(userRecord.nama)
+      const identifiers = [userRecord?.nip, userRecord?.username, user.username].filter(Boolean) as string[]
+      if (identifiers.length > 0) {
+        const gurus = await db.guru.findMany({ where: { OR: identifiers.map(id => ({ nip: id })) }, select: { nama: true } })
+        for (const g of gurus) guruNames.add(g.nama)
+      }
+      const guruNameArr = Array.from(guruNames).filter(Boolean)
+      const mapelWhere = guruNameArr.length > 0 ? { guru: { in: guruNameArr }, status: 'aktif' } : { status: 'aktif' }
+
       const [myMapel, myKelasWali, myNilaiCount, mySiswaCount, myAbsenToday] = await Promise.all([
         // Mapel taught by this guru
         db.mataPelajaran.findMany({
-          where: { guru: userNama, status: 'aktif' },
+          where: mapelWhere,
           select: { kodeMapel: true, namaMapel: true, guru: true, kkm: true },
         }),
         // Kelas where this guru is wali kelas
@@ -28,17 +41,17 @@ export async function GET(request: NextRequest) {
           select: { kodeKelas: true, namaKelas: true, waliKelas: true },
         }),
         // Nilai count by this guru
-        db.nilai.count({ where: { guru: userNama } }),
+        db.nilai.count({ where: { guru: { in: guruNameArr.length > 0 ? guruNameArr : [userNama] } } }),
         // Count students in classes where this guru teaches
         (async () => {
           const mapelList = await db.mataPelajaran.findMany({
-            where: { guru: userNama, status: 'aktif' },
+            where: mapelWhere,
             select: { kodeMapel: true },
           })
           if (mapelList.length === 0) return 0
           const mapelCodes = mapelList.map(m => m.kodeMapel)
           const nilaiRecords = await db.nilai.findMany({
-            where: { guru: userNama },
+            where: { guru: { in: guruNameArr.length > 0 ? guruNameArr : [userNama] } },
             select: { kelas: true, nis: true },
             distinct: ['kelas', 'nis'],
           })
@@ -53,7 +66,7 @@ export async function GET(request: NextRequest) {
       // Build a combined list of kelas the guru is associated with
       // (wali kelas + kelas found in nilai records)
       const nilaiKelasList = await db.nilai.findMany({
-        where: { guru: userNama },
+        where: { guru: { in: guruNameArr.length > 0 ? guruNameArr : [userNama] } },
         select: { kelas: true },
         distinct: ['kelas'],
       })
