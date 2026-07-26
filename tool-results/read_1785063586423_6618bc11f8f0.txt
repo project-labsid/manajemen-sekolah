@@ -1,0 +1,833 @@
+    70→interface Kelas {
+    71→  id: string
+    72→  kodeKelas: string
+    73→  namaKelas: string
+    74→  waliKelas: string
+    75→  status: string
+    76→}
+    77→
+    78→interface SiswaResponse {
+    79→  data: Siswa[]
+    80→  total: number
+    81→  page: number
+    82→  limit: number
+    83→  totalPages: number
+    84→}
+    85→
+    86→interface FormData {
+    87→  nis: string
+    88→  nisn: string
+    89→  nama: string
+    90→  jenisKelamin: string
+    91→  tempatLahir: string
+    92→  tanggalLahir: string
+    93→  agama: string
+    94→  alamat: string
+    95→  namaAyah: string
+    96→  namaIbu: string
+    97→  noHp: string
+    98→  kelas: string
+    99→  status: string
+   100→}
+   101→
+   102→const AGAMA_OPTIONS = [
+   103→  'Islam',
+   104→  'Kristen',
+   105→  'Katolik',
+   106→  'Hindu',
+   107→  'Budha',
+   108→  'Konghucu',
+   109→]
+   110→
+   111→const EMPTY_FORM: FormData = {
+   112→  nis: '',
+   113→  nisn: '',
+   114→  nama: '',
+   115→  jenisKelamin: '',
+   116→  tempatLahir: '',
+   117→  tanggalLahir: '',
+   118→  agama: '',
+   119→  alamat: '',
+   120→  namaAyah: '',
+   121→  namaIbu: '',
+   122→  noHp: '',
+   123→  kelas: '',
+   124→  status: 'Aktif',
+   125→}
+   126→
+   127→const PAGE_LIMIT = 10
+   128→
+   129→// ── Component ───────────────────────────────────────────────────────────────
+   130→
+   131→export default function DataSiswa() {
+   132→  // ── Table state ──
+   133→  const [siswaList, setSiswaList] = useState<Siswa[]>([])
+   134→  const [total, setTotal] = useState(0)
+   135→  const [totalPages, setTotalPages] = useState(1)
+   136→  const [page, setPage] = useState(1)
+   137→  const [search, setSearch] = useState('')
+   138→  const [debouncedSearch, setDebouncedSearch] = useState('')
+   139→  const [filterKelas, setFilterKelas] = useState('')
+   140→  const [loading, setLoading] = useState(true)
+   141→
+   142→  // ── Kelas dropdown data ──
+   143→  const [kelasList, setKelasList] = useState<Kelas[]>([])
+   144→
+   145→  // ── Modal state ──
+   146→  const [modalOpen, setModalOpen] = useState(false)
+   147→  const [editingId, setEditingId] = useState<string | null>(null)
+   148→  const [form, setForm] = useState<FormData>(EMPTY_FORM)
+   149→  const [formSubmitting, setFormSubmitting] = useState(false)
+   150→
+   151→  // ── Delete confirmation state ──
+   152→  const [deleteOpen, setDeleteOpen] = useState(false)
+   153→  const [deletingItem, setDeletingItem] = useState<Siswa | null>(null)
+   154→  const [deleting, setDeleting] = useState(false)
+   155→
+   156→  // ── Refs ──
+   157→  const fileInputRef = useRef<HTMLInputElement>(null)
+   158→  const debounceTimer = useRef<ReturnType<typeof setTimeout>>()
+   159→
+   160→  // ── Fetch kelas list ──
+   161→  const fetchKelas = useCallback(async () => {
+   162→    try {
+   163→      const res = await api.get<Kelas[]>('/kelas')
+   164→      setKelasList(Array.isArray(res) ? res : (res as unknown as { data: Kelas[] }).data ?? [])
+   165→    } catch {
+   166→      // silently fail, dropdown will just be empty
+   167→    }
+   168→  }, [])
+   169→
+   170→  // ── Fetch siswa list ──
+   171→  const fetchSiswa = useCallback(async () => {
+   172→    setLoading(true)
+   173→    try {
+   174→      const params = new URLSearchParams()
+   175→      params.set('page', String(page))
+   176→      params.set('limit', String(PAGE_LIMIT))
+   177→      if (debouncedSearch) params.set('search', debouncedSearch)
+   178→      if (filterKelas) params.set('kelas', filterKelas)
+   179→
+   180→      const res = await api.get<SiswaResponse>(`/siswa?${params.toString()}`)
+   181→      const data = res as SiswaResponse
+   182→      setSiswaList(data.data ?? [])
+   183→      setTotal(data.total ?? 0)
+   184→      setTotalPages(data.totalPages ?? 1)
+   185→    } catch {
+   186→      toast.error('Gagal memuat data siswa')
+   187→    } finally {
+   188→      setLoading(false)
+   189→    }
+   190→  }, [page, debouncedSearch, filterKelas])
+   191→
+   192→  // ── Debounced search ──
+   193→  useEffect(() => {
+   194→    if (debounceTimer.current) clearTimeout(debounceTimer.current)
+   195→    debounceTimer.current = setTimeout(() => {
+   196→      setDebouncedSearch(search)
+   197→      setPage(1)
+   198→    }, 400)
+   199→    return () => {
+   200→      if (debounceTimer.current) clearTimeout(debounceTimer.current)
+   201→    }
+   202→  }, [search])
+   203→
+   204→  // ── Data fetching effects ──
+   205→  useEffect(() => {
+   206→    fetchKelas()
+   207→  }, [fetchKelas])
+   208→
+   209→  useEffect(() => {
+   210→    fetchSiswa()
+   211→  }, [fetchSiswa])
+   212→
+   213→  // ── Helpers ──
+   214→  const getKelasNama = (kodeKelas: string) => {
+   215→    const k = kelasList.find((k) => k.kodeKelas === kodeKelas)
+   216→    return k?.namaKelas ?? kodeKelas
+   217→  }
+   218→
+   219→  const openAddModal = () => {
+   220→    setEditingId(null)
+   221→    setForm(EMPTY_FORM)
+   222→    setModalOpen(true)
+   223→  }
+   224→
+   225→  const openEditModal = (siswa: Siswa) => {
+   226→    setEditingId(siswa.id)
+   227→    setForm({
+   228→      nis: siswa.nis,
+   229→      nisn: siswa.nisn,
+   230→      nama: siswa.nama,
+   231→      jenisKelamin: siswa.jenisKelamin,
+   232→      tempatLahir: siswa.tempatLahir,
+   233→      tanggalLahir: siswa.tanggalLahir,
+   234→      agama: siswa.agama,
+   235→      alamat: siswa.alamat,
+   236→      namaAyah: siswa.namaAyah,
+   237→      namaIbu: siswa.namaIbu,
+   238→      noHp: siswa.noHp,
+   239→      kelas: siswa.kelas || '',
+   240→      status: siswa.status,
+   241→    })
+   242→    setModalOpen(true)
+   243→  }
+   244→
+   245→  const handleFormChange = (field: keyof FormData, value: string) => {
+   246→    setForm((prev) => ({ ...prev, [field]: value }))
+   247→  }
+   248→
+   249→  const handleSubmit = async () => {
+   250→    if (!form.nis.trim() || !form.nisn.trim() || !form.nama.trim()) {
+   251→      toast.error('NIS, NISN, dan Nama wajib diisi')
+   252→      return
+   253→    }
+   254→    if (!form.kelas) {
+   255→      toast.error('Kelas wajib dipilih')
+   256→      return
+   257→    }
+   258→
+   259→    setFormSubmitting(true)
+   260→    try {
+   261→      const payload = {
+   262→        nis: form.nis,
+   263→        nisn: form.nisn,
+   264→        nama: form.nama,
+   265→        jenisKelamin: form.jenisKelamin,
+   266→        tempatLahir: form.tempatLahir,
+   267→        tanggalLahir: form.tanggalLahir,
+   268→        agama: form.agama,
+   269→        alamat: form.alamat,
+   270→        namaAyah: form.namaAyah,
+   271→        namaIbu: form.namaIbu,
+   272→        noHp: form.noHp,
+   273→        kelas: form.kelas,
+   274→        status: form.status,
+   275→      }
+   276→      if (editingId) {
+   277→        await api.put('/siswa', { id: editingId, ...payload })
+   278→        toast.success('Data siswa berhasil diperbarui')
+   279→      } else {
+   280→        await api.post('/siswa', payload)
+   281→        toast.success('Data siswa berhasil ditambahkan')
+   282→      }
+   283→      setModalOpen(false)
+   284→      fetchSiswa()
+   285→    } catch (err) {
+   286→      toast.error(err instanceof Error ? err.message : 'Gagal menyimpan data')
+   287→    } finally {
+   288→      setFormSubmitting(false)
+   289→    }
+   290→  }
+   291→
+   292→  const confirmDelete = (siswa: Siswa) => {
+   293→    setDeletingItem(siswa)
+   294→    setDeleteOpen(true)
+   295→  }
+   296→
+   297→  const handleDelete = async () => {
+   298→    if (!deletingItem) return
+   299→    setDeleting(true)
+   300→    try {
+   301→      await api.del(`/siswa?id=${deletingItem.id}`)
+   302→      toast.success('Data siswa berhasil dihapus')
+   303→      setDeleteOpen(false)
+   304→      setDeletingItem(null)
+   305→      fetchSiswa()
+   306→    } catch (err) {
+   307→      toast.error(err instanceof Error ? err.message : 'Gagal menghapus data')
+   308→    } finally {
+   309→      setDeleting(false)
+   310→    }
+   311→  }
+   312→
+   313→  const handleImportExcel = () => {
+   314→    fileInputRef.current?.click()
+   315→  }
+   316→
+   317→  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+   318→    const file = e.target.files?.[0]
+   319→    if (!file) return
+   320→    const formData = new FormData()
+   321→    formData.append('file', file)
+   322→    try {
+   323→      const token = (await import('@/lib/store')).useAppStore.getState().token
+   324→      const headers: Record<string, string> = {}
+   325→      if (token) headers['Authorization'] = `Bearer ${token}`
+   326→      const res = await fetch('/api/siswa/import', {
+   327→        method: 'POST',
+   328→        headers,
+   329→        body: formData,
+   330→      })
+   331→      const json = await res.json()
+   332→      if (!res.ok) throw new Error(json.error || 'Gagal import')
+   333→      toast.success('Data berhasil diimport')
+   334→      fetchSiswa()
+   335→    } catch (err) {
+   336→      toast.error(err instanceof Error ? err.message : 'Gagal mengimport file')
+   337→    } finally {
+   338→      if (fileInputRef.current) fileInputRef.current.value = ''
+   339→    }
+   340→  }
+   341→
+   342→  const handleExportExcel = async () => {
+   343→    try {
+   344→      const token = (await import('@/lib/store')).useAppStore.getState().token
+   345→      const headers: Record<string, string> = {}
+   346→      if (token) headers['Authorization'] = `Bearer ${token}`
+   347→      const params = new URLSearchParams()
+   348→      if (debouncedSearch) params.set('search', debouncedSearch)
+   349→      if (filterKelas) params.set('kelas', filterKelas)
+   350→      const res = await fetch(`/api/siswa/export?${params.toString()}`, { headers })
+   351→      if (!res.ok) throw new Error('Gagal export')
+   352→      const blob = await res.blob()
+   353→      const url = URL.createObjectURL(blob)
+   354→      const a = document.createElement('a')
+   355→      a.href = url
+   356→      a.download = 'data-siswa.xlsx'
+   357→      a.click()
+   358→      URL.revokeObjectURL(url)
+   359→      toast.success('Data berhasil diexport')
+   360→    } catch (err) {
+   361→      toast.error(err instanceof Error ? err.message : 'Gagal mengexport data')
+   362→    }
+   363→  }
+   364→
+   365→  // ── Pagination range ──
+   366→  const startIdx = (page - 1) * PAGE_LIMIT
+   367→  const endIdx = Math.min(startIdx + PAGE_LIMIT, total)
+   368→
+   369→  return (
+   370→    <section className="w-full" style={{ backgroundColor: '#f4f6f9' }}>
+   371→      <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+   372→        {/* ── Header ── */}
+   373→        <div className="mb-6">
+   374→          <h1
+   375→            className="text-2xl font-bold"
+   376→            style={{ color: '#0a2540' }}
+   377→          >
+   378→            Data Siswa
+   379→          </h1>
+   380→          <p className="mt-1 text-sm" style={{ color: '#0a2540' }}>
+   381→            Kelola data siswa sekolah dengan mudah
+   382→          </p>
+   383→        </div>
+   384→
+   385→        {/* ── Card ── */}
+   386→        <div className="rounded-2xl bg-white p-4 shadow-sm sm:p-6">
+   387→          {/* ── Action Bar ── */}
+   388→          <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+   389→            {/* Left: buttons */}
+   390→            <div className="flex flex-wrap items-center gap-2">
+   391→              <Button
+   392→                onClick={openAddModal}
+   393→                className="gap-1.5 text-white"
+   394→                style={{ backgroundColor: '#10b981' }}
+   395→              >
+   396→                <Plus className="size-4" />
+   397→                Tambah
+   398→              </Button>
+   399→              <Button
+   400→                variant="outline"
+   401→                onClick={handleImportExcel}
+   402→                className="gap-1.5"
+   403→                style={{ color: '#0a2540', borderColor: '#d1d5db' }}
+   404→              >
+   405→                <FileSpreadsheet className="size-4" />
+   406→                Import Excel
+   407→              </Button>
+   408→              <Button
+   409→                variant="outline"
+   410→                onClick={handleExportExcel}
+   411→                className="gap-1.5"
+   412→                style={{ color: '#0a2540', borderColor: '#d1d5db' }}
+   413→              >
+   414→                <Download className="size-4" />
+   415→                Export Excel
+   416→              </Button>
+   417→              <input
+   418→                ref={fileInputRef}
+   419→                type="file"
+   420→                accept=".xlsx,.xls"
+   421→                className="hidden"
+   422→                onChange={handleFileChange}
+   423→              />
+   424→            </div>
+   425→
+   426→            {/* Right: search + filter */}
+   427→            <div className="flex flex-wrap items-center gap-2">
+   428→              <div className="relative">
+   429→                <Search
+   430→                  className="absolute left-2.5 top-1/2 size-4 -translate-y-1/2 text-gray-400"
+   431→                />
+   432→                <Input
+   433→                  placeholder="Cari siswa..."
+   434→                  value={search}
+   435→                  onChange={(e) => setSearch(e.target.value)}
+   436→                  className="w-56 pl-9"
+   437→                />
+   438→              </div>
+   439→              <Select value={filterKelas} onValueChange={(v) => { setFilterKelas(v); setPage(1) }}>
+   440→                <SelectTrigger className="w-44">
+   441→                  <SelectValue placeholder="Semua Kelas" />
+   442→                </SelectTrigger>
+   443→                <SelectContent>
+   444→                  <SelectItem value="__all__">Semua Kelas</SelectItem>
+   445→                  {kelasList.map((k) => (
+   446→                    <SelectItem key={k.kodeKelas} value={k.kodeKelas}>
+   447→                      {k.namaKelas}
+   448→                    </SelectItem>
+   449→                  ))}
+   450→                </SelectContent>
+   451→              </Select>
+   452→            </div>
+   453→          </div>
+   454→
+   455→          {/* ── Table ── */}
+   456→          <div className="overflow-x-auto">
+   457→            {loading ? (
+   458→              /* Skeleton */
+   459→              <div className="space-y-3">
+   460→                {Array.from({ length: 5 }).map((_, i) => (
+   461→                  <div key={i} className="flex items-center gap-4">
+   462→                    <Skeleton className="h-8 w-8" />
+   463→                    <Skeleton className="h-8 w-20" />
+   464→                    <Skeleton className="h-8 w-24" />
+   465→                    <Skeleton className="h-8 flex-1" />
+   466→                    <Skeleton className="h-8 w-12" />
+   467→                    <Skeleton className="h-8 w-20" />
+   468→                    <Skeleton className="h-8 w-16" />
+   469→                    <Skeleton className="h-8 w-20" />
+   470→                  </div>
+   471→                ))}
+   472→              </div>
+   473→            ) : siswaList.length === 0 ? (
+   474→              /* Empty state */
+   475→              <div className="flex flex-col items-center justify-center py-16 text-center">
+   476→                <div
+   477→                  className="mb-4 flex size-16 items-center justify-center rounded-full"
+   478→                  style={{ backgroundColor: '#f0fdf4' }}
+   479→                >
+   480→                  <Inbox className="size-8" style={{ color: '#10b981' }} />
+   481→                </div>
+   482→                <h3
+   483→                  className="text-base font-semibold"
+   484→                  style={{ color: '#0a2540' }}
+   485→                >
+   486→                  Data Kosong
+   487→                </h3>
+   488→                <p className="mt-1 max-w-xs text-sm text-gray-500">
+   489→                  {debouncedSearch || filterKelas
+   490→                    ? 'Tidak ditemukan siswa yang sesuai dengan filter.'
+   491→                    : 'Belum ada data siswa. Klik tombol Tambah untuk menambahkan siswa baru.'}
+   492→                </p>
+   493→              </div>
+   494→            ) : (
+   495→              <table className="siadak-table w-full text-sm">
+   496→                <thead>
+   497→                  <tr
+   498→                    className="border-b text-left text-xs font-semibold uppercase tracking-wide"
+   499→                    style={{ color: '#0a2540', backgroundColor: '#f9fafb' }}
+   500→                  >
+   501→                    <th className="px-3 py-3">No</th>
+   502→                    <th className="px-3 py-3">NIS</th>
+   503→                    <th className="px-3 py-3">NISN</th>
+   504→                    <th className="px-3 py-3">Nama</th>
+   505→                    <th className="px-3 py-3">JK</th>
+   506→                    <th className="px-3 py-3">Kelas</th>
+   507→                    <th className="px-3 py-3">Status</th>
+   508→                    <th className="px-3 py-3 text-right">Aksi</th>
+   509→                  </tr>
+   510→                </thead>
+   511→                <tbody>
+   512→                  {siswaList.map((siswa, idx) => (
+   513→                    <tr
+   514→                      key={siswa.id}
+   515→                      className="border-b transition-colors last:border-b-0 hover:bg-gray-50"
+   516→                    >
+   517→                      <td className="px-3 py-3" style={{ color: '#0a2540' }}>
+   518→                        {startIdx + idx + 1}
+   519→                      </td>
+   520→                      <td className="px-3 py-3" style={{ color: '#0a2540' }}>
+   521→                        {siswa.nis}
+   522→                      </td>
+   523→                      <td className="px-3 py-3" style={{ color: '#0a2540' }}>
+   524→                        {siswa.nisn}
+   525→                      </td>
+   526→                      <td
+   527→                        className="px-3 py-3 font-medium"
+   528→                        style={{ color: '#0a2540' }}
+   529→                      >
+   530→                        {siswa.nama}
+   531→                      </td>
+   532→                      <td className="px-3 py-3">
+   533→                        <Badge
+   534→                          className={
+   535→                            siswa.jenisKelamin === 'L'
+   536→                              ? 'bg-blue-100 text-blue-700'
+   537→                              : 'bg-pink-100 text-pink-700'
+   538→                          }
+   539→                        >
+   540→                          {siswa.jenisKelamin === 'L' ? 'L' : 'P'}
+   541→                        </Badge>
+   542→                      </td>
+   543→                      <td className="px-3 py-3" style={{ color: '#0a2540' }}>
+   544→                        {getKelasNama(siswa.kelas)}
+   545→                      </td>
+   546→                      <td className="px-3 py-3">
+   547→                        {siswa.status === 'Aktif' ? (
+   548→                          <Badge className="bg-green-100 text-green-700">
+   549→                            Aktif
+   550→                          </Badge>
+   551→                        ) : (
+   552→                          <Badge className="bg-red-100 text-red-700">
+   553→                            Nonaktif
+   554→                          </Badge>
+   555→                        )}
+   556→                      </td>
+   557→                      <td className="px-3 py-3 text-right">
+   558→                        <div className="flex items-center justify-end gap-1">
+   559→                          <button
+   560→                            onClick={() => openEditModal(siswa)}
+   561→                            className="rounded-lg p-1.5 transition-colors hover:bg-blue-50"
+   562→                            title="Edit"
+   563→                          >
+   564→                            <Pencil className="size-4" style={{ color: '#2563eb' }} />
+   565→                          </button>
+   566→                          <button
+   567→                            onClick={() => confirmDelete(siswa)}
+   568→                            className="rounded-lg p-1.5 transition-colors hover:bg-red-50"
+   569→                            title="Hapus"
+   570→                          >
+   571→                            <Trash2 className="size-4" style={{ color: '#ef4444' }} />
+   572→                          </button>
+   573→                        </div>
+   574→                      </td>
+   575→                    </tr>
+   576→                  ))}
+   577→                </tbody>
+   578→              </table>
+   579→            )}
+   580→          </div>
+   581→
+   582→          {/* ── Pagination ── */}
+   583→          {!loading && siswaList.length > 0 && (
+   584→            <div className="mt-4 flex items-center justify-between">
+   585→              <p className="text-sm text-gray-500">
+   586→                Menampilkan {startIdx + 1}–{endIdx} dari {total} data
+   587→              </p>
+   588→              <div className="flex items-center gap-1">
+   589→                <button
+   590→                  onClick={() => setPage((p) => Math.max(1, p - 1))}
+   591→                  disabled={page <= 1}
+   592→                  className="flex size-8 items-center justify-center rounded-lg border border-gray-200 text-gray-600 transition-colors hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-40"
+   593→                >
+   594→                  <ChevronLeft className="size-4" />
+   595→                </button>
+   596→                {Array.from({ length: totalPages }, (_, i) => i + 1)
+   597→                  .filter((p) => {
+   598→                    if (totalPages <= 5) return true
+   599→                    if (p === 1 || p === totalPages) return true
+   600→                    return Math.abs(p - page) <= 1
+   601→                  })
+   602→                  .reduce<(number | 'ellipsis')[]>((acc, p, i, arr) => {
+   603→                    if (i > 0) {
+   604→                      const prev = arr[i - 1]
+   605→                      if (p - prev > 1) acc.push('ellipsis')
+   606→                    }
+   607→                    acc.push(p)
+   608→                    return acc
+   609→                  }, [])
+   610→                  .map((item, i) =>
+   611→                    item === 'ellipsis' ? (
+   612→                      <span
+   613→                        key={`ellipsis-${i}`}
+   614→                        className="flex size-8 items-center justify-center text-sm text-gray-400"
+   615→                      >
+   616→                        ...
+   617→                      </span>
+   618→                    ) : (
+   619→                      <button
+   620→                        key={item}
+   621→                        onClick={() => setPage(item)}
+   622→                        className={
+   623→                          'flex size-8 items-center justify-center rounded-lg text-sm font-medium transition-colors ' +
+   624→                          (page === item
+   625→                            ? ' text-white'
+   626→                            : 'border border-gray-200 text-gray-600 hover:bg-gray-100')
+   627→                        }
+   628→                        style={
+   629→                          page === item
+   630→                            ? { backgroundColor: '#10b981' }
+   631→                            : undefined
+   632→                        }
+   633→                      >
+   634→                        {item}
+   635→                      </button>
+   636→                    ),
+   637→                  )}
+   638→                <button
+   639→                  onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+   640→                  disabled={page >= totalPages}
+   641→                  className="flex size-8 items-center justify-center rounded-lg border border-gray-200 text-gray-600 transition-colors hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-40"
+   642→                >
+   643→                  <ChevronRight className="size-4" />
+   644→                </button>
+   645→              </div>
+   646→            </div>
+   647→          )}
+   648→        </div>
+   649→      </div>
+   650→
+   651→      {/* ── Add / Edit Modal ── */}
+   652→      <Dialog open={modalOpen} onOpenChange={setModalOpen}>
+   653→        <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-2xl">
+   654→          <DialogHeader>
+   655→            <DialogTitle style={{ color: '#0a2540' }}>
+   656→              {editingId ? 'Edit Data Siswa' : 'Tambah Siswa Baru'}
+   657→            </DialogTitle>
+   658→            <DialogDescription>
+   659→              {editingId
+   660→                ? 'Perbarui informasi siswa di bawah ini.'
+   661→                : 'Isi form berikut untuk menambahkan siswa baru.'}
+   662→            </DialogDescription>
+   663→          </DialogHeader>
+   664→
+   665→          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+   666→            {/* NIS */}
+   667→            <div className="space-y-1.5">
+   668→              <Label htmlFor="nis">
+   669→                NIS <span style={{ color: '#ef4444' }}>*</span>
+   670→              </Label>
+   671→              <Input
+   672→                id="nis"
+   673→                placeholder="Nomor Induk Siswa"
+   674→                value={form.nis}
+   675→                onChange={(e) => handleFormChange('nis', e.target.value)}
+   676→              />
+   677→            </div>
+   678→
+   679→            {/* NISN */}
+   680→            <div className="space-y-1.5">
+   681→              <Label htmlFor="nisn">
+   682→                NISN <span style={{ color: '#ef4444' }}>*</span>
+   683→              </Label>
+   684→              <Input
+   685→                id="nisn"
+   686→                placeholder="NISN"
+   687→                value={form.nisn}
+   688→                onChange={(e) => handleFormChange('nisn', e.target.value)}
+   689→              />
+   690→            </div>
+   691→
+   692→            {/* Nama */}
+   693→            <div className="space-y-1.5 sm:col-span-2">
+   694→              <Label htmlFor="nama">
+   695→                Nama Lengkap <span style={{ color: '#ef4444' }}>*</span>
+   696→              </Label>
+   697→              <Input
+   698→                id="nama"
+   699→                placeholder="Nama lengkap siswa"
+   700→                value={form.nama}
+   701→                onChange={(e) => handleFormChange('nama', e.target.value)}
+   702→              />
+   703→            </div>
+   704→
+   705→            {/* Jenis Kelamin */}
+   706→            <div className="space-y-1.5">
+   707→              <Label>Jenis Kelamin</Label>
+   708→              <Select
+   709→                value={form.jenisKelamin}
+   710→                onValueChange={(v) => handleFormChange('jenisKelamin', v)}
+   711→              >
+   712→                <SelectTrigger className="w-full">
+   713→                  <SelectValue placeholder="Pilih jenis kelamin" />
+   714→                </SelectTrigger>
+   715→                <SelectContent>
+   716→                  <SelectItem value="L">Laki-laki</SelectItem>
+   717→                  <SelectItem value="P">Perempuan</SelectItem>
+   718→                </SelectContent>
+   719→              </Select>
+   720→            </div>
+   721→
+   722→            {/* Agama */}
+   723→            <div className="space-y-1.5">
+   724→              <Label>Agama</Label>
+   725→              <Select
+   726→                value={form.agama}
+   727→                onValueChange={(v) => handleFormChange('agama', v)}
+   728→              >
+   729→                <SelectTrigger className="w-full">
+   730→                  <SelectValue placeholder="Pilih agama" />
+   731→                </SelectTrigger>
+   732→                <SelectContent>
+   733→                  {AGAMA_OPTIONS.map((a) => (
+   734→                    <SelectItem key={a} value={a}>
+   735→                      {a}
+   736→                    </SelectItem>
+   737→                  ))}
+   738→                </SelectContent>
+   739→              </Select>
+   740→            </div>
+   741→
+   742→            {/* Tempat Lahir */}
+   743→            <div className="space-y-1.5">
+   744→              <Label htmlFor="tempatLahir">Tempat Lahir</Label>
+   745→              <Input
+   746→                id="tempatLahir"
+   747→                placeholder="Kota tempat lahir"
+   748→                value={form.tempatLahir}
+   749→                onChange={(e) => handleFormChange('tempatLahir', e.target.value)}
+   750→              />
+   751→            </div>
+   752→
+   753→            {/* Tanggal Lahir */}
+   754→            <div className="space-y-1.5">
+   755→              <Label htmlFor="tanggalLahir">Tanggal Lahir</Label>
+   756→              <Input
+   757→                id="tanggalLahir"
+   758→                type="date"
+   759→                value={form.tanggalLahir}
+   760→                onChange={(e) => handleFormChange('tanggalLahir', e.target.value)}
+   761→              />
+   762→            </div>
+   763→
+   764→            {/* Alamat */}
+   765→            <div className="space-y-1.5 sm:col-span-2">
+   766→              <Label htmlFor="alamat">Alamat</Label>
+   767→              <Textarea
+   768→                id="alamat"
+   769→                placeholder="Alamat lengkap siswa"
+   770→                rows={3}
+   771→                value={form.alamat}
+   772→                onChange={(e) => handleFormChange('alamat', e.target.value)}
+   773→              />
+   774→            </div>
+   775→
+   776→            {/* Nama Ayah */}
+   777→            <div className="space-y-1.5">
+   778→              <Label htmlFor="namaAyah">Nama Ayah</Label>
+   779→              <Input
+   780→                id="namaAyah"
+   781→                placeholder="Nama ayah"
+   782→                value={form.namaAyah}
+   783→                onChange={(e) => handleFormChange('namaAyah', e.target.value)}
+   784→              />
+   785→            </div>
+   786→
+   787→            {/* Nama Ibu */}
+   788→            <div className="space-y-1.5">
+   789→              <Label htmlFor="namaIbu">Nama Ibu</Label>
+   790→              <Input
+   791→                id="namaIbu"
+   792→                placeholder="Nama ibu"
+   793→                value={form.namaIbu}
+   794→                onChange={(e) => handleFormChange('namaIbu', e.target.value)}
+   795→              />
+   796→            </div>
+   797→
+   798→            {/* No HP */}
+   799→            <div className="space-y-1.5">
+   800→              <Label htmlFor="noHp">No. HP</Label>
+   801→              <Input
+   802→                id="noHp"
+   803→                placeholder="08xxxxxxxxxx"
+   804→                value={form.noHp}
+   805→                onChange={(e) => handleFormChange('noHp', e.target.value)}
+   806→              />
+   807→            </div>
+   808→
+   809→            {/* Kelas */}
+   810→            <div className="space-y-1.5">
+   811→              <Label>Kelas <span style={{ color: '#ef4444' }}>*</span></Label>
+   812→              <Select
+   813→                value={form.kelas}
+   814→                onValueChange={(v) => handleFormChange('kelas', v)}
+   815→              >
+   816→                <SelectTrigger className="w-full">
+   817→                  <SelectValue placeholder="Pilih kelas" />
+   818→                </SelectTrigger>
+   819→                <SelectContent>
+   820→                  {kelasList.map((k) => (
+   821→                    <SelectItem key={k.kodeKelas} value={k.kodeKelas}>
+   822→                      {k.namaKelas}
+   823→                    </SelectItem>
+   824→                  ))}
+   825→                </SelectContent>
+   826→              </Select>
+   827→            </div>
+   828→
+   829→            {/* Status */}
+   830→            <div className="space-y-1.5">
+   831→              <Label>Status</Label>
+   832→              <Select
+   833→                value={form.status}
+   834→                onValueChange={(v) => handleFormChange('status', v)}
+   835→              >
+   836→                <SelectTrigger className="w-full">
+   837→                  <SelectValue placeholder="Pilih status" />
+   838→                </SelectTrigger>
+   839→                <SelectContent>
+   840→                  <SelectItem value="Aktif">Aktif</SelectItem>
+   841→                  <SelectItem value="Nonaktif">Nonaktif</SelectItem>
+   842→                </SelectContent>
+   843→              </Select>
+   844→            </div>
+   845→          </div>
+   846→
+   847→          <DialogFooter>
+   848→            <Button
+   849→              variant="outline"
+   850→              onClick={() => setModalOpen(false)}
+   851→              disabled={formSubmitting}
+   852→            >
+   853→              Batal
+   854→            </Button>
+   855→            <Button
+   856→              onClick={handleSubmit}
+   857→              disabled={formSubmitting}
+   858→              className="gap-1.5 text-white"
+   859→              style={{ backgroundColor: '#10b981' }}
+   860→            >
+   861→              {formSubmitting && <Loader2 className="size-4 animate-spin" />}
+   862→              {editingId ? 'Simpan Perubahan' : 'Tambah Siswa'}
+   863→            </Button>
+   864→          </DialogFooter>
+   865→        </DialogContent>
+   866→      </Dialog>
+   867→
+   868→      {/* ── Delete Confirmation ── */}
+   869→      <AlertDialog open={deleteOpen} onOpenChange={setDeleteOpen}>
+   870→        <AlertDialogContent>
+   871→          <AlertDialogHeader>
+   872→            <AlertDialogTitle style={{ color: '#0a2540' }}>
+   873→              Hapus Data Siswa?
+   874→            </AlertDialogTitle>
+   875→            <AlertDialogDescription>
+   876→              Apakah Anda yakin ingin menghapus data siswa{' '}
+   877→              <span className="font-semibold" style={{ color: '#0a2540' }}>
+   878→                {deletingItem?.nama}
+   879→              </span>{' '}
+   880→              ? Tindakan ini tidak dapat dibatalkan.
+   881→            </AlertDialogDescription>
+   882→          </AlertDialogHeader>
+   883→          <AlertDialogFooter>
+   884→            <AlertDialogCancel disabled={deleting}>
+   885→              Batal
+   886→            </AlertDialogCancel>
+   887→            <AlertDialogAction
+   888→              onClick={handleDelete}
+   889→              disabled={deleting}
+   890→              className="gap-1.5 bg-red-500 text-white hover:bg-red-600"
+   891→              style={{ backgroundColor: '#ef4444' }}
+   892→            >
+   893→              {deleting && <Loader2 className="size-4 animate-spin" />}
+   894→              Hapus
+   895→            </AlertDialogAction>
+   896→          </AlertDialogFooter>
+   897→        </AlertDialogContent>
+   898→      </AlertDialog>
+   899→    </section>
+   900→  )
+   901→}
+   902→

@@ -106,6 +106,11 @@ function getDeviceInfo(): string {
   return 'Unknown Device'
 }
 
+function getLocalTime(): string {
+  const now = new Date()
+  return now.toTimeString().slice(0, 5)
+}
+
 function getStatusBadge(status: string) {
   switch (status) {
     case 'Hadir':
@@ -174,6 +179,7 @@ export default function AbsensiGuru() {
   const [pulangDialogOpen, setPulangDialogOpen] = useState(false)
   const [pulangKeterangan, setPulangKeterangan] = useState('')
   const [pulangRecordId, setPulangRecordId] = useState<string | null>(null)
+  const [pulangJam, setPulangJam] = useState('')
 
   // ── Compute: today string for the selected date ──
   const selectedDateStr = useMemo(
@@ -263,10 +269,12 @@ export default function AbsensiGuru() {
       const geo = await getGeolocation()
       const browser = getBrowserInfo()
       const device = getDeviceInfo()
+      const jamMasuk = getLocalTime()
 
       await api.post('/absensi-guru', {
         namaGuru: user.nama,
         nip: user.username || '',
+        jamMasuk,
         latitude: geo.latitude,
         longitude: geo.longitude,
         browser,
@@ -289,6 +297,7 @@ export default function AbsensiGuru() {
     if (!myTodayRecord) return
     setPulangRecordId(myTodayRecord.id)
     setPulangKeterangan('')
+    setPulangJam(getLocalTime())
     setPulangDialogOpen(true)
   }, [myTodayRecord])
 
@@ -300,6 +309,7 @@ export default function AbsensiGuru() {
     try {
       await api.put('/absensi-guru', {
         id: pulangRecordId,
+        jamPulang: pulangJam,
         keterangan: pulangKeterangan,
       })
 
@@ -307,6 +317,7 @@ export default function AbsensiGuru() {
       setPulangDialogOpen(false)
       setPulangKeterangan('')
       setPulangRecordId(null)
+      setPulangJam('')
       fetchRecords()
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : 'Gagal melakukan absen pulang'
@@ -603,7 +614,7 @@ export default function AbsensiGuru() {
             <DialogDescription>
               Anda akan mencatat absen pulang pada pukul{' '}
               <span className="font-semibold text-foreground">
-                {new Date().toTimeString().slice(0, 5)}
+                {pulangJam}
               </span>
               . Tambahkan keterangan jika diperlukan.
             </DialogDescription>
@@ -621,7 +632,7 @@ export default function AbsensiGuru() {
               <div className="rounded-xl bg-red-50 p-3">
                 <p className="text-xs text-red-600 font-medium">Jam Pulang</p>
                 <p className="text-lg font-bold text-red-700">
-                  {new Date().toTimeString().slice(0, 5)}
+                  {pulangJam}
                 </p>
               </div>
             </div>

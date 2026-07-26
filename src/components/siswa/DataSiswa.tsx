@@ -62,7 +62,7 @@ interface Siswa {
   alamat: string
   namaAyah: string
   namaIbu: string
-  noHp: string
+  noHP: string
   kelas: string
   status: string
 }
@@ -83,6 +83,16 @@ interface SiswaResponse {
   totalPages: number
 }
 
+interface SiswaApiRaw {
+  data: Siswa[]
+  pagination?: {
+    page: number
+    limit: number
+    total: number
+    totalPages: number
+  }
+}
+
 interface FormData {
   nis: string
   nisn: string
@@ -94,7 +104,7 @@ interface FormData {
   alamat: string
   namaAyah: string
   namaIbu: string
-  noHp: string
+  noHP: string
   kelas: string
   status: string
 }
@@ -119,9 +129,9 @@ const EMPTY_FORM: FormData = {
   alamat: '',
   namaAyah: '',
   namaIbu: '',
-  noHp: '',
+  noHP: '',
   kelas: '',
-  status: 'Aktif',
+  status: 'aktif',
 }
 
 const PAGE_LIMIT = 10
@@ -177,11 +187,14 @@ export default function DataSiswa() {
       if (debouncedSearch) params.set('search', debouncedSearch)
       if (filterKelas) params.set('kelas', filterKelas)
 
-      const res = await api.get<SiswaResponse>(`/siswa?${params.toString()}`)
-      const data = res as SiswaResponse
-      setSiswaList(data.data ?? [])
-      setTotal(data.total ?? 0)
-      setTotalPages(data.totalPages ?? 1)
+      const res = await api.get<SiswaApiRaw>(`/siswa?${params.toString()}`)
+      const raw = res as SiswaApiRaw
+      const data = raw.data ?? []
+      const pag = raw.pagination
+      setSiswaList(data)
+      setTotal(pag?.total ?? 0)
+      setTotalPages(pag?.totalPages ?? 1)
+      setPage(pag?.page ?? 1)
     } catch {
       toast.error('Gagal memuat data siswa')
     } finally {
@@ -235,7 +248,7 @@ export default function DataSiswa() {
       alamat: siswa.alamat,
       namaAyah: siswa.namaAyah,
       namaIbu: siswa.namaIbu,
-      noHp: siswa.noHp,
+      noHP: siswa.noHP ?? '',
       kelas: siswa.kelas || '',
       status: siswa.status,
     })
@@ -269,7 +282,7 @@ export default function DataSiswa() {
         alamat: form.alamat,
         namaAyah: form.namaAyah,
         namaIbu: form.namaIbu,
-        noHp: form.noHp,
+        noHP: form.noHP,
         kelas: form.kelas,
         status: form.status,
       }
@@ -532,19 +545,19 @@ export default function DataSiswa() {
                       <td className="px-3 py-3">
                         <Badge
                           className={
-                            siswa.jenisKelamin === 'L'
+                            siswa.jenisKelamin?.startsWith('L')
                               ? 'bg-blue-100 text-blue-700'
                               : 'bg-pink-100 text-pink-700'
                           }
                         >
-                          {siswa.jenisKelamin === 'L' ? 'L' : 'P'}
+                          {siswa.jenisKelamin?.startsWith('L') ? 'L' : 'P'}
                         </Badge>
                       </td>
                       <td className="px-3 py-3" style={{ color: '#0a2540' }}>
                         {getKelasNama(siswa.kelas)}
                       </td>
                       <td className="px-3 py-3">
-                        {siswa.status === 'Aktif' ? (
+                        {siswa.status === 'aktif' ? (
                           <Badge className="bg-green-100 text-green-700">
                             Aktif
                           </Badge>
@@ -797,12 +810,12 @@ export default function DataSiswa() {
 
             {/* No HP */}
             <div className="space-y-1.5">
-              <Label htmlFor="noHp">No. HP</Label>
+              <Label htmlFor="noHP">No. HP</Label>
               <Input
-                id="noHp"
+                id="noHP"
                 placeholder="08xxxxxxxxxx"
-                value={form.noHp}
-                onChange={(e) => handleFormChange('noHp', e.target.value)}
+                value={form.noHP}
+                onChange={(e) => handleFormChange('noHP', e.target.value)}
               />
             </div>
 
@@ -837,8 +850,8 @@ export default function DataSiswa() {
                   <SelectValue placeholder="Pilih status" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="Aktif">Aktif</SelectItem>
-                  <SelectItem value="Nonaktif">Nonaktif</SelectItem>
+                  <SelectItem value="aktif">Aktif</SelectItem>
+                  <SelectItem value="nonaktif">Nonaktif</SelectItem>
                 </SelectContent>
               </Select>
             </div>

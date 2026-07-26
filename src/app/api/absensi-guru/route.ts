@@ -39,15 +39,15 @@ export async function POST(request: NextRequest) {
     await requirePermission(user, 'absensi-guru:clock-in')
 
     const body = await request.json()
-    const { namaGuru, nip, latitude, longitude, alamat, browser, device, keterangan } = body
+    const { namaGuru, nip, latitude, longitude, alamat, browser, device, keterangan, jamMasuk: clientJamMasuk } = body
 
     if (!namaGuru) {
       return NextResponse.json({ error: 'Nama guru wajib diisi' }, { status: 400 })
     }
 
     const today = new Date().toISOString().split('T')[0]
-    const now = new Date()
-    const jamMasuk = now.toTimeString().slice(0, 5)
+    // Use client-provided time if available, otherwise use server time
+    const jamMasuk = clientJamMasuk || new Date().toTimeString().slice(0, 5)
 
     const existing = await db.absensiGuru.findFirst({
       where: { tanggal: today, nip: nip || '' },
@@ -103,7 +103,7 @@ export async function PUT(request: NextRequest) {
     await requirePermission(user, 'absensi-guru:clock-out')
 
     const body = await request.json()
-    const { id, keterangan } = body
+    const { id, keterangan, jamPulang: clientJamPulang } = body
 
     if (!id) {
       return NextResponse.json({ error: 'ID wajib diisi' }, { status: 400 })
@@ -118,8 +118,8 @@ export async function PUT(request: NextRequest) {
       return NextResponse.json({ error: 'Absensi pulang sudah tercatat' }, { status: 409 })
     }
 
-    const now = new Date()
-    const jamPulang = now.toTimeString().slice(0, 5)
+    // Use client-provided time if available, otherwise use server time
+    const jamPulang = clientJamPulang || new Date().toTimeString().slice(0, 5)
 
     const jamMasukTime = new Date(`1970-01-01T${existing.jamMasuk}:00`)
     const jamPulangTime = new Date(`1970-01-01T${jamPulang}:00`)
