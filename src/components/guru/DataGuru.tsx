@@ -221,8 +221,8 @@ export default function DataGuru() {
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) {
       errors.email = 'Format email tidak valid'
     }
-    if (!form.noHp.trim()) errors.noHp = 'No HP wajib diisi'
-    if (!form.mapel.trim()) errors.mapel = 'Mapel wajib diisi'
+    if (!(form.noHp || '').trim()) errors.noHp = 'No HP wajib diisi'
+    if (!(form.mapel || '').trim()) errors.mapel = 'Mapel wajib diisi'
     setFormErrors(errors)
     return Object.keys(errors).length === 0
   }
