@@ -51,7 +51,7 @@ import { toast } from 'sonner'
 // ── Types ────────────────────────────────────────────────────────────────────
 
 interface Siswa {
-  id: number
+  id: string
   nis: string
   nisn: string
   nama: string
@@ -63,14 +63,16 @@ interface Siswa {
   namaAyah: string
   namaIbu: string
   noHp: string
-  kelasId: number
-  kelas?: string
+  kelas: string
   status: string
 }
 
 interface Kelas {
-  id: number
-  nama: string
+  id: string
+  kodeKelas: string
+  namaKelas: string
+  waliKelas: string
+  status: string
 }
 
 interface SiswaResponse {
@@ -93,7 +95,7 @@ interface FormData {
   namaAyah: string
   namaIbu: string
   noHp: string
-  kelasId: string
+  kelas: string
   status: string
 }
 
@@ -118,7 +120,7 @@ const EMPTY_FORM: FormData = {
   namaAyah: '',
   namaIbu: '',
   noHp: '',
-  kelasId: '',
+  kelas: '',
   status: 'Aktif',
 }
 
@@ -142,7 +144,7 @@ export default function DataSiswa() {
 
   // ── Modal state ──
   const [modalOpen, setModalOpen] = useState(false)
-  const [editingId, setEditingId] = useState<number | null>(null)
+  const [editingId, setEditingId] = useState<string | null>(null)
   const [form, setForm] = useState<FormData>(EMPTY_FORM)
   const [formSubmitting, setFormSubmitting] = useState(false)
 
@@ -209,9 +211,9 @@ export default function DataSiswa() {
   }, [fetchSiswa])
 
   // ── Helpers ──
-  const getKelasNama = (kelasId: number) => {
-    const k = kelasList.find((k) => k.id === kelasId)
-    return k?.nama ?? kelasId.toString()
+  const getKelasNama = (kodeKelas: string) => {
+    const k = kelasList.find((k) => k.kodeKelas === kodeKelas)
+    return k?.namaKelas ?? kodeKelas
   }
 
   const openAddModal = () => {
@@ -234,7 +236,7 @@ export default function DataSiswa() {
       namaAyah: siswa.namaAyah,
       namaIbu: siswa.namaIbu,
       noHp: siswa.noHp,
-      kelasId: String(siswa.kelasId),
+      kelas: siswa.kelas || '',
       status: siswa.status,
     })
     setModalOpen(true)
@@ -249,7 +251,7 @@ export default function DataSiswa() {
       toast.error('NIS, NISN, dan Nama wajib diisi')
       return
     }
-    if (!form.kelasId) {
+    if (!form.kelas) {
       toast.error('Kelas wajib dipilih')
       return
     }
@@ -257,8 +259,19 @@ export default function DataSiswa() {
     setFormSubmitting(true)
     try {
       const payload = {
-        ...form,
-        kelasId: Number(form.kelasId),
+        nis: form.nis,
+        nisn: form.nisn,
+        nama: form.nama,
+        jenisKelamin: form.jenisKelamin,
+        tempatLahir: form.tempatLahir,
+        tanggalLahir: form.tanggalLahir,
+        agama: form.agama,
+        alamat: form.alamat,
+        namaAyah: form.namaAyah,
+        namaIbu: form.namaIbu,
+        noHp: form.noHp,
+        kelas: form.kelas,
+        status: form.status,
       }
       if (editingId) {
         await api.put('/siswa', { id: editingId, ...payload })
@@ -430,8 +443,8 @@ export default function DataSiswa() {
                 <SelectContent>
                   <SelectItem value="__all__">Semua Kelas</SelectItem>
                   {kelasList.map((k) => (
-                    <SelectItem key={k.id} value={String(k.id)}>
-                      {k.nama}
+                    <SelectItem key={k.kodeKelas} value={k.kodeKelas}>
+                      {k.namaKelas}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -528,7 +541,7 @@ export default function DataSiswa() {
                         </Badge>
                       </td>
                       <td className="px-3 py-3" style={{ color: '#0a2540' }}>
-                        {siswa.kelas ?? getKelasNama(siswa.kelasId)}
+                        {getKelasNama(siswa.kelas)}
                       </td>
                       <td className="px-3 py-3">
                         {siswa.status === 'Aktif' ? (
@@ -797,16 +810,16 @@ export default function DataSiswa() {
             <div className="space-y-1.5">
               <Label>Kelas <span style={{ color: '#ef4444' }}>*</span></Label>
               <Select
-                value={form.kelasId}
-                onValueChange={(v) => handleFormChange('kelasId', v)}
+                value={form.kelas}
+                onValueChange={(v) => handleFormChange('kelas', v)}
               >
                 <SelectTrigger className="w-full">
                   <SelectValue placeholder="Pilih kelas" />
                 </SelectTrigger>
                 <SelectContent>
                   {kelasList.map((k) => (
-                    <SelectItem key={k.id} value={String(k.id)}>
-                      {k.nama}
+                    <SelectItem key={k.kodeKelas} value={k.kodeKelas}>
+                      {k.namaKelas}
                     </SelectItem>
                   ))}
                 </SelectContent>
