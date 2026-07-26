@@ -7,7 +7,7 @@ export async function GET(request: NextRequest) {
     await initAuth()
     const user = authenticate(request)
     // Allow access if user has 'siswa' or 'absensi-siswa' permission
-    await requireAnyPermission(user, ['siswa', 'absensi-siswa'])</arg_value>  
+    await requireAnyPermission(user, ['siswa', 'absensi-siswa'])
 
     const url = new URL(request.url)
     const page = Math.max(1, parseInt(url.searchParams.get('page') || '1'))
