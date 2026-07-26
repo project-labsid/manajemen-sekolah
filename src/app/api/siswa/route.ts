@@ -1,12 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { authenticate, requirePermission, createAuditLog, initAuth, AuthError } from '@/lib/rbac'
+import { authenticate, requirePermission, requireAnyPermission, createAuditLog, initAuth, AuthError } from '@/lib/rbac'
 import { db } from '@/lib/db'
 
 export async function GET(request: NextRequest) {
   try {
     await initAuth()
     const user = authenticate(request)
-    await requirePermission(user, 'siswa')
+    // Allow access if user has 'siswa' or 'absensi-siswa' permission
+    await requireAnyPermission(user, ['siswa', 'absensi-siswa'])</arg_value>  
 
     const url = new URL(request.url)
     const page = Math.max(1, parseInt(url.searchParams.get('page') || '1'))
