@@ -5,8 +5,8 @@ import { useAppStore } from '@/lib/store'
 import { Plus, Search, Pencil, Trash2, Megaphone, X } from 'lucide-react'
 
 export default function Pengumuman() {
-  const { user } = useAppStore()
-  const isAdmin = user?.role === 'admin'
+  const { user, hasPermission } = useAppStore()
+  const canManage = hasPermission('pengumuman:manage')
   const [data, setData] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState('')
@@ -61,7 +61,7 @@ export default function Pengumuman() {
             <input type="text" placeholder="Cari pengumuman..." value={search} onChange={(e) => setSearch(e.target.value)}
               className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-gray-200 dark:border-slate-600 bg-gray-50 dark:bg-slate-700 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
           </div>
-          {isAdmin && (
+          {canManage && (
             <button onClick={openAdd} className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-white text-sm font-medium transition-all hover:opacity-90" style={{ background: '#10b981' }}>
               <Plus className="w-4 h-4" /> Buat Pengumuman
             </button>
@@ -79,7 +79,7 @@ export default function Pengumuman() {
                 <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: '#eff6ff' }}><Megaphone className="w-5 h-5" style={{ color: '#2563eb' }} /></div>
                 <div><h3 className="text-sm font-semibold" style={{ color: '#0a2540' }}>{p.judul}</h3><p className="text-[11px] text-muted-foreground">{p.tanggal}</p></div>
               </div>
-              {isAdmin && (<div className="flex gap-1"><button onClick={() => openEdit(p)} className="p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-700"><Pencil className="w-4 h-4" style={{ color: '#2563eb' }} /></button><button onClick={() => handleDelete(p.id)} className="p-1.5 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20"><Trash2 className="w-4 h-4 text-red-500" /></button></div>)}
+              {canManage && (<div className="flex gap-1"><button onClick={() => openEdit(p)} className="p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-700"><Pencil className="w-4 h-4" style={{ color: '#2563eb' }} /></button><button onClick={() => handleDelete(p.id)} className="p-1.5 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20"><Trash2 className="w-4 h-4 text-red-500" /></button></div>)}
             </div>
             <p className="text-sm text-gray-600 dark:text-gray-300 line-clamp-3">{p.isi}</p>
             <div className="mt-3 pt-3 border-t border-gray-100 dark:border-slate-700"><span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-medium bg-green-50 text-green-700 dark:bg-green-900/30 dark:text-green-400">Aktif</span></div>

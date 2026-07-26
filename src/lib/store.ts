@@ -88,7 +88,8 @@ export const useAppStore = create<AppState>((set, get) => ({
   hasPermission: (slug: string) => {
     const { user } = get()
     if (!user) return false
-    if (user.isSuperAdmin || user.permissions.includes('*')) return true
-    return user.permissions.includes(slug)
+    const perms = user.permissions || []
+    if (user.isSuperAdmin || perms.includes('*')) return true
+    return perms.includes(slug)
   },
 }))

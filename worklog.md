@@ -43,3 +43,21 @@ Stage Summary:
 - HTML nesting hydration error fixed
 - Logo already correctly set up from previous session
 
+---
+Task ID: 1
+Agent: Main
+Task: Fix hasPermission crash + Pengumuman role access
+
+Work Log:
+- Fixed `user.permissions.includes()` crash in store.ts by adding `|| []` fallback for undefined permissions
+- Changed `const perms = user.permissions || []` before calling `.includes()`
+- Updated Pengumuman component to use `hasPermission('pengumuman:manage')` instead of hardcoded `isAdmin` check
+- Added `pengumuman:manage` permission to `kepala-sekolah` role in database
+- Confirmed `super-admin` (wildcard), `admin`, `wakil-kepala-sekolah` already have the permission
+- Note: `kurikulum` role doesn't exist in DB - user may need to create it first
+
+Stage Summary:
+- Store hasPermission no longer crashes when permissions array is undefined
+- Pengumuman create/edit/delete now uses RBAC permission check
+- Roles with access: super-admin, admin, operator, kepala-sekolah, wakil-kepala-sekolah, tata-usaha
+- Lint passes clean
