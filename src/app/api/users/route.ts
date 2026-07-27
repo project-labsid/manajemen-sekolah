@@ -41,11 +41,12 @@ export async function POST(request: NextRequest) {
     const body = await request.json()
     const { nama, username, password, role, email, noHP, nip, jabatan } = body
     if (!nama || !username || !password) return NextResponse.json({ error: 'Nama, username, dan password wajib diisi' }, { status: 400 })
+    if (!role) return NextResponse.json({ error: 'Role wajib dipilih' }, { status: 400 })
     const existing = await db.user.findUnique({ where: { username } })
     if (existing) return NextResponse.json({ error: 'Username sudah digunakan' }, { status: 409 })
     const hashedPassword = await bcrypt.hash(password, 10)
     const newUser = await db.user.create({
-      data: { nama, username, password: hashedPassword, passwordText: password, role: role || 'guru', status: 'aktif', email: email || '', noHP: noHP || '', nip: nip || '', jabatan: jabatan || '' },
+      data: { nama, username, password: hashedPassword, passwordText: password, role, status: 'aktif', email: email || '', noHP: noHP || '', nip: nip || '', jabatan: jabatan || '' },
     })
     await createAuditLog({ user: user.nama, role: user.role, aktivitas: 'Tambah User', ip: request.headers.get('x-forwarded-for') || '', detail: `Menambahkan user ${username} (${role || 'guru'})` })
     const { password: _, ...safeUser } = newUser
@@ -66,7 +67,7 @@ export async function PUT(request: NextRequest) {
     await requirePermission(user, 'users')
 
     const body = await request.json()
-    const { id, nama, username, email, noHP, nip, jabatan, status, password } = body
+    const { id, nama, username, role, email, noHP, nip, jabatan, status, password } = body
     if (!id) return NextResponse.json({ error: 'ID wajib diisi' }, { status: 400 })
     const existing = await db.user.findUnique({ where: { id } })
     if (!existing) return NextResponse.json({ error: 'User tidak ditemukan' }, { status: 404 })
@@ -76,6 +77,7 @@ export async function PUT(request: NextRequest) {
     if (noHP !== undefined) updateData.noHP = noHP
     if (nip !== undefined) updateData.nip = nip
     if (jabatan !== undefined) updateData.jabatan = jabatan
+    if (role) updateData.role = role
     if (status) updateData.status = status
     if (username && username !== existing.username) {
       const taken = await db.user.findFirst({ where: { username, id: { not: id } } })

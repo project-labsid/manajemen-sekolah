@@ -1,7 +1,26 @@
 ---
+Task ID: 4
+Agent: Main
+Task: Perbaiki dropdown role kosong dan validasi role saat buat user
+
+Work Log:
+- Diagnosa: dropdown role kosong karena fetchRoles API call gagal silent
+- Hapus dependensi API /api/roles, gunakan hardcoded ALL_ROLES constant langsung di komponen
+- Ubah emptyForm.role dari 'guru' ke '' (memaksa user memilih role)
+- Tambah validasi frontend: 'Role wajib dipilih' sebelum simpan
+- Tambah validasi backend: role wajib diisi (return 400 jika kosong)
+- Tambah field role di PUT endpoint agar role bisa diubah saat edit
+- Hapus fallback role || 'guru' di backend create
+- Tambah label merah * di field Role
+
+Stage Summary:
+- Dropdown sekarang selalu menampilkan 10 role tanpa dependensi API
+- User tidak bisa disimpan tanpa memilih role
+- Edit user sekarang bisa mengubah role
+- Masalah 'user tidak bisa absen' disebabkan user dibuat tanpa role (sekarang dicegah)
+
+---
 Task ID: 3
-Agent: Main Agent
-Task: Fix 11 pending bugs and features for school management system
 
 Work Log:
 - Verified store.ts permissions fix already in place (|| [] fallback)

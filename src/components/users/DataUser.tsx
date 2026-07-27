@@ -6,10 +6,8 @@ import { toast } from 'sonner'
 import { Plus, Search, Pencil, Trash2, X, Users, UserCog, Loader2, Shield, UserCheck, Eye, EyeOff } from 'lucide-react'
 
 interface RoleItem {
-  id: string
   slug: string
   nama: string
-  deskripsi: string
 }
 
 interface UserRecord {
@@ -17,7 +15,20 @@ interface UserRecord {
   email: string; noHP: string; nip: string; jabatan: string; lastLogin: string | null; createdAt: string
 }
 
-const emptyForm = { nama: '', username: '', password: '', role: 'guru', email: '', noHP: '', nip: '', jabatan: '', status: 'aktif' }
+const ALL_ROLES: RoleItem[] = [
+  { slug: 'super-admin', nama: 'Super Admin' },
+  { slug: 'admin', nama: 'Admin Sekolah' },
+  { slug: 'kepala-sekolah', nama: 'Kepala Sekolah' },
+  { slug: 'wakil-kepala-sekolah', nama: 'Wakil Kepala Sekolah' },
+  { slug: 'tata-usaha', nama: 'Tata Usaha' },
+  { slug: 'operator', nama: 'Operator Sekolah' },
+  { slug: 'guru', nama: 'Guru' },
+  { slug: 'wali-kelas', nama: 'Wali Kelas' },
+  { slug: 'siswa', nama: 'Siswa' },
+  { slug: 'orang-tua', nama: 'Orang Tua' },
+]
+
+const emptyForm = { nama: '', username: '', password: '', role: '', email: '', noHP: '', nip: '', jabatan: '', status: 'aktif' }
 
 const ROLE_COLORS: Record<string, string> = {
   'super-admin': 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400',
@@ -39,6 +50,10 @@ function getRoleBadgeClass(slug: string) {
   return ROLE_COLORS[slug] || DEFAULT_ROLE_COLOR
 }
 
+function getRoleName(slug: string) {
+  return ALL_ROLES.find(r => r.slug === slug)?.nama || slug
+}
+
 export default function DataUser() {
   const [data, setData] = useState<UserRecord[]>([])
   const [total, setTotal] = useState(0)
@@ -53,15 +68,7 @@ export default function DataUser() {
   const [form, setForm] = useState(emptyForm)
   const [saving, setSaving] = useState(false)
   const [showPw, setShowPw] = useState(false)
-  const [roles, setRoles] = useState<RoleItem[]>([])
   const limit = 10
-
-  const fetchRoles = useCallback(async () => {
-    try {
-      const res = await api.get<{ data: RoleItem[] }>('/roles')
-      setRoles(res.data || [])
-    } catch { /* silent */ }
-  }, [])
 
   const fetchData = useCallback(async () => {
     setLoading(true)
@@ -76,7 +83,6 @@ export default function DataUser() {
     finally { setLoading(false) }
   }, [page, search, roleFilter])
 
-  useEffect(() => { fetchRoles() }, [fetchRoles])
   useEffect(() => { fetchData() }, [fetchData])
 
   const handleAdd = () => { setForm(emptyForm); setEditId(null); setShowPw(false); setShowModal(true) }
@@ -86,6 +92,7 @@ export default function DataUser() {
   }
   const handleSave = async () => {
     if (!form.nama || !form.username) { toast.error('Nama dan username wajib diisi'); return }
+    if (!form.role) { toast.error('Role wajib dipilih'); return }
     if (!editId && !form.password) { toast.error('Password wajib diisi'); return }
     setSaving(true)
     try {
@@ -117,13 +124,13 @@ export default function DataUser() {
         <button onClick={handleAdd} className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-white text-sm font-medium bg-[#2563eb] hover:bg-[#1d4ed8]"><Plus className="w-4 h-4" /> Tambah User</button>
       </div>
 
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
         {[
           { icon: <Users className="w-5 h-5" />, label: 'Total User', value: total, bg: 'bg-blue-50 dark:bg-blue-900/30', color: 'text-[#2563eb]' },
           { icon: <Shield className="w-5 h-5" />, label: 'Super Admin', value: data.filter(u => u.role === 'super-admin').length, bg: 'bg-purple-50 dark:bg-purple-900/30', color: 'text-purple-600' },
           { icon: <Shield className="w-5 h-5" />, label: 'Admin', value: data.filter(u => u.role === 'admin').length, bg: 'bg-blue-50 dark:bg-blue-900/30', color: 'text-[#2563eb]' },
-          { icon: <UserCheck className="w-5 h-5" />, label: 'Guru & Wali Kelas', value: data.filter(u => u.role === 'guru' || u.role === 'wali-kelas').length, bg: 'bg-emerald-50 dark:bg-emerald-900/30', color: 'text-[#10b981]' },
-          { icon: <UserCog className="w-5 h-5" />, label: 'Aktif', value: data.filter(u => u.status === 'aktif').length, bg: 'bg-amber-50 dark:bg-amber-900/30', color: 'text-[#f59e0b]' },
+          { icon: <UserCheck className="w-5 h-5" />, label: 'Guru', value: data.filter(u => u.role === 'guru' || u.role === 'wali-kelas').length, bg: 'bg-emerald-50 dark:bg-emerald-900/30', color: 'text-[#10b981]' },
+          { icon: <UserCog className="w-5 h-5" />, label: 'Lainnya', value: data.filter(u => !['super-admin','admin','guru','wali-kelas'].includes(u.role)).length, bg: 'bg-amber-50 dark:bg-amber-900/30', color: 'text-[#f59e0b]' },
         ].map((c, i) => (
           <div key={i} className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-700/50 p-4 flex items-center gap-3">
             <div className={`w-10 h-10 rounded-xl ${c.bg} flex items-center justify-center ${c.color}`}>{c.icon}</div>
@@ -139,7 +146,7 @@ export default function DataUser() {
         </div>
         <select value={roleFilter} onChange={(e) => { setRoleFilter(e.target.value); setPage(1) }} className="px-4 py-2.5 rounded-xl border border-gray-200 dark:border-slate-600 bg-gray-50 dark:bg-slate-700 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
           <option value="">Semua Role</option>
-          {roles.map(r => <option key={r.slug} value={r.slug}>{r.nama}</option>)}
+          {ALL_ROLES.map(r => <option key={r.slug} value={r.slug}>{r.nama}</option>)}
         </select>
       </div>
 
@@ -156,7 +163,7 @@ export default function DataUser() {
                   <td className="font-medium">{u.nama}</td>
                   <td><code className="text-xs bg-gray-100 dark:bg-slate-700 px-2 py-1 rounded">{u.username}</code></td>
                   <td><code className="text-xs bg-gray-100 dark:bg-slate-700 px-2 py-1 rounded">{u.passwordText || '••••••••'}</code></td>
-                  <td><span className={`inline-flex px-2 py-1 rounded-full text-xs font-medium ${getRoleBadgeClass(u.role)}`}>{roles.find(r => r.slug === u.role)?.nama || u.role}</span></td>
+                  <td><span className={`inline-flex px-2 py-1 rounded-full text-xs font-medium ${getRoleBadgeClass(u.role)}`}>{getRoleName(u.role)}</span></td>
                   <td><span className={`inline-flex px-2 py-1 rounded-full text-xs font-medium ${u.status === 'aktif' ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400' : 'bg-red-100 text-red-600 dark:bg-red-900/30 dark:text-red-400'}`}>{u.status}</span></td>
                   <td>
                     <div className="flex items-center gap-1">
@@ -196,10 +203,10 @@ export default function DataUser() {
                   <button type="button" onClick={() => setShowPw(!showPw)} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400">{showPw ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}</button>
                 </div>
               </div>
-              <div><label className={labelCls}>Role</label>
+              <div><label className={labelCls}>Role <span className="text-red-500">*</span></label>
                 <select value={form.role} onChange={(e) => setForm({ ...form, role: e.target.value })} className={inputCls}>
                   <option value="">-- Pilih Role --</option>
-                  {roles.map(r => <option key={r.slug} value={r.slug}>{r.nama}</option>)}
+                  {ALL_ROLES.map(r => <option key={r.slug} value={r.slug}>{r.nama}</option>)}
                 </select>
               </div>
               <div className="grid grid-cols-2 gap-4">
