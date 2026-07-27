@@ -5,12 +5,39 @@ import { useAppStore } from '@/lib/store'
 import { toast } from 'sonner'
 import { Plus, Search, Pencil, Trash2, X, Users, UserCog, Loader2, Shield, UserCheck, Eye, EyeOff } from 'lucide-react'
 
+interface RoleItem {
+  id: string
+  slug: string
+  nama: string
+  deskripsi: string
+}
+
 interface UserRecord {
   id: string; nama: string; username: string; passwordText: string; role: string; status: string
   email: string; noHP: string; nip: string; jabatan: string; lastLogin: string | null; createdAt: string
 }
 
 const emptyForm = { nama: '', username: '', password: '', role: 'guru', email: '', noHP: '', nip: '', jabatan: '', status: 'aktif' }
+
+const ROLE_COLORS: Record<string, string> = {
+  'super-admin': 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400',
+  'admin': 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400',
+  'kepala-sekolah': 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400',
+  'wakil-kepala-sekolah': 'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400',
+  'kurikulum': 'bg-cyan-100 text-cyan-700 dark:bg-cyan-900/30 dark:text-cyan-400',
+  'tata-usaha': 'bg-teal-100 text-teal-700 dark:bg-teal-900/30 dark:text-teal-400',
+  'operator': 'bg-indigo-100 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-400',
+  'guru': 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400',
+  'wali-kelas': 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400',
+  'siswa': 'bg-sky-100 text-sky-700 dark:bg-sky-900/30 dark:text-sky-400',
+  'orang-tua': 'bg-pink-100 text-pink-700 dark:bg-pink-900/30 dark:text-pink-400',
+}
+
+const DEFAULT_ROLE_COLOR = 'bg-gray-100 text-gray-600 dark:bg-slate-700 dark:text-gray-300'
+
+function getRoleBadgeClass(slug: string) {
+  return ROLE_COLORS[slug] || DEFAULT_ROLE_COLOR
+}
 
 export default function DataUser() {
   const [data, setData] = useState<UserRecord[]>([])
@@ -26,7 +53,15 @@ export default function DataUser() {
   const [form, setForm] = useState(emptyForm)
   const [saving, setSaving] = useState(false)
   const [showPw, setShowPw] = useState(false)
+  const [roles, setRoles] = useState<RoleItem[]>([])
   const limit = 10
+
+  const fetchRoles = useCallback(async () => {
+    try {
+      const res = await api.get<{ data: RoleItem[] }>('/roles')
+      setRoles(res.data || [])
+    } catch { /* silent */ }
+  }, [])
 
   const fetchData = useCallback(async () => {
     setLoading(true)
@@ -41,6 +76,7 @@ export default function DataUser() {
     finally { setLoading(false) }
   }, [page, search, roleFilter])
 
+  useEffect(() => { fetchRoles() }, [fetchRoles])
   useEffect(() => { fetchData() }, [fetchData])
 
   const handleAdd = () => { setForm(emptyForm); setEditId(null); setShowPw(false); setShowModal(true) }
@@ -84,8 +120,9 @@ export default function DataUser() {
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {[
           { icon: <Users className="w-5 h-5" />, label: 'Total User', value: total, bg: 'bg-blue-50 dark:bg-blue-900/30', color: 'text-[#2563eb]' },
-          { icon: <Shield className="w-5 h-5" />, label: 'Admin', value: data.filter(u => u.role === 'admin').length, bg: 'bg-red-50 dark:bg-red-900/30', color: 'text-[#ef4444]' },
-          { icon: <UserCheck className="w-5 h-5" />, label: 'Guru', value: data.filter(u => u.role === 'guru').length, bg: 'bg-emerald-50 dark:bg-emerald-900/30', color: 'text-[#10b981]' },
+          { icon: <Shield className="w-5 h-5" />, label: 'Super Admin', value: data.filter(u => u.role === 'super-admin').length, bg: 'bg-purple-50 dark:bg-purple-900/30', color: 'text-purple-600' },
+          { icon: <Shield className="w-5 h-5" />, label: 'Admin', value: data.filter(u => u.role === 'admin').length, bg: 'bg-blue-50 dark:bg-blue-900/30', color: 'text-[#2563eb]' },
+          { icon: <UserCheck className="w-5 h-5" />, label: 'Guru & Wali Kelas', value: data.filter(u => u.role === 'guru' || u.role === 'wali-kelas').length, bg: 'bg-emerald-50 dark:bg-emerald-900/30', color: 'text-[#10b981]' },
           { icon: <UserCog className="w-5 h-5" />, label: 'Aktif', value: data.filter(u => u.status === 'aktif').length, bg: 'bg-amber-50 dark:bg-amber-900/30', color: 'text-[#f59e0b]' },
         ].map((c, i) => (
           <div key={i} className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-700/50 p-4 flex items-center gap-3">
@@ -101,7 +138,8 @@ export default function DataUser() {
           <input type="text" placeholder="Cari nama atau username..." value={search} onChange={(e) => { setSearch(e.target.value); setPage(1) }} className="w-full pl-9 pr-4 py-2.5 rounded-xl border border-gray-200 dark:border-slate-600 bg-gray-50 dark:bg-slate-700 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
         </div>
         <select value={roleFilter} onChange={(e) => { setRoleFilter(e.target.value); setPage(1) }} className="px-4 py-2.5 rounded-xl border border-gray-200 dark:border-slate-600 bg-gray-50 dark:bg-slate-700 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
-          <option value="">Semua Role</option><option value="admin">Admin</option><option value="guru">Guru</option>
+          <option value="">Semua Role</option>
+          {roles.map(r => <option key={r.slug} value={r.slug}>{r.nama}</option>)}
         </select>
       </div>
 
@@ -118,7 +156,7 @@ export default function DataUser() {
                   <td className="font-medium">{u.nama}</td>
                   <td><code className="text-xs bg-gray-100 dark:bg-slate-700 px-2 py-1 rounded">{u.username}</code></td>
                   <td><code className="text-xs bg-gray-100 dark:bg-slate-700 px-2 py-1 rounded">{u.passwordText || '••••••••'}</code></td>
-                  <td><span className={`inline-flex px-2 py-1 rounded-full text-xs font-medium ${u.role === 'admin' ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400' : 'bg-gray-100 text-gray-600 dark:bg-slate-700 dark:text-gray-300'}`}>{u.role}</span></td>
+                  <td><span className={`inline-flex px-2 py-1 rounded-full text-xs font-medium ${getRoleBadgeClass(u.role)}`}>{roles.find(r => r.slug === u.role)?.nama || u.role}</span></td>
                   <td><span className={`inline-flex px-2 py-1 rounded-full text-xs font-medium ${u.status === 'aktif' ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400' : 'bg-red-100 text-red-600 dark:bg-red-900/30 dark:text-red-400'}`}>{u.status}</span></td>
                   <td>
                     <div className="flex items-center gap-1">
@@ -158,7 +196,12 @@ export default function DataUser() {
                   <button type="button" onClick={() => setShowPw(!showPw)} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400">{showPw ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}</button>
                 </div>
               </div>
-              <div><label className={labelCls}>Role</label><select value={form.role} onChange={(e) => setForm({ ...form, role: e.target.value })} className={inputCls}><option value="admin">Admin</option><option value="guru">Guru</option></select></div>
+              <div><label className={labelCls}>Role</label>
+                <select value={form.role} onChange={(e) => setForm({ ...form, role: e.target.value })} className={inputCls}>
+                  <option value="">-- Pilih Role --</option>
+                  {roles.map(r => <option key={r.slug} value={r.slug}>{r.nama}</option>)}
+                </select>
+              </div>
               <div className="grid grid-cols-2 gap-4">
                 <div><label className={labelCls}>Email</label><input type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} className={inputCls} /></div>
                 <div><label className={labelCls}>No. HP</label><input value={form.noHP} onChange={(e) => setForm({ ...form, noHP: e.target.value })} className={inputCls} /></div>
