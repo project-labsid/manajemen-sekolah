@@ -1,0 +1,837 @@
+     1→'use client'
+     2→
+     3→import React, { useCallback, useEffect, useMemo, useState } from 'react'
+     4→import {
+     5→  LogIn,
+     6→  LogOut,
+     7→  Clock,
+     8→  MapPin,
+     9→  Calendar,
+    10→  Monitor,
+    11→  Loader2,
+    12→  Inbox,
+    13→  UserCheck,
+    14→  AlertCircle,
+    15→  CheckCircle2,
+    16→  AlertTriangle,
+    17→} from 'lucide-react'
+    18→import { format } from 'date-fns'
+    19→import { id as localeId } from 'date-fns/locale'
+    20→import { api } from '@/lib/api'
+    21→import { useAppStore } from '@/lib/store'
+    22→import { Button } from '@/components/ui/button'
+    23→import { Badge } from '@/components/ui/badge'
+    24→import { Skeleton } from '@/components/ui/skeleton'
+    25→import { Input } from '@/components/ui/input'
+    26→import { Label } from '@/components/ui/label'
+    27→import {
+    28→  Popover,
+    29→  PopoverContent,
+    30→  PopoverTrigger,
+    31→} from '@/components/ui/popover'
+    32→import { Calendar as CalendarUI } from '@/components/ui/calendar'
+    33→import {
+    34→  Dialog,
+    35→  DialogContent,
+    36→  DialogHeader,
+    37→  DialogTitle,
+    38→  DialogDescription,
+    39→  DialogFooter,
+    40→} from '@/components/ui/dialog'
+    41→import { Textarea } from '@/components/ui/textarea'
+    42→import { toast } from 'sonner'
+    43→
+    44→/* ------------------------------------------------------------------ */
+    45→/*  Types                                                              */
+    46→/* ------------------------------------------------------------------ */
+    47→
+    48→interface AbsensiGuruRecord {
+    49→  id: string
+    50→  tanggal: string
+    51→  namaGuru: string
+    52→  nip: string
+    53→  jamMasuk: string
+    54→  jamPulang: string
+    55→  durasi: string
+    56→  status: string
+    57→  latitude: string
+    58→  longitude: string
+    59→  alamat: string
+    60→  browser: string
+    61→  device: string
+    62→  ip: string
+    63→  keterangan: string
+    64→  createdAt: string
+    65→}
+    66→
+    67→interface AbsensiResponse {
+    68→  data: AbsensiGuruRecord[]
+    69→  tanggal: string
+    70→}
+    71→
+    72→/* ------------------------------------------------------------------ */
+    73→/*  Helpers                                                            */
+    74→/* ------------------------------------------------------------------ */
+    75→
+    76→function getTodayString(): string {
+    77→  return new Date().toISOString().split('T')[0]
+    78→}
+    79→
+    80→function formatDateDisplay(dateStr: string): string {
+    81→  try {
+    82→    const date = new Date(dateStr + 'T00:00:00')
+    83→    return format(date, 'EEEE, dd MMMM yyyy', { locale: localeId })
+    84→  } catch {
+    85→    return dateStr
+    86→  }
+    87→}
+    88→
+    89→function getBrowserInfo(): string {
+    90→  if (typeof navigator === 'undefined') return ''
+    91→  const ua = navigator.userAgent
+    92→  if (ua.includes('Firefox/')) return 'Firefox ' + ua.split('Firefox/')[1]?.split(' ')[0]
+    93→  if (ua.includes('Edg/')) return 'Edge ' + ua.split('Edg/')[1]?.split(' ')[0]
+    94→  if (ua.includes('Chrome/')) return 'Chrome ' + ua.split('Chrome/')[1]?.split(' ')[0]
+    95→  if (ua.includes('Safari/')) return 'Safari ' + ua.split('Version/')[1]?.split(' ')[0]
+    96→  return 'Unknown'
+    97→}
+    98→
+    99→function getDeviceInfo(): string {
+   100→  if (typeof navigator === 'undefined') return ''
+   101→  const ua = navigator.userAgent
+   102→  if (/iPhone|iPad/.test(ua)) return 'iOS Device'
+   103→  if (/Android/.test(ua)) return 'Android Device'
+   104→  if (/Windows/.test(ua)) return 'Windows PC'
+   105→  if (/Mac/.test(ua)) return 'Mac'
+   106→  if (/Linux/.test(ua)) return 'Linux'
+   107→  return 'Unknown Device'
+   108→}
+   109→
+   110→function getLocalTime(): string {
+   111→  const now = new Date()
+   112→  return now.toTimeString().slice(0, 5)
+   113→}
+   114→
+   115→function getStatusBadge(status: string) {
+   116→  switch (status) {
+   117→    case 'Hadir':
+   118→      return (
+   119→        <Badge className="bg-emerald-100 text-emerald-700 hover:bg-emerald-100 border-0">
+   120→          {status}
+   121→        </Badge>
+   122→      )
+   123→    case 'Sudah Pulang':
+   124→      return (
+   125→        <Badge className="bg-blue-100 text-blue-700 hover:bg-blue-100 border-0">
+   126→          {status}
+   127→        </Badge>
+   128→      )
+   129→    case 'Tidak Hadir':
+   130→    case 'Izin':
+   131→    case 'Sakit':
+   132→    case 'Alpha':
+   133→      return (
+   134→        <Badge className="bg-red-100 text-red-600 hover:bg-red-100 border-0">
+   135→          {status}
+   136→        </Badge>
+   137→      )
+   138→    default:
+   139→      return (
+   140→        <Badge className="bg-gray-100 text-gray-600 hover:bg-gray-100 border-0">
+   141→          {status || '-'}
+   142→        </Badge>
+   143→      )
+   144→  }
+   145→}
+   146→
+   147→function calculateDuration(jamMasuk: string, jamPulang: string): string {
+   148→  if (!jamMasuk || !jamPulang) return '-'
+   149→  try {
+   150→    const [h1, m1] = jamMasuk.split(':').map(Number)
+   151→    const [h2, m2] = jamPulang.split(':').map(Number)
+   152→    const diffMs = (h2 * 60 + m2 - h1 * 60 - m1) * 60 * 1000
+   153→    if (diffMs <= 0) return '-'
+   154→    const hours = Math.floor(diffMs / (1000 * 60 * 60))
+   155→    const minutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60))
+   156→    if (hours > 0) return `${hours} jam ${minutes} menit`
+   157→    return `${minutes} menit`
+   158→  } catch {
+   159→    return '-'
+   160→  }
+   161→}
+   162→
+   163→/* ------------------------------------------------------------------ */
+   164→/*  Component                                                          */
+   165→/* ------------------------------------------------------------------ */
+   166→
+   167→export default function AbsensiGuru() {
+   168→  const user = useAppStore((s) => s.user)
+   169→  const isAdmin = user?.role === 'admin'
+   170→
+   171→  // ── State ──
+   172→  const [selectedDate, setSelectedDate] = useState<Date>(new Date())
+   173→  const [dateOpen, setDateOpen] = useState(false)
+   174→  const [records, setRecords] = useState<AbsensiGuruRecord[]>([])
+   175→  const [loading, setLoading] = useState(true)
+   176→  const [submittingMasuk, setSubmittingMasuk] = useState(false)
+   177→  const [submittingPulang, setSubmittingPulang] = useState(false)
+   178→
+   179→  // ── Pulang dialog ──
+   180→  const [pulangDialogOpen, setPulangDialogOpen] = useState(false)
+   181→  const [pulangKeterangan, setPulangKeterangan] = useState('')
+   182→  const [pulangRecordId, setPulangRecordId] = useState<string | null>(null)
+   183→  const [pulangJam, setPulangJam] = useState('')
+   184→
+   185→  // ── Sakit/Izin dialog ──
+   186→  const [sakitIzinDialogOpen, setSakitIzinDialogOpen] = useState(false)
+   187→  const [sakitIzinStatus, setSakitIzinStatus] = useState<'Sakit' | 'Izin'>('Sakit')
+   188→  const [sakitIzinKeterangan, setSakitIzinKeterangan] = useState('')
+   189→  const [submittingSakitIzin, setSubmittingSakitIzin] = useState(false)
+   190→
+   191→  // ── Compute: today string for the selected date ──
+   192→  const selectedDateStr = useMemo(
+   193→    () => format(selectedDate, 'yyyy-MM-dd'),
+   194→    [selectedDate],
+   195→  )
+   196→  const isToday = selectedDateStr === getTodayString()
+   197→
+   198→  // ── Compute: own today's record (for guru role) ──
+   199→  const myTodayRecord = useMemo(() => {
+   200→    if (isAdmin || !isToday) return null
+   201→    return records.find(
+   202→      (r) => r.namaGuru === user?.nama,
+   203→    ) || null
+   204→  }, [records, user, isAdmin, isToday])
+   205→
+   206→  // ── Compute: own info cards data ──
+   207→  const ownJamMasuk = myTodayRecord?.jamMasuk || '-'
+   208→  const ownJamPulang = myTodayRecord?.jamPulang || '-'
+   209→  const ownDurasi = myTodayRecord?.durasi ||
+   210→    (myTodayRecord?.jamMasuk && !myTodayRecord?.jamPulang
+   211→      ? 'Masih bekerja'
+   212→      : '-')
+   213→  const ownStatus = myTodayRecord?.status || 'Tidak Hadir'
+   214→
+   215→  // ── Can absen masuk? ──
+   216→  const canAbsenMasuk = isToday && !myTodayRecord && !isAdmin
+   217→  // ── Can absen pulang? ──
+   218→  const canAbsenPulang = isToday && myTodayRecord && !myTodayRecord.jamPulang && !isAdmin
+   219→  // ── Can sakit/izin? ──
+   220→  const canSakitIzin = isToday && !myTodayRecord && !isAdmin
+   221→
+   222→  // ── Geolocation ──
+   223→  const getGeolocation = useCallback((): Promise<{ latitude: string; longitude: string }> => {
+   224→    return new Promise((resolve) => {
+   225→      if (typeof navigator === 'undefined' || !navigator.geolocation) {
+   226→        resolve({ latitude: '', longitude: '' })
+   227→        return
+   228→      }
+   229→      navigator.geolocation.getCurrentPosition(
+   230→        (pos) => {
+   231→          resolve({
+   232→            latitude: String(pos.coords.latitude),
+   233→            longitude: String(pos.coords.longitude),
+   234→          })
+   235→        },
+   236→        () => {
+   237→          resolve({ latitude: '', longitude: '' })
+   238→        },
+   239→        { enableHighAccuracy: false, timeout: 5000 },
+   240→      )
+   241→    })
+   242→  }, [])
+   243→
+   244→  // ── Fetch attendance records ──
+   245→  const fetchRecords = useCallback(async () => {
+   246→    setLoading(true)
+   247→    try {
+   248→      const params = new URLSearchParams({ tanggal: selectedDateStr })
+   249→      const res = await api.get<AbsensiResponse>(`/absensi-guru?${params.toString()}`)
+   250→      const absensiRes = res as AbsensiResponse
+   251→      const data = Array.isArray(absensiRes.data) ? absensiRes.data : []
+   252→
+   253→      // For guru role, only show own record
+   254→      if (!isAdmin) {
+   255→        const filtered = data.filter((r) => r.namaGuru === user?.nama)
+   256→        setRecords(filtered)
+   257→      } else {
+   258→        setRecords(data)
+   259→      }
+   260→    } catch {
+   261→      toast.error('Gagal memuat data absensi')
+   262→      setRecords([])
+   263→    } finally {
+   264→      setLoading(false)
+   265→    }
+   266→  }, [selectedDateStr, isAdmin, user])
+   267→
+   268→  useEffect(() => {
+   269→    fetchRecords()
+   270→  }, [fetchRecords])
+   271→
+   272→  // ── Handle Absen Masuk ──
+   273→  const handleAbsenMasuk = useCallback(async () => {
+   274→    if (!user) return
+   275→
+   276→    setSubmittingMasuk(true)
+   277→    try {
+   278→      const geo = await getGeolocation()
+   279→      const browser = getBrowserInfo()
+   280→      const device = getDeviceInfo()
+   281→      const jamMasuk = getLocalTime()
+   282→
+   283→      await api.post('/absensi-guru', {
+   284→        namaGuru: user.nama,
+   285→        nip: user.username || '',
+   286→        jamMasuk,
+   287→        latitude: geo.latitude,
+   288→        longitude: geo.longitude,
+   289→        browser,
+   290→        device,
+   291→        keterangan: '',
+   292→      })
+   293→
+   294→      toast.success('Absen masuk berhasil dicatat!')
+   295→      fetchRecords()
+   296→    } catch (err: unknown) {
+   297→      const message = err instanceof Error ? err.message : 'Gagal melakukan absen masuk'
+   298→      toast.error(message)
+   299→    } finally {
+   300→      setSubmittingMasuk(false)
+   301→    }
+   302→  }, [user, getGeolocation, fetchRecords])
+   303→
+   304→  // ── Handle Absen Pulang: open dialog ──
+   305→  const handleOpenPulangDialog = useCallback(() => {
+   306→    if (!myTodayRecord) return
+   307→    setPulangRecordId(myTodayRecord.id)
+   308→    setPulangKeterangan('')
+   309→    setPulangJam(getLocalTime())
+   310→    setPulangDialogOpen(true)
+   311→  }, [myTodayRecord])
+   312→
+   313→  // ── Handle Absen Pulang: submit ──
+   314→  const handleAbsenPulang = useCallback(async () => {
+   315→    if (!pulangRecordId) return
+   316→
+   317→    setSubmittingPulang(true)
+   318→    try {
+   319→      await api.put('/absensi-guru', {
+   320→        id: pulangRecordId,
+   321→        jamPulang: pulangJam,
+   322→        keterangan: pulangKeterangan,
+   323→      })
+   324→
+   325→      toast.success('Absen pulang berhasil dicatat!')
+   326→      setPulangDialogOpen(false)
+   327→      setPulangKeterangan('')
+   328→      setPulangRecordId(null)
+   329→      setPulangJam('')
+   330→      fetchRecords()
+   331→    } catch (err: unknown) {
+   332→      const message = err instanceof Error ? err.message : 'Gagal melakukan absen pulang'
+   333→      toast.error(message)
+   334→    } finally {
+   335→      setSubmittingPulang(false)
+   336→    }
+   337→  }, [pulangRecordId, pulangKeterangan, fetchRecords])
+   338→
+   339→  // ── Handle Sakit/Izin Submit ──
+   340→  const handleSakitIzin = useCallback(async () => {
+   341→    if (!user) return
+   342→    if (!sakitIzinKeterangan.trim()) {
+   343→      toast.error('Keterangan wajib diisi untuk Sakit/Izin')
+   344→      return
+   345→    }
+   346→
+   347→    setSubmittingSakitIzin(true)
+   348→    try {
+   349→      await api.post('/absensi-guru', {
+   350→        namaGuru: user.nama,
+   351→        nip: user.username || '',
+   352→        status: sakitIzinStatus,
+   353→        keterangan: sakitIzinKeterangan.trim(),
+   354→      })
+   355→
+   356→      toast.success(`Absen ${sakitIzinStatus.toLowerCase()} berhasil dicatat!`)
+   357→      setSakitIzinDialogOpen(false)
+   358→      setSakitIzinKeterangan('')
+   359→      fetchRecords()
+   360→    } catch (err: unknown) {
+   361→      const message = err instanceof Error ? err.message : `Gagal melakukan absen ${sakitIzinStatus.toLowerCase()}`
+   362→      toast.error(message)
+   363→    } finally {
+   364→      setSubmittingSakitIzin(false)
+   365→    }
+   366→  }, [user, sakitIzinStatus, sakitIzinKeterangan, fetchRecords])
+   367→
+   368→  // ── Render ──
+   369→  return (
+   370→    <div className="space-y-6 animate-fadeIn">
+   371→      {/* ── Action Buttons (Guru only, today only) ── */}
+   372→      {!isAdmin && (
+   373→        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+   374→          {/* Absen Masuk Button */}
+   375→          <button
+   376→            type="button"
+   377→            disabled={!canAbsenMasuk || submittingMasuk}
+   378→            onClick={handleAbsenMasuk}
+   379→            className={
+   380→              'relative flex items-center justify-center gap-3 rounded-2xl p-5 sm:p-6 text-white font-semibold text-base transition-all shadow-sm '
+   381→              +
+   382→              (canAbsenMasuk && !submittingMasuk
+   383→                ? 'bg-[#10b981] hover:bg-[#059669] hover:shadow-md active:scale-[0.98]'
+   384→                : 'bg-gray-300 cursor-not-allowed opacity-60')
+   385→            }
+   386→          >
+   387→            {submittingMasuk ? (
+   388→              <Loader2 className="h-6 w-6 animate-spin" />
+   389→            ) : (
+   390→              <LogIn className="h-6 w-6" />
+   391→            )}
+   392→            <span>{submittingMasuk ? 'Memproses...' : 'Absen Masuk'}</span>
+   393→            {!canAbsenMasuk && !submittingMasuk && myTodayRecord?.jamMasuk && (
+   394→              <span className="absolute top-2 right-3 text-xs font-normal opacity-80">
+   395→                Sudah diabsen
+   396→              </span>
+   397→            )}
+   398→          </button>
+   399→
+   400→          {/* Absen Pulang Button */}
+   401→          <button
+   402→            type="button"
+   403→            disabled={!canAbsenPulang || submittingPulang}
+   404→            onClick={handleOpenPulangDialog}
+   405→            className={
+   406→              'relative flex items-center justify-center gap-3 rounded-2xl p-5 sm:p-6 text-white font-semibold text-base transition-all shadow-sm '
+   407→              +
+   408→              (canAbsenPulang && !submittingPulang
+   409→                ? 'bg-[#ef4444] hover:bg-[#dc2626] hover:shadow-md active:scale-[0.98]'
+   410→                : 'bg-gray-300 cursor-not-allowed opacity-60')
+   411→            }
+   412→          >
+   413→            {submittingPulang ? (
+   414→              <Loader2 className="h-6 w-6 animate-spin" />
+   415→            ) : (
+   416→              <LogOut className="h-6 w-6" />
+   417→            )}
+   418→            <span>{submittingPulang ? 'Memproses...' : 'Absen Pulang'}</span>
+   419→            {!canAbsenPulang && !submittingPulang && myTodayRecord?.jamPulang && (
+   420→              <span className="absolute top-2 right-3 text-xs font-normal opacity-80">
+   421→                Sudah pulang
+   422→              </span>
+   423→            )}
+   424→          </button>
+   425→
+   426→          {/* Sakit/Izin Button */}
+   427→          <button
+   428→            type="button"
+   429→            disabled={!canSakitIzin || submittingSakitIzin}
+   430→            onClick={() => {
+   431→              setSakitIzinStatus('Sakit')
+   432→              setSakitIzinKeterangan('')
+   433→              setSakitIzinDialogOpen(true)
+   434→            }}
+   435→            className={
+   436→              'relative flex items-center justify-center gap-3 rounded-2xl p-5 sm:p-6 text-white font-semibold text-base transition-all shadow-sm '
+   437→              +
+   438→              (canSakitIzin && !submittingSakitIzin
+   439→                ? 'bg-[#f59e0b] hover:bg-[#d97706] hover:shadow-md active:scale-[0.98]'
+   440→                : 'bg-gray-300 cursor-not-allowed opacity-60')
+   441→            }
+   442→          >
+   443→            {submittingSakitIzin ? (
+   444→              <Loader2 className="h-6 w-6 animate-spin" />
+   445→            ) : (
+   446→              <AlertTriangle className="h-6 w-6" />
+   447→            )}
+   448→            <span>{submittingSakitIzin ? 'Memproses...' : 'Sakit / Izin'}</span>
+   449→            {!canSakitIzin && !submittingSakitIzin && myTodayRecord && (
+   450→              <span className="absolute top-2 right-3 text-xs font-normal opacity-80">
+   451→                Sudah absen
+   452→              </span>
+   453→            )}
+   454→          </button>
+   455→        </div>
+   456→      )}
+   457→
+   458→      {/* ── Info Cards Row (Guru own summary) ── */}
+   459→      {!isAdmin && (
+   460→        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+   461→          {/* Jam Masuk */}
+   462→          <div className="bg-white rounded-2xl shadow-sm p-4 sm:p-5 flex items-center gap-4">
+   463→            <div className="flex-shrink-0 h-12 w-12 rounded-xl bg-emerald-50 flex items-center justify-center">
+   464→              <LogIn className="h-6 w-6 text-[#10b981]" />
+   465→            </div>
+   466→            <div className="min-w-0">
+   467→              <p className="text-xs font-medium text-muted-foreground">Jam Masuk</p>
+   468→              <div className="text-lg sm:text-xl font-bold text-foreground truncate">
+   469→                {loading ? <Skeleton className="h-6 w-16 inline-block" /> : ownJamMasuk}
+   470→              </div>
+   471→            </div>
+   472→          </div>
+   473→
+   474→          {/* Jam Pulang */}
+   475→          <div className="bg-white rounded-2xl shadow-sm p-4 sm:p-5 flex items-center gap-4">
+   476→            <div className="flex-shrink-0 h-12 w-12 rounded-xl bg-red-50 flex items-center justify-center">
+   477→              <LogOut className="h-6 w-6 text-[#ef4444]" />
+   478→            </div>
+   479→            <div className="min-w-0">
+   480→              <p className="text-xs font-medium text-muted-foreground">Jam Pulang</p>
+   481→              <div className="text-lg sm:text-xl font-bold text-foreground truncate">
+   482→                {loading ? <Skeleton className="h-6 w-16 inline-block" /> : ownJamPulang}
+   483→              </div>
+   484→            </div>
+   485→          </div>
+   486→
+   487→          {/* Durasi Kerja */}
+   488→          <div className="bg-white rounded-2xl shadow-sm p-4 sm:p-5 flex items-center gap-4">
+   489→            <div className="flex-shrink-0 h-12 w-12 rounded-xl bg-amber-50 flex items-center justify-center">
+   490→              <Clock className="h-6 w-6 text-[#f59e0b]" />
+   491→            </div>
+   492→            <div className="min-w-0">
+   493→              <p className="text-xs font-medium text-muted-foreground">Durasi Kerja</p>
+   494→              <div className="text-lg sm:text-xl font-bold text-foreground truncate">
+   495→                {loading ? <Skeleton className="h-6 w-20 inline-block" /> : ownDurasi}
+   496→              </div>
+   497→            </div>
+   498→          </div>
+   499→
+   500→          {/* Status */}
+   501→          <div className="bg-white rounded-2xl shadow-sm p-4 sm:p-5 flex items-center gap-4">
+   502→            <div className="flex-shrink-0 h-12 w-12 rounded-xl bg-blue-50 flex items-center justify-center">
+   503→              <UserCheck className="h-6 w-6 text-[#3b82f6]" />
+   504→            </div>
+   505→            <div className="min-w-0">
+   506→              <p className="text-xs font-medium text-muted-foreground">Status</p>
+   507→              <div className="mt-0.5">
+   508→                {loading ? (
+   509→                  <Skeleton className="h-6 w-20 inline-block" />
+   510→                ) : (
+   511→                  getStatusBadge(ownStatus)
+   512→                )}
+   513→              </div>
+   514→            </div>
+   515→          </div>
+   516→        </div>
+   517→      )}
+   518→
+   519→      {/* ── Date Picker + Filter Card ── */}
+   520→      <div className="bg-white rounded-2xl shadow-sm p-4 sm:p-6">
+   521→        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+   522→          <div className="flex items-center gap-2">
+   523→            <Calendar className="h-5 w-5 text-[#10b981]" />
+   524→            <h2 className="text-lg font-semibold text-foreground">
+   525→              {isAdmin ? 'Rekap Absensi Guru' : 'Riwayat Absensi Saya'}
+   526→            </h2>
+   527→          </div>
+   528→
+   529→          <div className="flex items-center gap-3">
+   530→            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+   531→              <Calendar className="h-4 w-4" />
+   532→              <span>Tanggal:</span>
+   533→            </div>
+   534→            <Popover open={dateOpen} onOpenChange={setDateOpen}>
+   535→              <PopoverTrigger asChild>
+   536→                <Button
+   537→                  variant="outline"
+   538→                  className="w-[220px] justify-start text-left font-normal"
+   539→                >
+   540→                  <Calendar className="mr-2 h-4 w-4" />
+   541→                  {formatDateDisplay(selectedDateStr)}
+   542→                </Button>
+   543→              </PopoverTrigger>
+   544→              <PopoverContent className="w-auto p-0" align="end">
+   545→                <CalendarUI
+   546→                  mode="single"
+   547→                  selected={selectedDate}
+   548→                  onSelect={(d) => {
+   549→                    if (d) {
+   550→                      setSelectedDate(d)
+   551→                      setDateOpen(false)
+   552→                    }
+   553→                  }}
+   554→                  initialFocus
+   555→                />
+   556→              </PopoverContent>
+   557→            </Popover>
+   558→          </div>
+   559→        </div>
+   560→
+   561→        {/* Display selected date summary for admin */}
+   562→        {isAdmin && (
+   563→          <div className="mt-4 flex flex-wrap items-center gap-3 text-sm text-muted-foreground">
+   564→            <span>
+   565→              Menampilkan data:{' '}
+   566→              <span className="font-semibold text-foreground">
+   567→                {formatDateDisplay(selectedDateStr)}
+   568→              </span>
+   569→            </span>
+   570→            <span className="text-border">|</span>
+   571→            <span>
+   572→              Total:{' '}
+   573→              <span className="font-semibold text-foreground">
+   574→                {records.length} guru
+   575→              </span>
+   576→            </span>
+   577→          </div>
+   578→        )}
+   579→      </div>
+   580→
+   581→      {/* ── Attendance Table ── */}
+   582→      <div className="bg-white rounded-2xl shadow-sm p-4 sm:p-6">
+   583→        <div className="overflow-x-auto max-h-96 overflow-y-auto">
+   584→          {loading ? (
+   585→            /* ── Skeleton ── */
+   586→            <div className="space-y-3">
+   587→              <Skeleton className="h-10 w-full" />
+   588→              {Array.from({ length: 5 }).map((_, i) => (
+   589→                <Skeleton key={i} className="h-12 w-full" />
+   590→              ))}
+   591→            </div>
+   592→          ) : records.length === 0 ? (
+   593→            /* ── Empty state ── */
+   594→            <div className="flex flex-col items-center justify-center py-16 text-muted-foreground">
+   595→              <Inbox className="h-16 w-16 mb-4 opacity-40" />
+   596→              <p className="text-lg font-medium">Belum Ada Data Absensi</p>
+   597→              <p className="text-sm mt-1">
+   598→                {isAdmin
+   599→                  ? 'Tidak ada data absensi guru pada tanggal ini'
+   600→                  : 'Anda belum melakukan absensi hari ini'}
+   601→              </p>
+   602→            </div>
+   603→          ) : (
+   604→            /* ── Data Table ── */
+   605→            <table className="siadak-table">
+   606→              <thead className="sticky top-0 z-10">
+   607→                <tr>
+   608→                  <th>No</th>
+   609→                  <th>Nama Guru</th>
+   610→                  <th>NIP</th>
+   611→                  <th>Jam Masuk</th>
+   612→                  <th>Jam Pulang</th>
+   613→                  <th>Durasi</th>
+   614→                  <th>Status</th>
+   615→                  <th>Keterangan</th>
+   616→                </tr>
+   617→              </thead>
+   618→              <tbody>
+   619→                {records.map((item, idx) => (
+   620→                  <tr key={item.id}>
+   621→                    <td className="font-medium">{idx + 1}</td>
+   622→                    <td className="font-medium">{item.namaGuru}</td>
+   623→                    <td className="font-mono text-sm">{item.nip || '-'}</td>
+   624→                    <td>
+   625→                      <div className="flex items-center gap-1.5">
+   626→                        <Clock className="h-3.5 w-3.5 text-emerald-500" />
+   627→                        {item.jamMasuk || '-'}
+   628→                      </div>
+   629→                    </td>
+   630→                    <td>
+   631→                      <div className="flex items-center gap-1.5">
+   632→                        <Clock className="h-3.5 w-3.5 text-red-500" />
+   633→                        {item.jamPulang || '-'}
+   634→                      </div>
+   635→                    </td>
+   636→                    <td>{item.durasi || calculateDuration(item.jamMasuk, item.jamPulang)}</td>
+   637→                    <td>{getStatusBadge(item.status)}</td>
+   638→                    <td className="max-w-[200px] truncate">{item.keterangan || '-'}</td>
+   639→                  </tr>
+   640→                ))}
+   641→              </tbody>
+   642→            </table>
+   643→          )}
+   644→        </div>
+   645→
+   646→        {/* Table Footer */}
+   647→        {!loading && records.length > 0 && (
+   648→          <div className="flex items-center justify-between mt-4 pt-4 border-t border-border">
+   649→            <p className="text-sm text-muted-foreground">
+   650→              Menampilkan{' '}
+   651→              <span className="font-semibold text-foreground">{records.length}</span>{' '}
+   652→              {isAdmin ? 'data absensi guru' : 'data absensi'}
+   653→            </p>
+   654→            {isAdmin && (
+   655→              <div className="flex items-center gap-4 text-xs text-muted-foreground">
+   656→                <div className="flex items-center gap-1">
+   657→                  <CheckCircle2 className="h-3.5 w-3.5 text-emerald-500" />
+   658→                  <span>Hadir: {records.filter((r) => r.status === 'Hadir').length}</span>
+   659→                </div>
+   660→                <div className="flex items-center gap-1">
+   661→                  <CheckCircle2 className="h-3.5 w-3.5 text-blue-500" />
+   662→                  <span>Sudah Pulang: {records.filter((r) => r.status === 'Sudah Pulang').length}</span>
+   663→                </div>
+   664→                <div className="flex items-center gap-1">
+   665→                  <AlertCircle className="h-3.5 w-3.5 text-red-500" />
+   666→                  <span>Tidak Hadir: {records.filter((r) => !r.jamMasuk).length}</span>
+   667→                </div>
+   668→              </div>
+   669→            )}
+   670→          </div>
+   671→        )}
+   672→      </div>
+   673→
+   674→      {/* ── Absen Pulang Dialog ── */}
+   675→      <Dialog open={pulangDialogOpen} onOpenChange={setPulangDialogOpen}>
+   676→        <DialogContent className="sm:max-w-md">
+   677→          <DialogHeader>
+   678→            <DialogTitle className="flex items-center gap-2">
+   679→              <LogOut className="h-5 w-5 text-[#ef4444]" />
+   680→              Konfirmasi Absen Pulang
+   681→            </DialogTitle>
+   682→            <DialogDescription>
+   683→              Anda akan mencatat absen pulang pada pukul{' '}
+   684→              <span className="font-semibold text-foreground">
+   685→                {pulangJam}
+   686→              </span>
+   687→              . Tambahkan keterangan jika diperlukan.
+   688→            </DialogDescription>
+   689→          </DialogHeader>
+   690→
+   691→          <div className="space-y-4 py-2">
+   692→            {/* Info summary */}
+   693→            <div className="grid grid-cols-2 gap-3">
+   694→              <div className="rounded-xl bg-emerald-50 p-3">
+   695→                <p className="text-xs text-emerald-600 font-medium">Jam Masuk</p>
+   696→                <p className="text-lg font-bold text-emerald-700">
+   697→                  {myTodayRecord?.jamMasuk || '-'}
+   698→                </p>
+   699→              </div>
+   700→              <div className="rounded-xl bg-red-50 p-3">
+   701→                <p className="text-xs text-red-600 font-medium">Jam Pulang</p>
+   702→                <p className="text-lg font-bold text-red-700">
+   703→                  {pulangJam}
+   704→                </p>
+   705→              </div>
+   706→            </div>
+   707→
+   708→            {/* Location & device info */}
+   709→            <div className="flex items-center gap-2 text-xs text-muted-foreground bg-muted/50 rounded-lg p-3">
+   710→              <Monitor className="h-4 w-4" />
+   711→              <span>{getBrowserInfo()} &middot; {getDeviceInfo()}</span>
+   712→            </div>
+   713→
+   714→            {/* Keterangan */}
+   715→            <div className="space-y-2">
+   716→              <Label htmlFor="pulang-keterangan">Keterangan (opsional)</Label>
+   717→              <Textarea
+   718→                id="pulang-keterangan"
+   719→                placeholder="Tuliskan keterangan kegiatan hari ini..."
+   720→                value={pulangKeterangan}
+   721→                onChange={(e) => setPulangKeterangan(e.target.value)}
+   722→                rows={3}
+   723→              />
+   724→            </div>
+   725→          </div>
+   726→
+   727→          <DialogFooter className="gap-2 sm:gap-0">
+   728→            <Button
+   729→              variant="outline"
+   730→              onClick={() => setPulangDialogOpen(false)}
+   731→              disabled={submittingPulang}
+   732→            >
+   733→              Batal
+   734→            </Button>
+   735→            <Button
+   736→              onClick={handleAbsenPulang}
+   737→              disabled={submittingPulang}
+   738→              className="bg-[#ef4444] hover:bg-[#dc2626] text-white"
+   739→            >
+   740→              {submittingPulang ? (
+   741→                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+   742→              ) : (
+   743→                <LogOut className="h-4 w-4 mr-2" />
+   744→              )}
+   745→              {submittingPulang ? 'Memproses...' : 'Absen Pulang'}
+   746→            </Button>
+   747→          </DialogFooter>
+   748→        </DialogContent>
+   749→      </Dialog>
+   750→
+   751→      {/* ── Sakit/Izin Dialog ── */}
+   752→      <Dialog open={sakitIzinDialogOpen} onOpenChange={setSakitIzinDialogOpen}>
+   753→        <DialogContent className="sm:max-w-md">
+   754→          <DialogHeader>
+   755→            <DialogTitle className="flex items-center gap-2">
+   756→              <AlertTriangle className="h-5 w-5 text-[#f59e0b]" />
+   757→              Absen Sakit / Izin
+   758→            </DialogTitle>
+   759→            <DialogDescription>
+   760→              Pilih status dan isi keterangan wajib untuk mencatat ketidakhadiran Anda.
+   761→            </DialogDescription>
+   762→          </DialogHeader>
+   763→
+   764→          <div className="space-y-4 py-2">
+   765→            {/* Status selection */}
+   766→            <div className="grid grid-cols-2 gap-3">
+   767→              <button
+   768→                type="button"
+   769→                onClick={() => setSakitIzinStatus('Sakit')}
+   770→                className={`p-4 rounded-xl border-2 text-center font-semibold transition-all ${
+   771→                  sakitIzinStatus === 'Sakit'
+   772→                    ? 'border-amber-500 bg-amber-50 text-amber-700'
+   773→                    : 'border-gray-200 hover:border-gray-300 text-gray-600'
+   774→                }`}
+   775→              >
+   776→                <p className="text-lg">🤒</p>
+   777→                <p className="text-sm mt-1">Sakit</p>
+   778→              </button>
+   779→              <button
+   780→                type="button"
+   781→                onClick={() => setSakitIzinStatus('Izin')}
+   782→                className={`p-4 rounded-xl border-2 text-center font-semibold transition-all ${
+   783→                  sakitIzinStatus === 'Izin'
+   784→                    ? 'border-blue-500 bg-blue-50 text-blue-700'
+   785→                    : 'border-gray-200 hover:border-gray-300 text-gray-600'
+   786→                }`}
+   787→              >
+   788→                <p className="text-lg">📋</p>
+   789→                <p className="text-sm mt-1">Izin</p>
+   790→              </button>
+   791→            </div>
+   792→
+   793→            {/* Keterangan (mandatory) */}
+   794→            <div className="space-y-2">
+   795→              <Label htmlFor="sakit-izin-keterangan">
+   796→                Keterangan <span className="text-red-500">*</span>
+   797→              </Label>
+   798→              <Textarea
+   799→                id="sakit-izin-keterangan"
+   800→                placeholder={`Alasan ${sakitIzinStatus.toLowerCase()} Anda...`}
+   801→                value={sakitIzinKeterangan}
+   802→                onChange={(e) => setSakitIzinKeterangan(e.target.value)}
+   803→                rows={3}
+   804→              />
+   805→              <p className="text-xs text-muted-foreground">
+   806→                Keterangan wajib diisi untuk status {sakitIzinStatus}
+   807→              </p>
+   808→            </div>
+   809→          </div>
+   810→
+   811→          <DialogFooter className="gap-2 sm:gap-0">
+   812→            <Button
+   813→              variant="outline"
+   814→              onClick={() => setSakitIzinDialogOpen(false)}
+   815→              disabled={submittingSakitIzin}
+   816→            >
+   817→              Batal
+   818→            </Button>
+   819→            <Button
+   820→              onClick={handleSakitIzin}
+   821→              disabled={submittingSakitIzin || !sakitIzinKeterangan.trim()}
+   822→              className="bg-[#f59e0b] hover:bg-[#d97706] text-white"
+   823→            >
+   824→              {submittingSakitIzin ? (
+   825→                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+   826→              ) : (
+   827→                <AlertTriangle className="h-4 w-4 mr-2" />
+   828→              )}
+   829→              {submittingSakitIzin ? 'Memproses...' : `Kirim ${sakitIzinStatus}`}
+   830→            </Button>
+   831→          </DialogFooter>
+   832→        </DialogContent>
+   833→      </Dialog>
+   834→    </div>
+   835→  )
+   836→}
+   837→

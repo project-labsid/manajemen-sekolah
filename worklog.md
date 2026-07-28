@@ -102,3 +102,31 @@ Stage Summary:
 - Background-removed logo deployed
 - All branding updated across Sidebar, LoginPage, Pengaturan
 - Guru dashboard correctly shows mapel and kelas data
+---
+Task ID: 1
+Agent: Main
+Task: Fix user baru tidak ada untuk absen (new users not showing in attendance)
+
+Work Log:
+- Analyzed screenshot: Rekap Absensi Guru shows "Total: 0 guru" with empty state
+- Root cause: GET /absensi-guru API only returned existing AbsensiGuru records, NOT all guru users
+- The system has 2 separate tables: User (login accounts) and Guru (teacher profiles)
+- New users created via "Tambah User" only go into User table, not Guru table
+- The old API only queried AbsensiGuru table by date → 0 results if nobody clocked in yet
+- Modified GET /absensi-guru API: for admin/rekap viewers (super-admin, admin, kepala-sekolah, wakil-kepala-sekolah), fetches ALL active users with role guru/wali-kelas from User table, then LEFT JOINs with AbsensiGuru records for that date
+- Users without attendance records get status "Tidak Hadir"
+- Also includes attendance records for guru names not in User table (backward compat)
+- Added isRekap flag to API response
+- Updated AbsensiGuru.tsx: isAdmin check broadened to include super-admin, kepala-sekolah, wakil-kepala-sekolah
+- Updated empty state message for admin view
+- Updated footer summary stats: Hadir (includes Sudah Pulang), Sakit/Izin, Tidak Hadir/Alpha
+- Verified via curl: API returns 2 guru users with "Tidak Hadir" status and isRekap:true
+- Created test user "Nisa Aulia" (role=guru) successfully
+- Confirmed guru role has absensi-guru permission in seed data
+- Lint passes cleanly
+
+Stage Summary:
+- Admin Rekap Absensi Guru now shows ALL guru/wali-kelas users, not just those who clocked in
+- New users with role guru/wali-kelas appear immediately in the attendance rekap
+- Users without attendance are shown with "Tidak Hadir" status
+- Newly created guru users can access the absensi-guru page (guru role has absensi-guru permission)

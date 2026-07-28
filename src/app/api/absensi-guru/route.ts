@@ -12,17 +12,85 @@ export async function GET(request: NextRequest) {
     const tanggal = url.searchParams.get('tanggal') || new Date().toISOString().split('T')[0]
     const nama = url.searchParams.get('nama') || ''
 
+    // Determine if user should see rekap (all guru) or only own records
+    const isRekapViewer = ['super-admin', 'admin', 'kepala-sekolah', 'wakil-kepala-sekolah'].includes(user.role)
+
+    // Fetch existing attendance records for that date
     const where: Record<string, unknown> = { tanggal }
     if (nama) {
       where.namaGuru = { contains: nama }
     }
 
-    const data = await db.absensiGuru.findMany({
-      where,
-      orderBy: { createdAt: 'desc' },
-    })
+    if (isRekapViewer) {
+      // Admin/rekap viewer: get ALL guru users merged with attendance
+      const [guruUsers, attendanceRecords] = await Promise.all([
+        // Get all active users with guru or wali-kelas role
+        db.user.findMany({
+          where: {
+            role: { in: ['guru', 'wali-kelas'] },
+            status: 'aktif',
+            ...(nama ? { nama: { contains: nama } } : {}),
+          },
+          orderBy: { nama: 'asc' },
+          select: { id: true, nama: true, username: true, nip: true, jabatan: true },
+        }),
+        // Get attendance records for that date
+        db.absensiGuru.findMany({
+          where,
+          orderBy: { createdAt: 'desc' },
+        }),
+      ])
 
-    return NextResponse.json({ data, tanggal })
+      // Build a map of attendance records by namaGuru
+      const attendanceMap = new Map<string, typeof attendanceRecords[0]>()
+      for (const record of attendanceRecords) {
+        attendanceMap.set(record.namaGuru, record)
+      }
+
+      // Merge: for each guru user, use attendance record if exists, otherwise create "Tidak Hadir" entry
+      const mergedData = guruUsers.map((gu) => {
+        const attendance = attendanceMap.get(gu.nama)
+        if (attendance) {
+          return attendance
+        }
+        // No attendance record → Tidak Hadir
+        return {
+          id: `pending-${gu.id}`,
+          tanggal,
+          namaGuru: gu.nama,
+          nip: gu.nip || gu.username || '',
+          jamMasuk: '',
+          jamPulang: '',
+          durasi: '',
+          status: 'Tidak Hadir',
+          latitude: '',
+          longitude: '',
+          alamat: '',
+          browser: '',
+          device: '',
+          ip: '',
+          keterangan: '',
+          createdAt: new Date().toISOString(),
+        }
+      })
+
+      // Also include attendance records for guru names not in the User table
+      const userNames = new Set(guruUsers.map((g) => g.nama))
+      for (const record of attendanceRecords) {
+        if (!userNames.has(record.namaGuru)) {
+          mergedData.push(record)
+        }
+      }
+
+      return NextResponse.json({ data: mergedData, tanggal, isRekap: true })
+    } else {
+      // Guru/wali-kelas: only show own records
+      const data = await db.absensiGuru.findMany({
+        where: { ...where, namaGuru: user.nama },
+        orderBy: { createdAt: 'desc' },
+      })
+      return NextResponse.json({ data, tanggal, isRekap: false })
+    }
   } catch (error: unknown) {
     if (error instanceof AuthError) {
       return NextResponse.json({ error: error.message }, { status: error.statusCode })

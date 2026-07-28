@@ -166,7 +166,7 @@ function calculateDuration(jamMasuk: string, jamPulang: string): string {
 
 export default function AbsensiGuru() {
   const user = useAppStore((s) => s.user)
-  const isAdmin = user?.role === 'admin'
+  const isAdmin = ['super-admin', 'admin', 'kepala-sekolah', 'wakil-kepala-sekolah'].includes(user?.role || '')
 
   // ── State ──
   const [selectedDate, setSelectedDate] = useState<Date>(new Date())
@@ -247,14 +247,15 @@ export default function AbsensiGuru() {
     try {
       const params = new URLSearchParams({ tanggal: selectedDateStr })
       const res = await api.get<AbsensiResponse>(`/absensi-guru?${params.toString()}`)
-      const absensiRes = res as AbsensiResponse
+      const absensiRes = res as unknown as AbsensiResponse & { isRekap?: boolean }
       const data = Array.isArray(absensiRes.data) ? absensiRes.data : []
 
-      // For guru role, only show own record
+      // For guru/wali-kelas role, only show own record
       if (!isAdmin) {
         const filtered = data.filter((r) => r.namaGuru === user?.nama)
         setRecords(filtered)
       } else {
+        // Admin/rekap: API already returns merged data (all guru + attendance status)
         setRecords(data)
       }
     } catch {
@@ -593,10 +594,10 @@ export default function AbsensiGuru() {
             /* ── Empty state ── */
             <div className="flex flex-col items-center justify-center py-16 text-muted-foreground">
               <Inbox className="h-16 w-16 mb-4 opacity-40" />
-              <p className="text-lg font-medium">Belum Ada Data Absensi</p>
+              <p className="text-lg font-medium">{isAdmin ? 'Belum Ada Data Guru' : 'Belum Ada Data Absensi'}</p>
               <p className="text-sm mt-1">
                 {isAdmin
-                  ? 'Tidak ada data absensi guru pada tanggal ini'
+                  ? 'Belum ada user dengan role Guru atau Wali Kelas yang aktif'
                   : 'Anda belum melakukan absensi hari ini'}
               </p>
             </div>
@@ -655,15 +656,15 @@ export default function AbsensiGuru() {
               <div className="flex items-center gap-4 text-xs text-muted-foreground">
                 <div className="flex items-center gap-1">
                   <CheckCircle2 className="h-3.5 w-3.5 text-emerald-500" />
-                  <span>Hadir: {records.filter((r) => r.status === 'Hadir').length}</span>
+                  <span>Hadir: {records.filter((r) => r.status === 'Hadir' || r.status === 'Sudah Pulang').length}</span>
                 </div>
                 <div className="flex items-center gap-1">
-                  <CheckCircle2 className="h-3.5 w-3.5 text-blue-500" />
-                  <span>Sudah Pulang: {records.filter((r) => r.status === 'Sudah Pulang').length}</span>
+                  <AlertCircle className="h-3.5 w-3.5 text-amber-500" />
+                  <span>Sakit/Izin: {records.filter((r) => r.status === 'Sakit' || r.status === 'Izin').length}</span>
                 </div>
                 <div className="flex items-center gap-1">
                   <AlertCircle className="h-3.5 w-3.5 text-red-500" />
-                  <span>Tidak Hadir: {records.filter((r) => !r.jamMasuk).length}</span>
+                  <span>Tidak Hadir: {records.filter((r) => r.status === 'Tidak Hadir' || r.status === 'Alpha').length}</span>
                 </div>
               </div>
             )}
