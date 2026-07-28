@@ -62,11 +62,48 @@ interface AbsensiGuruRecord {
   ip: string
   keterangan: string
   createdAt: string
+  roleUser?: string
+  jabatanUser?: string
 }
 
 interface AbsensiResponse {
   data: AbsensiGuruRecord[]
   tanggal: string
+}
+
+/* ------------------------------------------------------------------ */
+/*  Role display helpers                                               */
+/* ------------------------------------------------------------------ */
+
+const ROLE_LABELS: Record<string, string> = {
+  'super-admin': 'Super Admin',
+  'admin': 'Admin',
+  'kepala-sekolah': 'Kepala Sekolah',
+  'wakil-kepala-sekolah': 'Wakil Kepala Sekolah',
+  'kurikulum': 'Kurikulum',
+  'tata-usaha': 'Tata Usaha',
+  'operator': 'Operator',
+  'guru': 'Guru',
+  'wali-kelas': 'Wali Kelas',
+}
+
+const ROLE_COLORS: Record<string, string> = {
+  'super-admin': 'bg-purple-100 text-purple-700',
+  'admin': 'bg-rose-100 text-rose-700',
+  'kepala-sekolah': 'bg-amber-100 text-amber-700',
+  'wakil-kepala-sekolah': 'bg-orange-100 text-orange-700',
+  'kurikulum': 'bg-cyan-100 text-cyan-700',
+  'tata-usaha': 'bg-teal-100 text-teal-700',
+  'operator': 'bg-indigo-100 text-indigo-700',
+  'guru': 'bg-emerald-100 text-emerald-700',
+  'wali-kelas': 'bg-sky-100 text-sky-700',
+}
+
+function getRoleBadge(roleSlug?: string) {
+  if (!roleSlug) return null
+  const label = ROLE_LABELS[roleSlug] || roleSlug
+  const color = ROLE_COLORS[roleSlug] || 'bg-gray-100 text-gray-600'
+  return <Badge className={`${color} hover:${color} border-0 text-[11px]`}>{label}</Badge>
 }
 
 /* ------------------------------------------------------------------ */
@@ -166,7 +203,8 @@ function calculateDuration(jamMasuk: string, jamPulang: string): string {
 
 export default function AbsensiGuru() {
   const user = useAppStore((s) => s.user)
-  const isAdmin = ['super-admin', 'admin', 'kepala-sekolah', 'wakil-kepala-sekolah'].includes(user?.role || '')
+  // Roles that see rekap (all staff attendance)
+  const isRekapViewer = ['super-admin', 'admin', 'kepala-sekolah', 'wakil-kepala-sekolah'].includes(user?.role || '')
 
   // ── State ──
   const [selectedDate, setSelectedDate] = useState<Date>(new Date())
@@ -195,13 +233,13 @@ export default function AbsensiGuru() {
   )
   const isToday = selectedDateStr === getTodayString()
 
-  // ── Compute: own today's record (for guru role) ──
+  // ── Compute: own today's record ──
   const myTodayRecord = useMemo(() => {
-    if (isAdmin || !isToday) return null
+    if (isRekapViewer && !isToday) return null
     return records.find(
       (r) => r.namaGuru === user?.nama,
     ) || null
-  }, [records, user, isAdmin, isToday])
+  }, [records, user, isRekapViewer, isToday])
 
   // ── Compute: own info cards data ──
   const ownJamMasuk = myTodayRecord?.jamMasuk || '-'
@@ -212,12 +250,12 @@ export default function AbsensiGuru() {
       : '-')
   const ownStatus = myTodayRecord?.status || 'Tidak Hadir'
 
-  // ── Can absen masuk? ──
-  const canAbsenMasuk = isToday && !myTodayRecord && !isAdmin
-  // ── Can absen pulang? ──
-  const canAbsenPulang = isToday && myTodayRecord && !myTodayRecord.jamPulang && !isAdmin
-  // ── Can sakit/izin? ──
-  const canSakitIzin = isToday && !myTodayRecord && !isAdmin
+  // ── Can absen masuk? (only on today, no existing record) ──
+  const canAbsenMasuk = isToday && !myTodayRecord
+  // ── Can absen pulang? (today, has record, not yet clocked out) ──
+  const canAbsenPulang = isToday && myTodayRecord && !myTodayRecord.jamPulang
+  // ── Can sakit/izin? (today, no record yet) ──
+  const canSakitIzin = isToday && !myTodayRecord
 
   // ── Geolocation ──
   const getGeolocation = useCallback((): Promise<{ latitude: string; longitude: string }> => {
@@ -250,13 +288,13 @@ export default function AbsensiGuru() {
       const absensiRes = res as unknown as AbsensiResponse & { isRekap?: boolean }
       const data = Array.isArray(absensiRes.data) ? absensiRes.data : []
 
-      // For guru/wali-kelas role, only show own record
-      if (!isAdmin) {
+      if (isRekapViewer) {
+        // Admin/rekap: API already returns merged data (all staff + attendance status)
+        setRecords(data)
+      } else {
+        // Non-admin: only show own record
         const filtered = data.filter((r) => r.namaGuru === user?.nama)
         setRecords(filtered)
-      } else {
-        // Admin/rekap: API already returns merged data (all guru + attendance status)
-        setRecords(data)
       }
     } catch {
       toast.error('Gagal memuat data absensi')
@@ -264,7 +302,7 @@ export default function AbsensiGuru() {
     } finally {
       setLoading(false)
     }
-  }, [selectedDateStr, isAdmin, user])
+  }, [selectedDateStr, isRekapViewer, user])
 
   useEffect(() => {
     fetchRecords()
@@ -283,7 +321,7 @@ export default function AbsensiGuru() {
 
       await api.post('/absensi-guru', {
         namaGuru: user.nama,
-        nip: user.username || '',
+        nip: user.nip || user.username || '',
         jamMasuk,
         latitude: geo.latitude,
         longitude: geo.longitude,
@@ -349,7 +387,7 @@ export default function AbsensiGuru() {
     try {
       await api.post('/absensi-guru', {
         namaGuru: user.nama,
-        nip: user.username || '',
+        nip: user.nip || user.username || '',
         status: sakitIzinStatus,
         keterangan: sakitIzinKeterangan.trim(),
       })
@@ -369,8 +407,8 @@ export default function AbsensiGuru() {
   // ── Render ──
   return (
     <div className="space-y-6 animate-fadeIn">
-      {/* ── Action Buttons (Guru only, today only) ── */}
-      {!isAdmin && (
+      {/* ── Action Buttons (ALL users, today only) ── */}
+      {isToday && (
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           {/* Absen Masuk Button */}
           <button
@@ -456,12 +494,12 @@ export default function AbsensiGuru() {
         </div>
       )}
 
-      {/* ── Info Cards Row (Guru own summary) ── */}
-      {!isAdmin && (
+      {/* ── Info Cards Row (own summary, shown for all on today) ── */}
+      {isToday && (
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
           {/* Jam Masuk */}
-          <div className="bg-white rounded-2xl shadow-sm p-4 sm:p-5 flex items-center gap-4">
-            <div className="flex-shrink-0 h-12 w-12 rounded-xl bg-emerald-50 flex items-center justify-center">
+          <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm p-4 sm:p-5 flex items-center gap-4">
+            <div className="flex-shrink-0 h-12 w-12 rounded-xl bg-emerald-50 dark:bg-emerald-900/30 flex items-center justify-center">
               <LogIn className="h-6 w-6 text-[#10b981]" />
             </div>
             <div className="min-w-0">
@@ -473,8 +511,8 @@ export default function AbsensiGuru() {
           </div>
 
           {/* Jam Pulang */}
-          <div className="bg-white rounded-2xl shadow-sm p-4 sm:p-5 flex items-center gap-4">
-            <div className="flex-shrink-0 h-12 w-12 rounded-xl bg-red-50 flex items-center justify-center">
+          <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm p-4 sm:p-5 flex items-center gap-4">
+            <div className="flex-shrink-0 h-12 w-12 rounded-xl bg-red-50 dark:bg-red-900/30 flex items-center justify-center">
               <LogOut className="h-6 w-6 text-[#ef4444]" />
             </div>
             <div className="min-w-0">
@@ -486,8 +524,8 @@ export default function AbsensiGuru() {
           </div>
 
           {/* Durasi Kerja */}
-          <div className="bg-white rounded-2xl shadow-sm p-4 sm:p-5 flex items-center gap-4">
-            <div className="flex-shrink-0 h-12 w-12 rounded-xl bg-amber-50 flex items-center justify-center">
+          <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm p-4 sm:p-5 flex items-center gap-4">
+            <div className="flex-shrink-0 h-12 w-12 rounded-xl bg-amber-50 dark:bg-amber-900/30 flex items-center justify-center">
               <Clock className="h-6 w-6 text-[#f59e0b]" />
             </div>
             <div className="min-w-0">
@@ -499,8 +537,8 @@ export default function AbsensiGuru() {
           </div>
 
           {/* Status */}
-          <div className="bg-white rounded-2xl shadow-sm p-4 sm:p-5 flex items-center gap-4">
-            <div className="flex-shrink-0 h-12 w-12 rounded-xl bg-blue-50 flex items-center justify-center">
+          <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm p-4 sm:p-5 flex items-center gap-4">
+            <div className="flex-shrink-0 h-12 w-12 rounded-xl bg-blue-50 dark:bg-blue-900/30 flex items-center justify-center">
               <UserCheck className="h-6 w-6 text-[#3b82f6]" />
             </div>
             <div className="min-w-0">
@@ -518,12 +556,12 @@ export default function AbsensiGuru() {
       )}
 
       {/* ── Date Picker + Filter Card ── */}
-      <div className="bg-white rounded-2xl shadow-sm p-4 sm:p-6">
+      <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm p-4 sm:p-6">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div className="flex items-center gap-2">
             <Calendar className="h-5 w-5 text-[#10b981]" />
             <h2 className="text-lg font-semibold text-foreground">
-              {isAdmin ? 'Rekap Absensi Guru' : 'Riwayat Absensi Saya'}
+              {isRekapViewer ? 'Rekap Absensi Pegawai' : 'Riwayat Absensi Saya'}
             </h2>
           </div>
 
@@ -559,8 +597,8 @@ export default function AbsensiGuru() {
           </div>
         </div>
 
-        {/* Display selected date summary for admin */}
-        {isAdmin && (
+        {/* Display selected date summary for rekap viewers */}
+        {isRekapViewer && (
           <div className="mt-4 flex flex-wrap items-center gap-3 text-sm text-muted-foreground">
             <span>
               Menampilkan data:{' '}
@@ -572,7 +610,7 @@ export default function AbsensiGuru() {
             <span>
               Total:{' '}
               <span className="font-semibold text-foreground">
-                {records.length} guru
+                {records.length} pegawai
               </span>
             </span>
           </div>
@@ -580,7 +618,7 @@ export default function AbsensiGuru() {
       </div>
 
       {/* ── Attendance Table ── */}
-      <div className="bg-white rounded-2xl shadow-sm p-4 sm:p-6">
+      <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm p-4 sm:p-6">
         <div className="overflow-x-auto max-h-96 overflow-y-auto">
           {loading ? (
             /* ── Skeleton ── */
@@ -594,10 +632,10 @@ export default function AbsensiGuru() {
             /* ── Empty state ── */
             <div className="flex flex-col items-center justify-center py-16 text-muted-foreground">
               <Inbox className="h-16 w-16 mb-4 opacity-40" />
-              <p className="text-lg font-medium">{isAdmin ? 'Belum Ada Data Guru' : 'Belum Ada Data Absensi'}</p>
+              <p className="text-lg font-medium">{isRekapViewer ? 'Belum Ada Data Pegawai' : 'Belum Ada Data Absensi'}</p>
               <p className="text-sm mt-1">
-                {isAdmin
-                  ? 'Belum ada user dengan role Guru atau Wali Kelas yang aktif'
+                {isRekapViewer
+                  ? 'Belum ada pegawai yang aktif'
                   : 'Anda belum melakukan absensi hari ini'}
               </p>
             </div>
@@ -607,8 +645,9 @@ export default function AbsensiGuru() {
               <thead className="sticky top-0 z-10">
                 <tr>
                   <th>No</th>
-                  <th>Nama Guru</th>
-                  <th>NIP</th>
+                  <th>Nama</th>
+                  {isRekapViewer && <th>Role</th>}
+                  <th>NIP/Username</th>
                   <th>Jam Masuk</th>
                   <th>Jam Pulang</th>
                   <th>Durasi</th>
@@ -621,6 +660,7 @@ export default function AbsensiGuru() {
                   <tr key={item.id}>
                     <td className="font-medium">{idx + 1}</td>
                     <td className="font-medium">{item.namaGuru}</td>
+                    {isRekapViewer && <td>{getRoleBadge(item.roleUser)}</td>}
                     <td className="font-mono text-sm">{item.nip || '-'}</td>
                     <td>
                       <div className="flex items-center gap-1.5">
@@ -650,9 +690,9 @@ export default function AbsensiGuru() {
             <p className="text-sm text-muted-foreground">
               Menampilkan{' '}
               <span className="font-semibold text-foreground">{records.length}</span>{' '}
-              {isAdmin ? 'data absensi guru' : 'data absensi'}
+              {isRekapViewer ? 'data absensi pegawai' : 'data absensi'}
             </p>
-            {isAdmin && (
+            {isRekapViewer && (
               <div className="flex items-center gap-4 text-xs text-muted-foreground">
                 <div className="flex items-center gap-1">
                   <CheckCircle2 className="h-3.5 w-3.5 text-emerald-500" />
@@ -692,15 +732,15 @@ export default function AbsensiGuru() {
           <div className="space-y-4 py-2">
             {/* Info summary */}
             <div className="grid grid-cols-2 gap-3">
-              <div className="rounded-xl bg-emerald-50 p-3">
+              <div className="rounded-xl bg-emerald-50 dark:bg-emerald-900/20 p-3">
                 <p className="text-xs text-emerald-600 font-medium">Jam Masuk</p>
-                <p className="text-lg font-bold text-emerald-700">
+                <p className="text-lg font-bold text-emerald-700 dark:text-emerald-400">
                   {myTodayRecord?.jamMasuk || '-'}
                 </p>
               </div>
-              <div className="rounded-xl bg-red-50 p-3">
+              <div className="rounded-xl bg-red-50 dark:bg-red-900/20 p-3">
                 <p className="text-xs text-red-600 font-medium">Jam Pulang</p>
-                <p className="text-lg font-bold text-red-700">
+                <p className="text-lg font-bold text-red-700 dark:text-red-400">
                   {pulangJam}
                 </p>
               </div>
@@ -770,8 +810,8 @@ export default function AbsensiGuru() {
                 onClick={() => setSakitIzinStatus('Sakit')}
                 className={`p-4 rounded-xl border-2 text-center font-semibold transition-all ${
                   sakitIzinStatus === 'Sakit'
-                    ? 'border-amber-500 bg-amber-50 text-amber-700'
-                    : 'border-gray-200 hover:border-gray-300 text-gray-600'
+                    ? 'border-amber-500 bg-amber-50 dark:bg-amber-900/20 text-amber-700 dark:text-amber-400'
+                    : 'border-gray-200 dark:border-slate-600 hover:border-gray-300 text-gray-600 dark:text-slate-400'
                 }`}
               >
                 <p className="text-lg">🤒</p>
@@ -782,8 +822,8 @@ export default function AbsensiGuru() {
                 onClick={() => setSakitIzinStatus('Izin')}
                 className={`p-4 rounded-xl border-2 text-center font-semibold transition-all ${
                   sakitIzinStatus === 'Izin'
-                    ? 'border-blue-500 bg-blue-50 text-blue-700'
-                    : 'border-gray-200 hover:border-gray-300 text-gray-600'
+                    ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-400'
+                    : 'border-gray-200 dark:border-slate-600 hover:border-gray-300 text-gray-600 dark:text-slate-400'
                 }`}
               >
                 <p className="text-lg">📋</p>

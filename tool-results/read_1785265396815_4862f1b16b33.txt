@@ -594,10 +594,10 @@
    594→            /* ── Empty state ── */
    595→            <div className="flex flex-col items-center justify-center py-16 text-muted-foreground">
    596→              <Inbox className="h-16 w-16 mb-4 opacity-40" />
-   597→              <p className="text-lg font-medium">Belum Ada Data Absensi</p>
+   597→              <p className="text-lg font-medium">{isAdmin ? 'Belum Ada Data Guru' : 'Belum Ada Data Absensi'}</p>
    598→              <p className="text-sm mt-1">
    599→                {isAdmin
-   600→                  ? 'Tidak ada data absensi guru pada tanggal ini'
+   600→                  ? 'Belum ada user dengan role Guru atau Wali Kelas yang aktif'
    601→                  : 'Anda belum melakukan absensi hari ini'}
    602→              </p>
    603→            </div>
@@ -656,15 +656,15 @@
    656→              <div className="flex items-center gap-4 text-xs text-muted-foreground">
    657→                <div className="flex items-center gap-1">
    658→                  <CheckCircle2 className="h-3.5 w-3.5 text-emerald-500" />
-   659→                  <span>Hadir: {records.filter((r) => r.status === 'Hadir').length}</span>
+   659→                  <span>Hadir: {records.filter((r) => r.status === 'Hadir' || r.status === 'Sudah Pulang').length}</span>
    660→                </div>
    661→                <div className="flex items-center gap-1">
-   662→                  <CheckCircle2 className="h-3.5 w-3.5 text-blue-500" />
-   663→                  <span>Sudah Pulang: {records.filter((r) => r.status === 'Sudah Pulang').length}</span>
+   662→                  <AlertCircle className="h-3.5 w-3.5 text-amber-500" />
+   663→                  <span>Sakit/Izin: {records.filter((r) => r.status === 'Sakit' || r.status === 'Izin').length}</span>
    664→                </div>
    665→                <div className="flex items-center gap-1">
    666→                  <AlertCircle className="h-3.5 w-3.5 text-red-500" />
-   667→                  <span>Tidak Hadir: {records.filter((r) => !r.jamMasuk).length}</span>
+   667→                  <span>Tidak Hadir: {records.filter((r) => r.status === 'Tidak Hadir' || r.status === 'Alpha').length}</span>
    668→                </div>
    669→              </div>
    670→            )}

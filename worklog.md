@@ -130,3 +130,26 @@ Stage Summary:
 - New users with role guru/wali-kelas appear immediately in the attendance rekap
 - Users without attendance are shown with "Tidak Hadir" status
 - Newly created guru users can access the absensi-guru page (guru role has absensi-guru permission)
+---
+Task ID: 1
+Agent: Main Agent
+
+Task: Make attendance (absensi) universal for ALL staff roles (superadmin to guru)
+
+Work Log:
+- Read and analyzed existing AbsensiGuru API (only queried guru/wali-kelas roles)
+- Read AbsensiGuru component (only showed absen buttons for non-admin roles)
+- Added absensi-guru + clock-in + clock-out permissions to super-admin, operator, tata-usaha roles
+- Rewrote absensi-guru API to query ALL staff roles (9 roles, excluding siswa/orang-tua)
+- Rewrote AbsensiGuru component: ALL users can click absen masuk/pulang/sakit-izin
+- Added role badges (per-role colors) in rekap table for admin viewers
+- Changed sidebar label from Absensi Guru to Absensi
+- Changed navbar title from Absensi Guru to Absensi
+- Fixed JSX comment syntax errors (missing closing braces)
+- Verified lint passes cleanly
+
+Stage Summary:
+- All 9 staff roles can now do self-attendance (absen masuk/pulang/sakit/izin)
+- Admin/rekap viewers see all staff with role badges in the rekap table
+- Non-admin staff see only their own attendance records
+- Server compiles and serves successfully (GET / 200)

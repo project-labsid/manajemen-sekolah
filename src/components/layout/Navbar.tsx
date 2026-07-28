@@ -14,7 +14,7 @@ const PAGE_TITLES: Record<string, string> = {
   mapel: 'Mata Pelajaran',
   nilai: 'Input Nilai',
   'rekap-nilai': 'Rekap Nilai',
-  'absensi-guru': 'Absensi Guru',
+  'absensi-guru': 'Absensi',
   'absensi-siswa': 'Absensi Siswa',
   laporan: 'Laporan',
   pengumuman: 'Pengumuman',

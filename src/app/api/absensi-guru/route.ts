@@ -2,6 +2,15 @@ import { NextRequest, NextResponse } from 'next/server'
 import { authenticate, requirePermission, requireAnyPermission, createAuditLog, initAuth, AuthError } from '@/lib/rbac'
 import { db } from '@/lib/db'
 
+// Staff roles that can do attendance (exclude siswa and orang-tua)
+const STAFF_ROLES = [
+  'super-admin', 'admin', 'kepala-sekolah', 'wakil-kepala-sekolah',
+  'kurikulum', 'tata-usaha', 'operator', 'guru', 'wali-kelas',
+]
+
+// Roles that can see rekap (all staff attendance)
+const REKAP_VIEWER_ROLES = ['super-admin', 'admin', 'kepala-sekolah', 'wakil-kepala-sekolah']
+
 export async function GET(request: NextRequest) {
   try {
     await initAuth()
@@ -12,8 +21,7 @@ export async function GET(request: NextRequest) {
     const tanggal = url.searchParams.get('tanggal') || new Date().toISOString().split('T')[0]
     const nama = url.searchParams.get('nama') || ''
 
-    // Determine if user should see rekap (all guru) or only own records
-    const isRekapViewer = ['super-admin', 'admin', 'kepala-sekolah', 'wakil-kepala-sekolah'].includes(user.role)
+    const isRekapViewer = REKAP_VIEWER_ROLES.includes(user.role)
 
     // Fetch existing attendance records for that date
     const where: Record<string, unknown> = { tanggal }
@@ -22,17 +30,17 @@ export async function GET(request: NextRequest) {
     }
 
     if (isRekapViewer) {
-      // Admin/rekap viewer: get ALL guru users merged with attendance
-      const [guruUsers, attendanceRecords] = await Promise.all([
-        // Get all active users with guru or wali-kelas role
+      // Admin/rekap viewer: get ALL staff users merged with attendance
+      const [staffUsers, attendanceRecords] = await Promise.all([
+        // Get all active staff users (exclude siswa and orang-tua)
         db.user.findMany({
           where: {
-            role: { in: ['guru', 'wali-kelas'] },
+            role: { in: STAFF_ROLES },
             status: 'aktif',
             ...(nama ? { nama: { contains: nama } } : {}),
           },
           orderBy: { nama: 'asc' },
-          select: { id: true, nama: true, username: true, nip: true, jabatan: true },
+          select: { id: true, nama: true, username: true, nip: true, jabatan: true, role: true },
         }),
         // Get attendance records for that date
         db.absensiGuru.findMany({
@@ -41,24 +49,26 @@ export async function GET(request: NextRequest) {
         }),
       ])
 
-      // Build a map of attendance records by namaGuru
+      // Build a map of attendance records by nip (more unique than nama)
       const attendanceMap = new Map<string, typeof attendanceRecords[0]>()
       for (const record of attendanceRecords) {
-        attendanceMap.set(record.namaGuru, record)
+        const key = record.nip || record.namaGuru
+        attendanceMap.set(key, record)
       }
 
-      // Merge: for each guru user, use attendance record if exists, otherwise create "Tidak Hadir" entry
-      const mergedData = guruUsers.map((gu) => {
-        const attendance = attendanceMap.get(gu.nama)
+      // Merge: for each staff user, use attendance record if exists, otherwise create "Tidak Hadir" entry
+      const mergedData = staffUsers.map((su) => {
+        const key = su.nip || su.username || su.nama
+        const attendance = attendanceMap.get(key)
         if (attendance) {
-          return attendance
+          return { ...attendance, roleUser: su.role, jabatanUser: su.jabatan }
         }
         // No attendance record → Tidak Hadir
         return {
-          id: `pending-${gu.id}`,
+          id: `pending-${su.id}`,
           tanggal,
-          namaGuru: gu.nama,
-          nip: gu.nip || gu.username || '',
+          namaGuru: su.nama,
+          nip: su.nip || su.username || '',
           jamMasuk: '',
           jamPulang: '',
           durasi: '',
@@ -71,20 +81,23 @@ export async function GET(request: NextRequest) {
           ip: '',
           keterangan: '',
           createdAt: new Date().toISOString(),
+          roleUser: su.role,
+          jabatanUser: su.jabatan,
         }
       })
 
-      // Also include attendance records for guru names not in the User table
-      const userNames = new Set(guruUsers.map((g) => g.nama))
+      // Also include attendance records for names not in the User table
+      const userKeys = new Set(staffUsers.map((s) => s.nip || s.username || s.nama))
       for (const record of attendanceRecords) {
-        if (!userNames.has(record.namaGuru)) {
-          mergedData.push(record)
+        const key = record.nip || record.namaGuru
+        if (!userKeys.has(key)) {
+          mergedData.push({ ...record, roleUser: '', jabatanUser: '' })
         }
       }
 
       return NextResponse.json({ data: mergedData, tanggal, isRekap: true })
     } else {
-      // Guru/wali-kelas: only show own records
+      // Non-admin staff: only show own records
       const data = await db.absensiGuru.findMany({
         where: { ...where, namaGuru: user.nama },
         orderBy: { createdAt: 'desc' },
@@ -110,7 +123,7 @@ export async function POST(request: NextRequest) {
     const { namaGuru, nip, latitude, longitude, alamat, browser, device, keterangan, jamMasuk: clientJamMasuk, status: reqStatus } = body
 
     if (!namaGuru) {
-      return NextResponse.json({ error: 'Nama guru wajib diisi' }, { status: 400 })
+      return NextResponse.json({ error: 'Nama wajib diisi' }, { status: 400 })
     }
 
     const status = reqStatus || 'Hadir'
@@ -156,9 +169,9 @@ export async function POST(request: NextRequest) {
     await createAuditLog({
       user: user.nama,
       role: user.role,
-      aktivitas: `Absen Guru: ${status}`,
+      aktivitas: `Absen: ${status}`,
       ip: request.headers.get('x-forwarded-for') || '',
-      detail: `Absensi guru: ${namaGuru}, status: ${status}`,
+      detail: `Absensi: ${namaGuru} (${user.roleName || user.role}), status: ${status}`,
     })
 
     return NextResponse.json({ data: absensi, message: `Absensi ${status.toLowerCase()} berhasil dicatat` }, { status: 201 })
@@ -215,9 +228,9 @@ export async function PUT(request: NextRequest) {
     await createAuditLog({
       user: user.nama,
       role: user.role,
-      aktivitas: 'Clock Out Guru',
+      aktivitas: 'Clock Out',
       ip: request.headers.get('x-forwarded-for') || '',
-      detail: `Clock out absensi guru: ${existing.namaGuru}`,
+      detail: `Clock out absensi: ${existing.namaGuru}`,
     })
 
     return NextResponse.json({ data: absensi, message: 'Absensi pulang berhasil dicatat' })
