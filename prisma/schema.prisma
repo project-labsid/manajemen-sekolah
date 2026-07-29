@@ -3,8 +3,9 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
 model SettingSekolah {
@@ -18,15 +19,15 @@ model SettingSekolah {
   telepon           String   @default("")
   kepalaSekolah     String   @default("")
   nipKepalaSekolah  String   @default("")
-  moto              String   @default("")
+  motto             String   @default("")
   visi              String   @default("")
   misi              String   @default("")
   semesterAktif     String   @default("Genap")
   tahunAjaranAktif  String   @default("2024/2025")
   tema              String   @default("light")
   darkMode          Boolean  @default(false)
-  createdAt         DateTime @default(now())
-  updatedAt         DateTime @updatedAt
+  createdAt         DateTime @default(now()) @db.Timestamptz()
+  updatedAt         DateTime @updatedAt @db.Timestamptz()
 }
 
 model Role {
@@ -35,8 +36,8 @@ model Role {
   nama      String
   deskripsi String          @default("")
   status    String          @default("aktif")
-  createdAt DateTime        @default(now())
-  updatedAt DateTime        @updatedAt
+  createdAt DateTime        @default(now()) @db.Timestamptz()
+  updatedAt DateTime        @updatedAt @db.Timestamptz()
   permissions RolePermission[]
   users      UserRole[]
 }
@@ -47,8 +48,8 @@ model Permission {
   nama     String
   kategori String          @default("umum")
   status   String          @default("aktif")
-  createdAt DateTime        @default(now())
-  updatedAt DateTime        @updatedAt
+  createdAt DateTime        @default(now()) @db.Timestamptz()
+  updatedAt DateTime        @updatedAt @db.Timestamptz()
   roles    RolePermission[]
 }
 
@@ -58,7 +59,7 @@ model RolePermission {
   permissionId String
   role        Role       @relation(fields: [roleId], references: [id], onDelete: Cascade)
   permission  Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
-  createdAt   DateTime   @default(now())
+  createdAt   DateTime   @default(now()) @db.Timestamptz()
   @@unique([roleId, permissionId])
 }
 
@@ -68,7 +69,7 @@ model UserRole {
   roleId String
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
   role   Role   @relation(fields: [roleId], references: [id], onDelete: Cascade)
-  createdAt DateTime @default(now())
+  createdAt DateTime @default(now()) @db.Timestamptz()
   @@unique([userId, roleId])
 }
 
@@ -77,7 +78,7 @@ model User {
   nama         String
   username     String     @unique
   password     String
-  passwordText String @default("")
+  passwordText String     @default("")
   role         String     @default("guru")
   status       String     @default("aktif")
   foto         String     @default("")
@@ -85,9 +86,9 @@ model User {
   noHP         String     @default("")
   nip          String     @default("")
   jabatan      String     @default("")
-  lastLogin    DateTime?
-  createdAt    DateTime   @default(now())
-  updatedAt    DateTime   @updatedAt
+  lastLogin    DateTime?  @db.Timestamptz()
+  createdAt    DateTime   @default(now()) @db.Timestamptz()
+  updatedAt    DateTime   @updatedAt @db.Timestamptz()
   userRoles    UserRole[]
 }
 
@@ -105,8 +106,8 @@ model Guru {
   mapel        String   @default("")
   status       String   @default("aktif")
   foto         String   @default("")
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  createdAt    DateTime @default(now()) @db.Timestamptz()
+  updatedAt    DateTime @updatedAt @db.Timestamptz()
 }
 
 model Siswa {
@@ -125,8 +126,8 @@ model Siswa {
   kelas        String   @default("")
   status       String   @default("aktif")
   foto         String   @default("")
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  createdAt    DateTime @default(now()) @db.Timestamptz()
+  updatedAt    DateTime @updatedAt @db.Timestamptz()
 }
 
 model Kelas {
@@ -177,8 +178,8 @@ model Nilai {
   nilaiAkhir  Float    @default(0)
   predikat    String   @default("")
   deskripsi   String   @default("")
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  createdAt   DateTime @default(now()) @db.Timestamptz()
+  updatedAt   DateTime @updatedAt @db.Timestamptz()
 }
 
 model AbsensiGuru {
@@ -197,7 +198,7 @@ model AbsensiGuru {
   device     String   @default("")
   ip         String   @default("")
   keterangan String   @default("")
-  createdAt  DateTime @default(now())
+  createdAt  DateTime @default(now()) @db.Timestamptz()
 }
 
 model AbsensiSiswa {
@@ -209,7 +210,7 @@ model AbsensiSiswa {
   status     String  @default("Hadir")
   keterangan String  @default("")
   guru       String  @default("")
-  createdAt  DateTime @default(now())
+  createdAt  DateTime @default(now()) @db.Timestamptz()
 }
 
 model Pengumuman {
@@ -219,7 +220,7 @@ model Pengumuman {
   lampiran  String   @default("")
   tanggal   String   @default("")
   status    String   @default("aktif")
-  createdAt DateTime @default(now())
+  createdAt DateTime @default(now()) @db.Timestamptz()
 }
 
 model AuditLog {
@@ -230,7 +231,7 @@ model AuditLog {
   aktivitas  String   @default("")
   ip         String   @default("")
   detail     String   @default("")
-  createdAt  DateTime @default(now())
+  createdAt  DateTime @default(now()) @db.Timestamptz()
 }
 
 model Backup {
@@ -239,7 +240,7 @@ model Backup {
   ukuran        String   @default("")
   tanggalBackup String   @default("")
   status        String   @default("aktif")
-  createdAt     DateTime @default(now())
+  createdAt     DateTime @default(now()) @db.Timestamptz()
 }
 
 model Alumni {
@@ -258,7 +259,7 @@ model JurnalMengajar {
   mapel      String  @default("")
   materi     String  @default("")
   keterangan String  @default("")
-  createdAt  DateTime @default(now())
+  createdAt  DateTime @default(now()) @db.Timestamptz()
 }
 
 model RiwayatLogin {
@@ -268,5 +269,5 @@ model RiwayatLogin {
   waktuLogin String   @default("")
   ipAddress  String   @default("")
   userAgent  String   @default("")
-  createdAt  DateTime @default(now())
+  createdAt  DateTime @default(now()) @db.Timestamptz()
 }
