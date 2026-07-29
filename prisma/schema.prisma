@@ -3,7 +3,7 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "mysql"
   url      = env("DATABASE_URL")
 }
 
@@ -31,7 +31,7 @@ model SettingSekolah {
 
 model Role {
   id        String          @id @default(cuid())
-  slug      String          @unique
+  slug      String          @unique @db.VarChar(191)
   nama      String
   deskripsi String          @default("")
   status    String          @default("aktif")
@@ -43,7 +43,7 @@ model Role {
 
 model Permission {
   id       String          @id @default(cuid())
-  slug     String          @unique
+  slug     String          @unique @db.VarChar(191)
   nama     String
   kategori String          @default("umum")
   status   String          @default("aktif")
@@ -75,7 +75,7 @@ model UserRole {
 model User {
   id           String     @id @default(cuid())
   nama         String
-  username     String     @unique
+  username     String     @unique @db.VarChar(191)
   password     String
   passwordText String     @default("")
   role         String     @default("guru")
@@ -93,7 +93,7 @@ model User {
 
 model Guru {
   id           String   @id @default(cuid())
-  nip          String   @unique
+  nip          String   @unique @db.VarChar(191)
   nama         String
   gelar        String   @default("")
   jenisKelamin String   @default("Laki-laki")
@@ -111,7 +111,7 @@ model Guru {
 
 model Siswa {
   id           String   @id @default(cuid())
-  nis          String   @unique
+  nis          String   @unique @db.VarChar(191)
   nisn         String   @default("")
   nama         String
   jenisKelamin String   @default("Laki-laki")
@@ -131,7 +131,7 @@ model Siswa {
 
 model Kelas {
   id        String @id @default(cuid())
-  kodeKelas String @unique
+  kodeKelas String @unique @db.VarChar(191)
   namaKelas String
   waliKelas String @default("")
   status    String @default("aktif")
@@ -139,22 +139,22 @@ model Kelas {
 
 model MataPelajaran {
   id        String @id @default(cuid())
-  kodeMapel String @unique
+  kodeMapel String @unique @db.VarChar(191)
   namaMapel String
   kkm       Int    @default(75)
-  guru      String @default("")
+  guru      String   @default("")
   status    String @default("aktif")
 }
 
 model TahunAjaran {
   id     String @id @default(cuid())
-  nama   String @unique
+  nama   String @unique @db.VarChar(191)
   status String @default("aktif")
 }
 
 model Semester {
   id       String @id @default(cuid())
-  semester String @unique
+  semester String @unique @db.VarChar(191)
   status   String @default("aktif")
 }
 
