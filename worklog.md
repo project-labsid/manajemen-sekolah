@@ -18,3 +18,55 @@ Stage Summary:
 - File `database_siakad.sql` tetap tersedia untuk import MySQL ke phpMyAdmin (nama db: siakad_sdmi)
 - App sudah berfungsi: login admin/admin123, semua API endpoint berjalan
 - Login credentials: admin/admin123 (Super Admin), kepsek/kepsek123 (Kepala Sekolah), ahmad/guru123 (Guru)
+---
+Task ID: 1
+Agent: main
+Task: Add student attendance grouping display (Hadir vs Tidak Hadir)
+
+Work Log:
+- Analyzed uploaded screenshot showing attendance page with only summary cards
+- Read AbsensiSiswa.tsx, absensi-siswa API route, store, auth, and schema files
+- Identified user wants clear grouped display of students who are Hadir vs Tidak Hadir
+- Fixed absensi map key from siswaId to nis (matching AbsensiSiswa model)
+- Added grouped view section with two cards: Siswa Hadir (green) and Siswa Tidak Hadir (red)
+- Each card lists students with name, NIS, and status badge
+- Tidak Hadir section shows specific reasons (Sakit/Izin/Alpha) with icons
+- Updated summary card icons to be more specific (Stethoscope, FileText, UserX)
+- Added "Input Absensi" section header to the table
+- Changed save button text to "Simpan Absensi"
+- Removed unused imports
+- Lint passes clean
+
+Stage Summary:
+- Updated /home/z/my-project/src/components/absensi/AbsensiSiswa.tsx with grouped attendance display
+- The page now shows two clear panels: Siswa Hadir (green) and Siswa Tidak Hadir (red)
+- Students are dynamically grouped as status changes are made
+- Each student row shows name, NIS, and status badge
+- Empty states handled (no students present / all present)
+
+---
+Task ID: 1
+Agent: main
+Task: Add student attendance grouping display (Hadir vs Tidak Hadir)
+
+Work Log:
+- Analyzed uploaded screenshot showing attendance page with only summary cards
+- Read AbsensiSiswa.tsx, absensi-siswa API route, store, auth, and schema files
+- Identified user wants clear grouped display of students who are Hadir vs Tidak Hadir
+- Fixed absensi map key from siswaId to nis (matching AbsensiSiswa model)
+- Added grouped view section with two cards: Siswa Hadir (green) and Siswa Tidak Hadir (red)
+- Each card lists students with name, NIS, and status badge
+- Tidak Hadir section shows specific reasons (Sakit/Izin/Alpha) with icons
+- Updated summary card icons to be more specific (Stethoscope, FileText, UserX)
+- Added "Input Absensi" section header to the table
+- Changed save button text to "Simpan Absensi"
+- Removed unused imports
+- Lint passes clean
+
+Stage Summary:
+- Updated /home/z/my-project/src/components/absensi/AbsensiSiswa.tsx with grouped attendance display
+- The page now shows two clear panels: Siswa Hadir (green) and Siswa Tidak Hadir (red)
+- Students are dynamically grouped as status changes are made
+- Each student row shows name, NIS, and status badge
+- Empty states handled (no students present / all present)
+

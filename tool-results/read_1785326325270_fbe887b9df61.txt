@@ -1,0 +1,625 @@
+     1→-- ========================================
+     2→-- SIAKAD Database - MySQL Script
+     3→-- Generated for phpMyAdmin import
+     4→-- ========================================
+     5→
+     6→CREATE DATABASE IF NOT EXISTS `siakad_sdmi` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+     7→USE `siakad_sdmi`;
+     8→
+     9→SET FOREIGN_KEY_CHECKS = 0;
+    10→
+    11→-- ----------------------------------------
+    12→-- 1. SettingSekolah
+    13→-- ----------------------------------------
+    14→DROP TABLE IF EXISTS `SettingSekolah`;
+    15→CREATE TABLE `SettingSekolah` (
+    16→  `id` VARCHAR(191) PRIMARY KEY,
+    17→  `namaSekolah` TEXT,
+    18→  `logo` TEXT,
+    19→  `alamat` TEXT,
+    20→  `npsn` VARCHAR(191),
+    21→  `email` VARCHAR(191),
+    22→  `website` VARCHAR(191),
+    23→  `telepon` VARCHAR(191),
+    24→  `kepalaSekolah` VARCHAR(191),
+    25→  `nipKepalaSekolah` VARCHAR(191),
+    26→  `motto` TEXT,
+    27→  `visi` TEXT,
+    28→  `misi` TEXT,
+    29→  `semesterAktif` VARCHAR(191),
+    30→  `tahunAjaranAktif` VARCHAR(191),
+    31→  `tema` VARCHAR(191),
+    32→  `darkMode` BOOLEAN DEFAULT 0,
+    33→  `createdAt` DATETIME,
+    34→  `updatedAt` DATETIME
+    35→) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+    36→
+    37→INSERT INTO `SettingSekolah` (`id`, `namaSekolah`, `logo`, `alamat`, `npsn`, `email`, `website`, `telepon`, `kepalaSekolah`, `nipKepalaSekolah`, `motto`, `visi`, `misi`, `semesterAktif`, `tahunAjaranAktif`, `tema`, `darkMode`, `createdAt`, `updatedAt`) VALUES
+    38→('seed-setting-001', 'MIS AL ASY''ARIYAH', '', '', '', '', '', '', '', '', '', '', '', 'Genap', '2024/2025', 'light', 0, NOW(), NOW());
+    39→
+    40→-- ----------------------------------------
+    41→-- 2. Role
+    42→-- ----------------------------------------
+    43→DROP TABLE IF EXISTS `Role`;
+    44→CREATE TABLE `Role` (
+    45→  `id` VARCHAR(191) PRIMARY KEY,
+    46→  `slug` VARCHAR(191) UNIQUE,
+    47→  `nama` VARCHAR(191),
+    48→  `deskripsi` TEXT,
+    49→  `status` VARCHAR(191),
+    50→  `createdAt` DATETIME,
+    51→  `updatedAt` DATETIME
+    52→) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+    53→
+    54→INSERT INTO `Role` (`id`, `slug`, `nama`, `deskripsi`, `status`, `createdAt`, `updatedAt`) VALUES
+    55→('seed-role-001', 'super-admin', 'Super Admin', 'Akses penuh terhadap seluruh sistem', 'aktif', NOW(), NOW()),
+    56→('seed-role-002', 'admin', 'Admin Sekolah', 'Mengelola seluruh operasional sekolah', 'aktif', NOW(), NOW()),
+    57→('seed-role-003', 'operator', 'Operator Sekolah', 'Membantu administrasi sekolah', 'aktif', NOW(), NOW()),
+    58→('seed-role-004', 'kepala-sekolah', 'Kepala Sekolah', 'Monitoring dan persetujuan', 'aktif', NOW(), NOW()),
+    59→('seed-role-005', 'wakil-kepala-sekolah', 'Wakil Kepala Sekolah', 'Supervisi akademik', 'aktif', NOW(), NOW()),
+    60→('seed-role-006', 'tata-usaha', 'Tata Usaha', 'Mengelola administrasi sekolah', 'aktif', NOW(), NOW()),
+    61→('seed-role-007', 'guru', 'Guru', 'Guru mengajar', 'aktif', NOW(), NOW()),
+    62→('seed-role-008', 'wali-kelas', 'Wali Kelas', 'Guru dengan hak tambahan wali kelas', 'aktif', NOW(), NOW()),
+    63→('seed-role-009', 'siswa', 'Siswa', 'Siswa (opsional)', 'aktif', NOW(), NOW()),
+    64→('seed-role-010', 'orang-tua', 'Orang Tua', 'Orang Tua (opsional)', 'aktif', NOW(), NOW());
+    65→
+    66→-- ----------------------------------------
+    67→-- 3. Permission
+    68→-- ----------------------------------------
+    69→DROP TABLE IF EXISTS `Permission`;
+    70→CREATE TABLE `Permission` (
+    71→  `id` VARCHAR(191) PRIMARY KEY,
+    72→  `slug` VARCHAR(191) UNIQUE,
+    73→  `nama` VARCHAR(191),
+    74→  `kategori` VARCHAR(191),
+    75→  `status` VARCHAR(191),
+    76→  `createdAt` DATETIME,
+    77→  `updatedAt` DATETIME
+    78→) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+    79→
+    80→INSERT INTO `Permission` (`id`, `slug`, `nama`, `kategori`, `status`, `createdAt`, `updatedAt`) VALUES
+    81→('seed-perm-001', 'dashboard', 'Dashboard', 'dashboard', 'aktif', NOW(), NOW()),
+    82→('seed-perm-002', 'users', 'Data User', 'users', 'aktif', NOW(), NOW()),
+    83→('seed-perm-003', 'roles', 'Manajemen Role', 'users', 'aktif', NOW(), NOW()),
+    84→('seed-perm-004', 'permissions', 'Manajemen Permission', 'users', 'aktif', NOW(), NOW()),
+    85→('seed-perm-005', 'riwayat-login', 'Riwayat Login', 'users', 'aktif', NOW(), NOW()),
+    86→('seed-perm-006', 'guru', 'Data Guru', 'master', 'aktif', NOW(), NOW()),
+    87→('seed-perm-007', 'guru:delete', 'Hapus Guru', 'master', 'aktif', NOW(), NOW()),
+    88→('seed-perm-008', 'siswa', 'Data Siswa', 'master', 'aktif', NOW(), NOW()),
+    89→('seed-perm-009', 'kelas', 'Data Kelas', 'master', 'aktif', NOW(), NOW()),
+    90→('seed-perm-010', 'mapel', 'Mata Pelajaran', 'master', 'aktif', NOW(), NOW()),
+    91→('seed-perm-011', 'tahun-ajaran', 'Tahun Ajaran', 'master', 'aktif', NOW(), NOW()),
+    92→('seed-perm-012', 'semester', 'Semester', 'master', 'aktif', NOW(), NOW()),
+    93→('seed-perm-013', 'nilai', 'Input Nilai', 'nilai', 'aktif', NOW(), NOW()),
+    94→('seed-perm-014', 'nilai:edit', 'Edit Nilai', 'nilai', 'aktif', NOW(), NOW()),
+    95→('seed-perm-015', 'nilai:import', 'Import Nilai', 'nilai', 'aktif', NOW(), NOW()),
+    96→('seed-perm-016', 'nilai:export', 'Export Nilai', 'nilai', 'aktif', NOW(), NOW()),
+    97→('seed-perm-017', 'rekap-nilai', 'Rekap Nilai', 'nilai', 'aktif', NOW(), NOW()),
+    98→('seed-perm-018', 'absensi-guru', 'Absensi Guru', 'absensi', 'aktif', NOW(), NOW()),
+    99→('seed-perm-019', 'absensi-guru:clock-in', 'Absen Masuk', 'absensi', 'aktif', NOW(), NOW()),
+   100→('seed-perm-020', 'absensi-guru:clock-out', 'Absen Pulang', 'absensi', 'aktif', NOW(), NOW()),
+   101→('seed-perm-021', 'absensi-siswa', 'Absensi Siswa', 'absensi', 'aktif', NOW(), NOW()),
+   102→('seed-perm-022', 'pengumuman', 'Lihat Pengumuman', 'pengumuman', 'aktif', NOW(), NOW()),
+   103→('seed-perm-023', 'pengumuman:manage', 'Kelola Pengumuman', 'pengumuman', 'aktif', NOW(), NOW()),
+   104→('seed-perm-024', 'laporan', 'Laporan', 'laporan', 'aktif', NOW(), NOW()),
+   105→('seed-perm-025', 'laporan:export', 'Export Laporan', 'laporan', 'aktif', NOW(), NOW()),
+   106→('seed-perm-026', 'audit-log', 'Audit Log', 'sistem', 'aktif', NOW(), NOW()),
+   107→('seed-perm-027', 'backup', 'Backup', 'sistem', 'aktif', NOW(), NOW()),
+   108→('seed-perm-028', 'restore', 'Restore', 'sistem', 'aktif', NOW(), NOW()),
+   109→('seed-perm-029', 'pengaturan', 'Pengaturan', 'sistem', 'aktif', NOW(), NOW()),
+   110→('seed-perm-030', 'manajemen-sekolah', 'Manajemen Sekolah', 'sistem', 'aktif', NOW(), NOW()),
+   111→('seed-perm-031', 'profil', 'Profil', 'profil', 'aktif', NOW(), NOW()),
+   112→('seed-perm-032', 'import-data', 'Import Data', 'data', 'aktif', NOW(), NOW()),
+   113→('seed-perm-033', 'export-data', 'Export Data', 'data', 'aktif', NOW(), NOW()),
+   114→('seed-perm-034', 'cetak-dokumen', 'Cetak Dokumen', 'data', 'aktif', NOW(), NOW()),
+   115→('seed-perm-035', 'wildcard-all', 'Akses Penuh (Super Admin)', 'sistem', 'aktif', NOW(), NOW());
+   116→
+   117→-- ----------------------------------------
+   118→-- 4. RolePermission
+   119→-- ----------------------------------------
+   120→DROP TABLE IF EXISTS `RolePermission`;
+   121→CREATE TABLE `RolePermission` (
+   122→  `id` VARCHAR(191) PRIMARY KEY,
+   123→  `roleId` VARCHAR(191),
+   124→  `permissionId` VARCHAR(191),
+   125→  `createdAt` DATETIME,
+   126→  UNIQUE KEY `unique_role_permission` (`roleId`, `permissionId`),
+   127→  CONSTRAINT `fk_rp_role` FOREIGN KEY (`roleId`) REFERENCES `Role` (`id`) ON DELETE CASCADE,
+   128→  CONSTRAINT `fk_rp_permission` FOREIGN KEY (`permissionId`) REFERENCES `Permission` (`id`) ON DELETE CASCADE
+   129→) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+   130→
+   131→INSERT INTO `RolePermission` (`id`, `roleId`, `permissionId`, `createdAt`) VALUES
+   132→-- super-admin: wildcard-all only
+   133→('seed-rp-0001', 'seed-role-001', 'seed-perm-035', NOW()),
+   134→-- admin: dashboard, users, riwayat-login, guru, siswa, kelas, mapel, tahun-ajaran, semester, nilai, nilai:edit, nilai:import, nilai:export, rekap-nilai, absensi-guru, absensi-siswa, pengumuman, pengumuman:manage, laporan, laporan:export, backup, restore, pengaturan, manajemen-sekolah, import-data, export-data, cetak-dokumen, profil
+   135→('seed-rp-0002', 'seed-role-002', 'seed-perm-001', NOW()),
+   136→('seed-rp-0003', 'seed-role-002', 'seed-perm-002', NOW()),
+   137→('seed-rp-0004', 'seed-role-002', 'seed-perm-005', NOW()),
+   138→('seed-rp-0005', 'seed-role-002', 'seed-perm-006', NOW()),
+   139→('seed-rp-0006', 'seed-role-002', 'seed-perm-008', NOW()),
+   140→('seed-rp-0007', 'seed-role-002', 'seed-perm-009', NOW()),
+   141→('seed-rp-0008', 'seed-role-002', 'seed-perm-010', NOW()),
+   142→('seed-rp-0009', 'seed-role-002', 'seed-perm-011', NOW()),
+   143→('seed-rp-0010', 'seed-role-002', 'seed-perm-012', NOW()),
+   144→('seed-rp-0011', 'seed-role-002', 'seed-perm-013', NOW()),
+   145→('seed-rp-0012', 'seed-role-002', 'seed-perm-014', NOW()),
+   146→('seed-rp-0013', 'seed-role-002', 'seed-perm-015', NOW()),
+   147→('seed-rp-0014', 'seed-role-002', 'seed-perm-016', NOW()),
+   148→('seed-rp-0015', 'seed-role-002', 'seed-perm-017', NOW()),
+   149→('seed-rp-0016', 'seed-role-002', 'seed-perm-018', NOW()),
+   150→('seed-rp-0017', 'seed-role-002', 'seed-perm-021', NOW()),
+   151→('seed-rp-0018', 'seed-role-002', 'seed-perm-022', NOW()),
+   152→('seed-rp-0019', 'seed-role-002', 'seed-perm-023', NOW()),
+   153→('seed-rp-0020', 'seed-role-002', 'seed-perm-024', NOW()),
+   154→('seed-rp-0021', 'seed-role-002', 'seed-perm-025', NOW()),
+   155→('seed-rp-0022', 'seed-role-002', 'seed-perm-027', NOW()),
+   156→('seed-rp-0023', 'seed-role-002', 'seed-perm-028', NOW()),
+   157→('seed-rp-0024', 'seed-role-002', 'seed-perm-029', NOW()),
+   158→('seed-rp-0025', 'seed-role-002', 'seed-perm-030', NOW()),
+   159→('seed-rp-0026', 'seed-role-002', 'seed-perm-032', NOW()),
+   160→('seed-rp-0027', 'seed-role-002', 'seed-perm-033', NOW()),
+   161→('seed-rp-0028', 'seed-role-002', 'seed-perm-034', NOW()),
+   162→('seed-rp-0029', 'seed-role-002', 'seed-perm-031', NOW()),
+   163→-- operator: dashboard, guru, siswa, import-data, export-data, pengumuman, pengumuman:manage, laporan, laporan:export, profil
+   164→('seed-rp-0030', 'seed-role-003', 'seed-perm-001', NOW()),
+   165→('seed-rp-0031', 'seed-role-003', 'seed-perm-006', NOW()),
+   166→('seed-rp-0032', 'seed-role-003', 'seed-perm-008', NOW()),
+   167→('seed-rp-0033', 'seed-role-003', 'seed-perm-032', NOW()),
+   168→('seed-rp-0034', 'seed-role-003', 'seed-perm-033', NOW()),
+   169→('seed-rp-0035', 'seed-role-003', 'seed-perm-022', NOW()),
+   170→('seed-rp-0036', 'seed-role-003', 'seed-perm-023', NOW()),
+   171→('seed-rp-0037', 'seed-role-003', 'seed-perm-024', NOW()),
+   172→('seed-rp-0038', 'seed-role-003', 'seed-perm-025', NOW()),
+   173→('seed-rp-0039', 'seed-role-003', 'seed-perm-031', NOW()),
+   174→-- kepala-sekolah: dashboard, guru, siswa, nilai, rekap-nilai, absensi-guru, absensi-siswa, pengumuman, laporan, laporan:export, cetak-dokumen, profil
+   175→('seed-rp-0040', 'seed-role-004', 'seed-perm-001', NOW()),
+   176→('seed-rp-0041', 'seed-role-004', 'seed-perm-006', NOW()),
+   177→('seed-rp-0042', 'seed-role-004', 'seed-perm-008', NOW()),
+   178→('seed-rp-0043', 'seed-role-004', 'seed-perm-013', NOW()),
+   179→('seed-rp-0044', 'seed-role-004', 'seed-perm-017', NOW()),
+   180→('seed-rp-0045', 'seed-role-004', 'seed-perm-018', NOW()),
+   181→('seed-rp-0046', 'seed-role-004', 'seed-perm-021', NOW()),
+   182→('seed-rp-0047', 'seed-role-004', 'seed-perm-022', NOW()),
+   183→('seed-rp-0048', 'seed-role-004', 'seed-perm-024', NOW()),
+   184→('seed-rp-0049', 'seed-role-004', 'seed-perm-025', NOW()),
+   185→('seed-rp-0050', 'seed-role-004', 'seed-perm-034', NOW()),
+   186→('seed-rp-0051', 'seed-role-004', 'seed-perm-031', NOW()),
+   187→-- wakil-kepala-sekolah: dashboard, guru, siswa, nilai, rekap-nilai, absensi-guru, absensi-siswa, pengumuman, pengumuman:manage, laporan, laporan:export, cetak-dokumen, profil
+   188→('seed-rp-0052', 'seed-role-005', 'seed-perm-001', NOW()),
+   189→('seed-rp-0053', 'seed-role-005', 'seed-perm-006', NOW()),
+   190→('seed-rp-0054', 'seed-role-005', 'seed-perm-008', NOW()),
+   191→('seed-rp-0055', 'seed-role-005', 'seed-perm-013', NOW()),
+   192→('seed-rp-0056', 'seed-role-005', 'seed-perm-017', NOW()),
+   193→('seed-rp-0057', 'seed-role-005', 'seed-perm-018', NOW()),
+   194→('seed-rp-0058', 'seed-role-005', 'seed-perm-021', NOW()),
+   195→('seed-rp-0059', 'seed-role-005', 'seed-perm-022', NOW()),
+   196→('seed-rp-0060', 'seed-role-005', 'seed-perm-023', NOW()),
+   197→('seed-rp-0061', 'seed-role-005', 'seed-perm-024', NOW()),
+   198→('seed-rp-0062', 'seed-role-005', 'seed-perm-025', NOW()),
+   199→('seed-rp-0063', 'seed-role-005', 'seed-perm-034', NOW()),
+   200→('seed-rp-0064', 'seed-role-005', 'seed-perm-031', NOW()),
+   201→-- tata-usaha: dashboard, guru, siswa, import-data, export-data, cetak-dokumen, pengumuman, pengumuman:manage, profil
+   202→('seed-rp-0065', 'seed-role-006', 'seed-perm-001', NOW()),
+   203→('seed-rp-0066', 'seed-role-006', 'seed-perm-006', NOW()),
+   204→('seed-rp-0067', 'seed-role-006', 'seed-perm-008', NOW()),
+   205→('seed-rp-0068', 'seed-role-006', 'seed-perm-032', NOW()),
+   206→('seed-rp-0069', 'seed-role-006', 'seed-perm-033', NOW()),
+   207→('seed-rp-0070', 'seed-role-006', 'seed-perm-034', NOW()),
+   208→('seed-rp-0071', 'seed-role-006', 'seed-perm-022', NOW()),
+   209→('seed-rp-0072', 'seed-role-006', 'seed-perm-023', NOW()),
+   210→('seed-rp-0073', 'seed-role-006', 'seed-perm-031', NOW()),
+   211→-- guru: dashboard, absensi-guru, absensi-guru:clock-in, absensi-guru:clock-out, absensi-siswa, nilai, nilai:edit, nilai:import, nilai:export, rekap-nilai, pengumuman, profil
+   212→('seed-rp-0074', 'seed-role-007', 'seed-perm-001', NOW()),
+   213→('seed-rp-0075', 'seed-role-007', 'seed-perm-018', NOW()),
+   214→('seed-rp-0076', 'seed-role-007', 'seed-perm-019', NOW()),
+   215→('seed-rp-0077', 'seed-role-007', 'seed-perm-020', NOW()),
+   216→('seed-rp-0078', 'seed-role-007', 'seed-perm-021', NOW()),
+   217→('seed-rp-0079', 'seed-role-007', 'seed-perm-013', NOW()),
+   218→('seed-rp-0080', 'seed-role-007', 'seed-perm-014', NOW()),
+   219→('seed-rp-0081', 'seed-role-007', 'seed-perm-015', NOW()),
+   220→('seed-rp-0082', 'seed-role-007', 'seed-perm-016', NOW()),
+   221→('seed-rp-0083', 'seed-role-007', 'seed-perm-017', NOW()),
+   222→('seed-rp-0084', 'seed-role-007', 'seed-perm-022', NOW()),
+   223→('seed-rp-0085', 'seed-role-007', 'seed-perm-031', NOW()),
+   224→-- wali-kelas: dashboard, absensi-guru, absensi-guru:clock-in, absensi-guru:clock-out, absensi-siswa, nilai, nilai:edit, nilai:import, nilai:export, rekap-nilai, pengumuman, cetak-dokumen, profil
+   225→('seed-rp-0086', 'seed-role-008', 'seed-perm-001', NOW()),
+   226→('seed-rp-0087', 'seed-role-008', 'seed-perm-018', NOW()),
+   227→('seed-rp-0088', 'seed-role-008', 'seed-perm-019', NOW()),
+   228→('seed-rp-0089', 'seed-role-008', 'seed-perm-020', NOW()),
+   229→('seed-rp-0090', 'seed-role-008', 'seed-perm-021', NOW()),
+   230→('seed-rp-0091', 'seed-role-008', 'seed-perm-013', NOW()),
+   231→('seed-rp-0092', 'seed-role-008', 'seed-perm-014', NOW()),
+   232→('seed-rp-0093', 'seed-role-008', 'seed-perm-015', NOW()),
+   233→('seed-rp-0094', 'seed-role-008', 'seed-perm-016', NOW()),
+   234→('seed-rp-0095', 'seed-role-008', 'seed-perm-017', NOW()),
+   235→('seed-rp-0096', 'seed-role-008', 'seed-perm-022', NOW()),
+   236→('seed-rp-0097', 'seed-role-008', 'seed-perm-034', NOW()),
+   237→('seed-rp-0098', 'seed-role-008', 'seed-perm-031', NOW()),
+   238→-- siswa: dashboard, nilai, absensi-siswa, pengumuman, profil
+   239→('seed-rp-0099', 'seed-role-009', 'seed-perm-001', NOW()),
+   240→('seed-rp-0100', 'seed-role-009', 'seed-perm-013', NOW()),
+   241→('seed-rp-0101', 'seed-role-009', 'seed-perm-021', NOW()),
+   242→('seed-rp-0102', 'seed-role-009', 'seed-perm-022', NOW()),
+   243→('seed-rp-0103', 'seed-role-009', 'seed-perm-031', NOW()),
+   244→-- orang-tua: dashboard, nilai, absensi-siswa, pengumuman, profil
+   245→('seed-rp-0104', 'seed-role-010', 'seed-perm-001', NOW()),
+   246→('seed-rp-0105', 'seed-role-010', 'seed-perm-013', NOW()),
+   247→('seed-rp-0106', 'seed-role-010', 'seed-perm-021', NOW()),
+   248→('seed-rp-0107', 'seed-role-010', 'seed-perm-022', NOW()),
+   249→('seed-rp-0108', 'seed-role-010', 'seed-perm-031', NOW());
+   250→
+   251→-- ----------------------------------------
+   252→-- 5. User
+   253→-- ----------------------------------------
+   254→DROP TABLE IF EXISTS `User`;
+   255→CREATE TABLE `User` (
+   256→  `id` VARCHAR(191) PRIMARY KEY,
+   257→  `nama` VARCHAR(191),
+   258→  `username` VARCHAR(191) UNIQUE,
+   259→  `password` TEXT,
+   260→  `passwordText` TEXT,
+   261→  `role` VARCHAR(191),
+   262→  `status` VARCHAR(191),
+   263→  `foto` TEXT,
+   264→  `email` VARCHAR(191),
+   265→  `noHP` VARCHAR(191),
+   266→  `nip` VARCHAR(191),
+   267→  `jabatan` VARCHAR(191),
+   268→  `lastLogin` DATETIME NULL,
+   269→  `createdAt` DATETIME,
+   270→  `updatedAt` DATETIME
+   271→) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+   272→
+   273→INSERT INTO `User` (`id`, `nama`, `username`, `password`, `passwordText`, `role`, `status`, `foto`, `email`, `noHP`, `nip`, `jabatan`, `lastLogin`, `createdAt`, `updatedAt`) VALUES
+   274→('seed-user-001', 'Super Admin', 'admin', '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', 'admin123', 'super-admin', 'aktif', '', 'admin@tuweri.sch.id', '081234567890', '000000000', 'Super Administrator', NULL, NOW(), NOW()),
+   275→('seed-user-002', 'Budi Santoso', 'adminsekolah', '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', 'admin123', 'admin', 'aktif', '', '', '', '198501012010011001', 'Admin Sekolah', NULL, NOW(), NOW()),
+   276→('seed-user-003', 'Siti Aminah', 'operator', '$2a$10$Hx8yKVZ6RqMDjXGXFJW5XejlJh3RZyKZ1sK0bKNq8MbWKkNqFOqeC', 'operator123', 'operator', 'aktif', '', '', '', '199001012015002001', 'Operator', NULL, NOW(), NOW()),
+   277→('seed-user-004', 'Drs. Ahmad Hidayat, M.Pd', 'kepsek', '$2a$10$pVJK6GTMK3oFaVfYi7YqIeWcHm5QJC6FqCLMbPqs7RqCJxNTVOaOi', 'kepsek123', 'kepala-sekolah', 'aktif', '', '', '', '197501012003121001', 'Kepala Sekolah', NULL, NOW(), NOW()),
+   278→('seed-user-005', 'Ir. Rahmawati, M.Pd', 'wakasek', '$2a$10$LKP9hU9r8BqHGaNSkKBvXesmzWYmZ1YVJQLNRPOy5FPqjZrVEMlGi', 'wakasek123', 'wakil-kepala-sekolah', 'aktif', '', '', '', '198001012005012001', 'Wakil Kepala Sekolah', NULL, NOW(), NOW()),
+   279→('seed-user-006', 'Dewi Lestari', 'tu', '$2a$10$kL5nFjX7K0sHGM9YpXMROeXc3Vb1W6KZ4QNbLsPq5RMoHqXUNlOaG', 'tu123', 'tata-usaha', 'aktif', '', '', '', '199201012018002002', 'Tata Usaha', NULL, NOW(), NOW()),
+   280→('seed-user-007', 'Ahmad Fauzi, S.Pd', 'ahmad', '$2a$10$ZK8vHJR5aF0WOGTqrEmkSO7mQyKN6LnL5pV3XkFBpqCiJrTkNqYGq', 'guru123', 'guru', 'aktif', '', '', '', '199001012015011001', 'Guru Matematika', NULL, NOW(), NOW()),
+   281→('seed-user-008', 'Sri Wahyuni, S.Pd', 'sri', '$2a$10$ZK8vHJR5aF0WOGTqrEmkSO7mQyKN6LnL5pV3XkFBpqCiJrTkNqYGq', 'guru123', 'wali-kelas', 'aktif', '', '', '', '199201012020012002', 'Guru / Wali Kelas', NULL, NOW(), NOW());
+   282→
+   283→-- ----------------------------------------
+   284→-- 6. UserRole
+   285→-- ----------------------------------------
+   286→DROP TABLE IF EXISTS `UserRole`;
+   287→CREATE TABLE `UserRole` (
+   288→  `id` VARCHAR(191) PRIMARY KEY,
+   289→  `userId` VARCHAR(191),
+   290→  `roleId` VARCHAR(191),
+   291→  `createdAt` DATETIME,
+   292→  UNIQUE KEY `unique_user_role` (`userId`, `roleId`),
+   293→  CONSTRAINT `fk_ur_user` FOREIGN KEY (`userId`) REFERENCES `User` (`id`) ON DELETE CASCADE,
+   294→  CONSTRAINT `fk_ur_role` FOREIGN KEY (`roleId`) REFERENCES `Role` (`id`) ON DELETE CASCADE
+   295→) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+   296→
+   297→INSERT INTO `UserRole` (`id`, `userId`, `roleId`, `createdAt`) VALUES
+   298→('seed-ur-001', 'seed-user-001', 'seed-role-001', NOW()),
+   299→('seed-ur-002', 'seed-user-002', 'seed-role-002', NOW()),
+   300→('seed-ur-003', 'seed-user-003', 'seed-role-003', NOW()),
+   301→('seed-ur-004', 'seed-user-004', 'seed-role-004', NOW()),
+   302→('seed-ur-005', 'seed-user-005', 'seed-role-005', NOW()),
+   303→('seed-ur-006', 'seed-user-006', 'seed-role-006', NOW()),
+   304→('seed-ur-007', 'seed-user-007', 'seed-role-007', NOW()),
+   305→('seed-ur-008', 'seed-user-008', 'seed-role-008', NOW());
+   306→
+   307→-- ----------------------------------------
+   308→-- 7. Guru
+   309→-- ----------------------------------------
+   310→DROP TABLE IF EXISTS `Guru`;
+   311→CREATE TABLE `Guru` (
+   312→  `id` VARCHAR(191) PRIMARY KEY,
+   313→  `nip` VARCHAR(191) UNIQUE,
+   314→  `nama` VARCHAR(191),
+   315→  `gelar` VARCHAR(191),
+   316→  `jenisKelamin` VARCHAR(191),
+   317→  `tempatLahir` VARCHAR(191),
+   318→  `tanggalLahir` VARCHAR(191),
+   319→  `alamat` TEXT,
+   320→  `email` VARCHAR(191),
+   321→  `noHP` VARCHAR(191),
+   322→  `mapel` VARCHAR(191),
+   323→  `status` VARCHAR(191),
+   324→  `foto` TEXT,
+   325→  `createdAt` DATETIME,
+   326→  `updatedAt` DATETIME
+   327→) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+   328→
+   329→INSERT INTO `Guru` (`id`, `nip`, `nama`, `gelar`, `jenisKelamin`, `tempatLahir`, `tanggalLahir`, `alamat`, `email`, `noHP`, `mapel`, `status`, `foto`, `createdAt`, `updatedAt`) VALUES
+   330→('seed-guru-001', '199001012015011001', 'Ahmad Fauzi, S.Pd', '', 'Laki-laki', '', '', '', '', '', 'Matematika', 'aktif', '', NOW(), NOW()),
+   331→('seed-guru-002', '199201012020012002', 'Sri Wahyuni, S.Pd', '', 'Perempuan', '', '', '', '', '', 'Bahasa Indonesia', 'aktif', '', NOW(), NOW()),
+   332→('seed-guru-003', '198803152010011003', 'Bambang Irawan, M.Pd', '', 'Laki-laki', '', '', '', '', '', 'Fisika', 'aktif', '', NOW(), NOW()),
+   333→('seed-guru-004', '199105202018012004', 'Rina Susanti, S.Pd', '', 'Perempuan', '', '', '', '', '', 'Kimia', 'aktif', '', NOW(), NOW()),
+   334→('seed-guru-005', '198706102009011005', 'Hendra Wijaya, S.Si', '', 'Laki-laki', '', '', '', '', '', 'Biologi', 'aktif', '', NOW(), NOW()),
+   335→('seed-guru-006', '199302152019012006', 'Diana Putri, S.Pd', '', 'Perempuan', '', '', '', '', '', 'Bahasa Inggris', 'aktif', '', NOW(), NOW()),
+   336→('seed-guru-007', '198511202008011007', 'Agus Supriyadi, S.Pd', '', 'Laki-laki', '', '', '', '', '', 'Sejarah', 'aktif', '', NOW(), NOW()),
+   337→('seed-guru-008', '199408252020012008', 'Fitri Handayani, S.Pd', '', 'Perempuan', '', '', '', '', '', 'Ekonomi', 'aktif', '', NOW(), NOW()),
+   338→('seed-guru-009', '198912302010011009', 'Rudi Hartono, S.Pd', '', 'Laki-laki', '', '', '', '', '', 'Geografi', 'aktif', '', NOW(), NOW()),
+   339→('seed-guru-010', '199505102021012010', 'Lestari Ningrum, S.Pd', '', 'Perempuan', '', '', '', '', '', 'Sosiologi', 'aktif', '', NOW(), NOW()),
+   340→('seed-guru-011', '198607152011011011', 'Wahyu Prasetyo, S.Kom', '', 'Laki-laki', '', '', '', '', '', 'Informatika', 'aktif', '', NOW(), NOW()),
+   341→('seed-guru-012', '199212202019012012', 'Anita Sari, S.Pd', '', 'Perempuan', '', '', '', '', '', 'PKN', 'aktif', '', NOW(), NOW()),
+   342→('seed-guru-013', '198410052007011013', 'Darmawan, M.Pd', '', 'Laki-laki', '', '', '', '', '', 'Seni Budaya', 'aktif', '', NOW(), NOW()),
+   343→('seed-guru-014', '199603012022012014', 'Mega Silvia, S.Pd', '', 'Perempuan', '', '', '', '', '', 'PJOK', 'aktif', '', NOW(), NOW()),
+   344→('seed-guru-015', '198908172012011015', 'Fajar Nugroho, S.Ag', '', 'Laki-laki', '', '', '', '', '', 'PAI', 'aktif', '', NOW(), NOW());
+   345→
+   346→-- ----------------------------------------
+   347→-- 8. Siswa
+   348→-- ----------------------------------------
+   349→DROP TABLE IF EXISTS `Siswa`;
+   350→CREATE TABLE `Siswa` (
+   351→  `id` VARCHAR(191) PRIMARY KEY,
+   352→  `nis` VARCHAR(191) UNIQUE,
+   353→  `nisn` VARCHAR(191),
+   354→  `nama` VARCHAR(191),
+   355→  `jenisKelamin` VARCHAR(191),
+   356→  `tempatLahir` VARCHAR(191),
+   357→  `tanggalLahir` VARCHAR(191),
+   358→  `agama` VARCHAR(191),
+   359→  `alamat` TEXT,
+   360→  `namaAyah` VARCHAR(191),
+   361→  `namaIbu` VARCHAR(191),
+   362→  `noHP` VARCHAR(191),
+   363→  `kelas` VARCHAR(191),
+   364→  `status` VARCHAR(191),
+   365→  `foto` TEXT,
+   366→  `createdAt` DATETIME,
+   367→  `updatedAt` DATETIME
+   368→) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+   369→
+   370→INSERT INTO `Siswa` (`id`, `nis`, `nisn`, `nama`, `jenisKelamin`, `tempatLahir`, `tanggalLahir`, `agama`, `alamat`, `namaAyah`, `namaIbu`, `noHP`, `kelas`, `status`, `foto`, `createdAt`, `updatedAt`) VALUES
+   371→('seed-siswa-001', '20240001', '', 'Andi Pratama', 'Laki-laki', '', '', 'Islam', '', '', '', '', '10A', 'aktif', '', NOW(), NOW()),
+   372→('seed-siswa-002', '20240002', '', 'Budi Setiawan', 'Laki-laki', '', '', 'Islam', '', '', '', '', '10A', 'aktif', '', NOW(), NOW()),
+   373→('seed-siswa-003', '20240003', '', 'Citra Dewi', 'Perempuan', '', '', 'Islam', '', '', '', '', '10A', 'aktif', '', NOW(), NOW()),
+   374→('seed-siswa-004', '20240004', '', 'Dian Permata', 'Perempuan', '', '', 'Islam', '', '', '', '', '10A', 'aktif', '', NOW(), NOW()),
+   375→('seed-siswa-005', '20240005', '', 'Eko Saputra', 'Laki-laki', '', '', 'Islam', '', '', '', '', '10B', 'aktif', '', NOW(), NOW()),
+   376→('seed-siswa-006', '20240006', '', 'Fani Oktavia', 'Perempuan', '', '', 'Islam', '', '', '', '', '10B', 'aktif', '', NOW(), NOW()),
+   377→('seed-siswa-007', '20240007', '', 'Gilang Ramadhan', 'Laki-laki', '', '', 'Islam', '', '', '', '', '10B', 'aktif', '', NOW(), NOW()),
+   378→('seed-siswa-008', '20240008', '', 'Hani Mulyani', 'Perempuan', '', '', 'Islam', '', '', '', '', '10B', 'aktif', '', NOW(), NOW()),
+   379→('seed-siswa-009', '20240009', '', 'Irfan Hakim', 'Laki-laki', '', '', 'Islam', '', '', '', '', '11A', 'aktif', '', NOW(), NOW()),
+   380→('seed-siswa-010', '20240010', '', 'Joko Widodo', 'Laki-laki', '', '', 'Islam', '', '', '', '', '11A', 'aktif', '', NOW(), NOW()),
+   381→('seed-siswa-011', '20240011', '', 'Kartika Sari', 'Perempuan', '', '', 'Islam', '', '', '', '', '11A', 'aktif', '', NOW(), NOW()),
+   382→('seed-siswa-012', '20240012', '', 'Lina Marlina', 'Perempuan', '', '', 'Islam', '', '', '', '', '11A', 'aktif', '', NOW(), NOW()),
+   383→('seed-siswa-013', '20240013', '', 'Muhammad Rizki', 'Laki-laki', '', '', 'Islam', '', '', '', '', '11B', 'aktif', '', NOW(), NOW()),
+   384→('seed-siswa-014', '20240014', '', 'Nur Aini', 'Perempuan', '', '', 'Islam', '', '', '', '', '11B', 'aktif', '', NOW(), NOW()),
+   385→('seed-siswa-015', '20240015', '', 'Oscar Pratama', 'Laki-laki', '', '', 'Islam', '', '', '', '', '11B', 'aktif', '', NOW(), NOW()),
+   386→('seed-siswa-016', '20240016', '', 'Putri Amelia', 'Perempuan', '', '', 'Islam', '', '', '', '', '11B', 'aktif', '', NOW(), NOW()),
+   387→('seed-siswa-017', '20240017', '', 'Qori Ananda', 'Perempuan', '', '', 'Islam', '', '', '', '', '12A', 'aktif', '', NOW(), NOW()),
+   388→('seed-siswa-018', '20240018', '', 'Rizky Aditya', 'Laki-laki', '', '', 'Islam', '', '', '', '', '12A', 'aktif', '', NOW(), NOW()),
+   389→('seed-siswa-019', '20240019', '', 'Sinta Maharani', 'Perempuan', '', '', 'Islam', '', '', '', '', '12A', 'aktif', '', NOW(), NOW()),
+   390→('seed-siswa-020', '20240020', '', 'Taufik Hidayat', 'Laki-laki', '', '', 'Islam', '', '', '', '', '12A', 'aktif', '', NOW(), NOW()),
+   391→('seed-siswa-021', '20240021', '', 'Umar Faruq', 'Laki-laki', '', '', 'Islam', '', '', '', '', '12B', 'aktif', '', NOW(), NOW()),
+   392→('seed-siswa-022', '20240022', '', 'Vina Oktaviani', 'Perempuan', '', '', 'Islam', '', '', '', '', '12B', 'aktif', '', NOW(), NOW()),
+   393→('seed-siswa-023', '20240023', '', 'Wahyu Setiabudi', 'Laki-laki', '', '', 'Islam', '', '', '', '', '12B', 'aktif', '', NOW(), NOW()),
+   394→('seed-siswa-024', '20240024', '', 'Yuni Astuti', 'Perempuan', '', '', 'Islam', '', '', '', '', '12B', 'aktif', '', NOW(), NOW());
+   395→
+   396→-- ----------------------------------------
+   397→-- 9. Kelas
+   398→-- ----------------------------------------
+   399→DROP TABLE IF EXISTS `Kelas`;
+   400→CREATE TABLE `Kelas` (
+   401→  `id` VARCHAR(191) PRIMARY KEY,
+   402→  `kodeKelas` VARCHAR(191) UNIQUE,
+   403→  `namaKelas` VARCHAR(191),
+   404→  `waliKelas` VARCHAR(191),
+   405→  `status` VARCHAR(191)
+   406→) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+   407→
+   408→INSERT INTO `Kelas` (`id`, `kodeKelas`, `namaKelas`, `waliKelas`, `status`) VALUES
+   409→('seed-kelas-001', '10A', 'X-A', 'Sri Wahyuni, S.Pd', 'aktif'),
+   410→('seed-kelas-002', '10B', 'X-B', '', 'aktif'),
+   411→('seed-kelas-003', '11A', 'XI-A', '', 'aktif'),
+   412→('seed-kelas-004', '11B', 'XI-B', '', 'aktif'),
+   413→('seed-kelas-005', '12A', 'XII-A', '', 'aktif'),
+   414→('seed-kelas-006', '12B', 'XII-B', '', 'aktif');
+   415→
+   416→-- ----------------------------------------
+   417→-- 10. MataPelajaran
+   418→-- ----------------------------------------
+   419→DROP TABLE IF EXISTS `MataPelajaran`;
+   420→CREATE TABLE `MataPelajaran` (
+   421→  `id` VARCHAR(191) PRIMARY KEY,
+   422→  `kodeMapel` VARCHAR(191) UNIQUE,
+   423→  `namaMapel` VARCHAR(191),
+   424→  `kkm` INT,
+   425→  `guru` VARCHAR(191),
+   426→  `status` VARCHAR(191)
+   427→) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+   428→
+   429→INSERT INTO `MataPelajaran` (`id`, `kodeMapel`, `namaMapel`, `kkm`, `guru`, `status`) VALUES
+   430→('seed-mapel-001', 'MTK', 'Matematika', 75, 'Ahmad Fauzi, S.Pd', 'aktif'),
+   431→('seed-mapel-002', 'BIN', 'Bahasa Indonesia', 75, 'Sri Wahyuni, S.Pd', 'aktif'),
+   432→('seed-mapel-003', 'FIS', 'Fisika', 75, 'Bambang Irawan, M.Pd', 'aktif'),
+   433→('seed-mapel-004', 'KIM', 'Kimia', 75, 'Rina Susanti, S.Pd', 'aktif'),
+   434→('seed-mapel-005', 'BIO', 'Biologi', 75, 'Hendra Wijaya, S.Si', 'aktif'),
+   435→('seed-mapel-006', 'BIG', 'Bahasa Inggris', 75, 'Diana Putri, S.Pd', 'aktif'),
+   436→('seed-mapel-007', 'SEJ', 'Sejarah', 75, 'Agus Supriyadi, S.Pd', 'aktif'),
+   437→('seed-mapel-008', 'EKO', 'Ekonomi', 75, 'Fitri Handayani, S.Pd', 'aktif'),
+   438→('seed-mapel-009', 'GEO', 'Geografi', 75, 'Rudi Hartono, S.Pd', 'aktif'),
+   439→('seed-mapel-010', 'SOS', 'Sosiologi', 75, 'Lestari Ningrum, S.Pd', 'aktif'),
+   440→('seed-mapel-011', 'INF', 'Informatika', 75, 'Wahyu Prasetyo, S.Kom', 'aktif'),
+   441→('seed-mapel-012', 'PKN', 'PKN', 75, 'Anita Sari, S.Pd', 'aktif');
+   442→
+   443→-- ----------------------------------------
+   444→-- 11. TahunAjaran
+   445→-- ----------------------------------------
+   446→DROP TABLE IF EXISTS `TahunAjaran`;
+   447→CREATE TABLE `TahunAjaran` (
+   448→  `id` VARCHAR(191) PRIMARY KEY,
+   449→  `nama` VARCHAR(191) UNIQUE,
+   450→  `status` VARCHAR(191)
+   451→) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+   452→
+   453→INSERT INTO `TahunAjaran` (`id`, `nama`, `status`) VALUES
+   454→('seed-ta-001', '2024/2025', 'aktif'),
+   455→('seed-ta-002', '2023/2024', 'tidak');
+   456→
+   457→-- ----------------------------------------
+   458→-- 12. Semester
+   459→-- ----------------------------------------
+   460→DROP TABLE IF EXISTS `Semester`;
+   461→CREATE TABLE `Semester` (
+   462→  `id` VARCHAR(191) PRIMARY KEY,
+   463→  `semester` VARCHAR(191) UNIQUE,
+   464→  `status` VARCHAR(191)
+   465→) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+   466→
+   467→INSERT INTO `Semester` (`id`, `semester`, `status`) VALUES
+   468→('seed-sem-001', 'Ganjil', 'tidak'),
+   469→('seed-sem-002', 'Genap', 'aktif');
+   470→
+   471→-- ----------------------------------------
+   472→-- 13. Nilai
+   473→-- ----------------------------------------
+   474→DROP TABLE IF EXISTS `Nilai`;
+   475→CREATE TABLE `Nilai` (
+   476→  `id` VARCHAR(191) PRIMARY KEY,
+   477→  `tahunAjaran` VARCHAR(191),
+   478→  `semester` VARCHAR(191),
+   479→  `kelas` VARCHAR(191),
+   480→  `mapel` VARCHAR(191),
+   481→  `guru` VARCHAR(191),
+   482→  `nis` VARCHAR(191),
+   483→  `nama` VARCHAR(191),
+   484→  `ph1` DOUBLE DEFAULT 0,
+   485→  `ph2` DOUBLE DEFAULT 0,
+   486→  `ph3` DOUBLE DEFAULT 0,
+   487→  `ph4` DOUBLE DEFAULT 0,
+   488→  `pts` DOUBLE DEFAULT 0,
+   489→  `pas` DOUBLE DEFAULT 0,
+   490→  `rataRata` DOUBLE DEFAULT 0,
+   491→  `nilaiAkhir` DOUBLE DEFAULT 0,
+   492→  `predikat` VARCHAR(191),
+   493→  `deskripsi` TEXT,
+   494→  `createdAt` DATETIME,
+   495→  `updatedAt` DATETIME
+   496→) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+   497→
+   498→-- ----------------------------------------
+   499→-- 14. AbsensiGuru
+   500→-- ----------------------------------------
+   501→DROP TABLE IF EXISTS `AbsensiGuru`;
+   502→CREATE TABLE `AbsensiGuru` (
+   503→  `id` VARCHAR(191) PRIMARY KEY,
+   504→  `tanggal` VARCHAR(191),
+   505→  `namaGuru` VARCHAR(191),
+   506→  `nip` VARCHAR(191),
+   507→  `jamMasuk` VARCHAR(191),
+   508→  `jamPulang` VARCHAR(191),
+   509→  `durasi` VARCHAR(191),
+   510→  `status` VARCHAR(191),
+   511→  `latitude` VARCHAR(191),
+   512→  `longitude` VARCHAR(191),
+   513→  `alamat` TEXT,
+   514→  `browser` VARCHAR(191),
+   515→  `device` VARCHAR(191),
+   516→  `ip` VARCHAR(191),
+   517→  `keterangan` TEXT,
+   518→  `createdAt` DATETIME
+   519→) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+   520→
+   521→-- ----------------------------------------
+   522→-- 15. AbsensiSiswa
+   523→-- ----------------------------------------
+   524→DROP TABLE IF EXISTS `AbsensiSiswa`;
+   525→CREATE TABLE `AbsensiSiswa` (
+   526→  `id` VARCHAR(191) PRIMARY KEY,
+   527→  `tanggal` VARCHAR(191),
+   528→  `kelas` VARCHAR(191),
+   529→  `nis` VARCHAR(191),
+   530→  `nama` VARCHAR(191),
+   531→  `status` VARCHAR(191),
+   532→  `keterangan` VARCHAR(191),
+   533→  `guru` VARCHAR(191),
+   534→  `createdAt` DATETIME
+   535→) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+   536→
+   537→-- ----------------------------------------
+   538→-- 16. Pengumuman
+   539→-- ----------------------------------------
+   540→DROP TABLE IF EXISTS `Pengumuman`;
+   541→CREATE TABLE `Pengumuman` (
+   542→  `id` VARCHAR(191) PRIMARY KEY,
+   543→  `judul` VARCHAR(191),
+   544→  `isi` TEXT,
+   545→  `lampiran` TEXT,
+   546→  `tanggal` VARCHAR(191),
+   547→  `status` VARCHAR(191),
+   548→  `createdAt` DATETIME
+   549→) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+   550→
+   551→INSERT INTO `Pengumuman` (`id`, `judul`, `isi`, `lampiran`, `tanggal`, `status`, `createdAt`) VALUES
+   552→('seed-pengumuman-001', 'Libur Hari Kemerdekaan', 'Diberitahukan bahwa tanggal 17 Agustus 2025 libur nasional dalam rangka memperingati Hari Kemerdekaan RI ke-80.', '', '2025-08-15', 'aktif', NOW()),
+   553→('seed-pengumuman-002', 'Ujian Tengah Semester Ganjil', 'UTS Ganjil akan dilaksanakan pada tanggal 6-11 Oktober 2025. Semua siswa diwajibkan hadir.', '', '2025-09-25', 'aktif', NOW());
+   554→
+   555→-- ----------------------------------------
+   556→-- 17. AuditLog
+   557→-- ----------------------------------------
+   558→DROP TABLE IF EXISTS `AuditLog`;
+   559→CREATE TABLE `AuditLog` (
+   560→  `id` VARCHAR(191) PRIMARY KEY,
+   561→  `tanggal` VARCHAR(191),
+   562→  `user` VARCHAR(191),
+   563→  `role` VARCHAR(191),
+   564→  `aktivitas` VARCHAR(191),
+   565→  `ip` VARCHAR(191),
+   566→  `detail` TEXT,
+   567→  `createdAt` DATETIME
+   568→) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+   569→
+   570→-- ----------------------------------------
+   571→-- 18. Backup
+   572→-- ----------------------------------------
+   573→DROP TABLE IF EXISTS `Backup`;
+   574→CREATE TABLE `Backup` (
+   575→  `id` VARCHAR(191) PRIMARY KEY,
+   576→  `namaFile` VARCHAR(191),
+   577→  `ukuran` VARCHAR(191),
+   578→  `tanggalBackup` VARCHAR(191),
+   579→  `status` VARCHAR(191),
+   580→  `createdAt` DATETIME
+   581→) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+   582→
+   583→-- ----------------------------------------
+   584→-- 19. Alumni
+   585→-- ----------------------------------------
+   586→DROP TABLE IF EXISTS `Alumni`;
+   587→CREATE TABLE `Alumni` (
+   588→  `id` VARCHAR(191) PRIMARY KEY,
+   589→  `nis` VARCHAR(191),
+   590→  `nama` VARCHAR(191),
+   591→  `tahunLulus` VARCHAR(191),
+   592→  `keterangan` VARCHAR(191)
+   593→) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+   594→
+   595→-- ----------------------------------------
+   596→-- 20. JurnalMengajar
+   597→-- ----------------------------------------
+   598→DROP TABLE IF EXISTS `JurnalMengajar`;
+   599→CREATE TABLE `JurnalMengajar` (
+   600→  `id` VARCHAR(191) PRIMARY KEY,
+   601→  `tanggal` VARCHAR(191),
+   602→  `guru` VARCHAR(191),
+   603→  `kelas` VARCHAR(191),
+   604→  `mapel` VARCHAR(191),
+   605→  `materi` TEXT,
+   606→  `keterangan` TEXT,
+   607→  `createdAt` DATETIME
+   608→) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+   609→
+   610→-- ----------------------------------------
+   611→-- 21. RiwayatLogin
+   612→-- ----------------------------------------
+   613→DROP TABLE IF EXISTS `RiwayatLogin`;
+   614→CREATE TABLE `RiwayatLogin` (
+   615→  `id` VARCHAR(191) PRIMARY KEY,
+   616→  `user` VARCHAR(191),
+   617→  `role` VARCHAR(191),
+   618→  `waktuLogin` VARCHAR(191),
+   619→  `ipAddress` VARCHAR(191),
+   620→  `userAgent` VARCHAR(191),
+   621→  `createdAt` DATETIME
+   622→) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+   623→
+   624→SET FOREIGN_KEY_CHECKS = 1;
+   625→
