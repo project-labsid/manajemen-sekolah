@@ -70,3 +70,24 @@ Stage Summary:
 - Each student row shows name, NIS, and status badge
 - Empty states handled (no students present / all present)
 
+
+---
+Task ID: 2
+Agent: main
+Task: Prepare project for Vercel deployment
+
+Work Log:
+- Updated prisma/schema.prisma: SQLite -> MySQL with @db.VarChar(191) on all unique fields and relationMode = "prisma"
+- Created vercel.json with buildCommand, installCommand, and Singapore region (sin1)
+- Created .env.example with DATABASE_URL and JWT_SECRET templates
+- Updated package.json: name=siakad-sdmi, version=1.0.0, added postinstall="prisma generate", updated build script
+- Updated .gitignore to allow .env.example (while keeping .env secret)
+- Removed output:"standalone" from next.config.ts (Vercel handles this)
+- Updated db.ts with cleaner PrismaClient configuration
+- Prisma generate validated successfully for MySQL
+- Lint passes clean
+
+Stage Summary:
+- Project is now Vercel-deploy ready
+- All config files created: vercel.json, .env.example
+- Schema is MySQL-ready with proper VarChar(191) constraints
