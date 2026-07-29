@@ -233,11 +233,11 @@ export default function AbsensiGuru() {
   )
   const isToday = selectedDateStr === getTodayString()
 
-  // ── Compute: own today's record ──
+  // ── Compute: own today's record (exclude fake pending entries) ──
   const myTodayRecord = useMemo(() => {
     if (isRekapViewer && !isToday) return null
     return records.find(
-      (r) => r.namaGuru === user?.nama,
+      (r) => r.namaGuru === user?.nama && !r.id.startsWith('pending-'),
     ) || null
   }, [records, user, isRekapViewer, isToday])
 
@@ -342,7 +342,7 @@ export default function AbsensiGuru() {
 
   // ── Handle Absen Pulang: open dialog ──
   const handleOpenPulangDialog = useCallback(() => {
-    if (!myTodayRecord) return
+    if (!myTodayRecord || myTodayRecord.id.startsWith('pending-')) return
     setPulangRecordId(myTodayRecord.id)
     setPulangKeterangan('')
     setPulangJam(getLocalTime())
@@ -351,7 +351,7 @@ export default function AbsensiGuru() {
 
   // ── Handle Absen Pulang: submit ──
   const handleAbsenPulang = useCallback(async () => {
-    if (!pulangRecordId) return
+    if (!pulangRecordId || pulangRecordId.startsWith('pending-')) return
 
     setSubmittingPulang(true)
     try {
