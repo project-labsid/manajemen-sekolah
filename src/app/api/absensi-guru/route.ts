@@ -49,18 +49,26 @@ export async function GET(request: NextRequest) {
         }),
       ])
 
-      // Build a map of attendance records by nip (more unique than nama)
-      const attendanceMap = new Map<string, typeof attendanceRecords[0]>()
+      // Build maps for flexible matching: by NIP, by nama, by username
+      const attendanceByNip = new Map<string, typeof attendanceRecords[0]>()
+      const attendanceByNama = new Map<string, typeof attendanceRecords[0]>()
       for (const record of attendanceRecords) {
-        const key = record.nip || record.namaGuru
-        attendanceMap.set(key, record)
+        if (record.nip) attendanceByNip.set(record.nip, record)
+        attendanceByNama.set(record.namaGuru, record)
       }
 
-      // Merge: for each staff user, use attendance record if exists, otherwise create "Tidak Hadir" entry
-      const mergedData = staffUsers.map((su) => {
-        const key = su.nip || su.username || su.nama
-        const attendance = attendanceMap.get(key)
+      // Track which attendance IDs have been matched
+      const matchedIds = new Set<string>()
+
+      // Merge: for each staff user, find their attendance record
+      const mergedData: Record<string, unknown>[] = staffUsers.map((su) => {
+        // Try matching by NIP first, then by nama, then by username
+        let attendance = su.nip ? attendanceByNip.get(su.nip) : null
+        if (!attendance) attendance = attendanceByNama.get(su.nama)
+        if (!attendance && su.username) attendance = attendanceByNip.get(su.username)
+
         if (attendance) {
+          matchedIds.add(attendance.id)
           return { ...attendance, roleUser: su.role, jabatanUser: su.jabatan }
         }
         // No attendance record → Tidak Hadir
@@ -86,11 +94,9 @@ export async function GET(request: NextRequest) {
         }
       })
 
-      // Also include attendance records for names not in the User table
-      const userKeys = new Set(staffUsers.map((s) => s.nip || s.username || s.nama))
+      // Also include attendance records not yet matched (from names not in the User table)
       for (const record of attendanceRecords) {
-        const key = record.nip || record.namaGuru
-        if (!userKeys.has(key)) {
+        if (!matchedIds.has(record.id)) {
           mergedData.push({ ...record, roleUser: '', jabatanUser: '' })
         }
       }
@@ -137,9 +143,14 @@ export async function POST(request: NextRequest) {
     // Use client-provided time if available, otherwise use server time
     const jamMasuk = (status === 'Hadir') ? (clientJamMasuk || new Date().toTimeString().slice(0, 5)) : ''
 
-    const existing = await db.absensiGuru.findFirst({
-      where: { tanggal: today, nip: nip || '' },
-    })
+    // Check for duplicate: same date + (NIP if provided, or nama)
+    const existingWhere: Record<string, unknown> = { tanggal: today }
+    if (nip) {
+      existingWhere.nip = nip
+    } else {
+      existingWhere.namaGuru = namaGuru
+    }
+    const existing = await db.absensiGuru.findFirst({ where: existingWhere })
 
     if (existing) {
       return NextResponse.json({ error: 'Absensi sudah tercatat hari ini' }, { status: 409 })

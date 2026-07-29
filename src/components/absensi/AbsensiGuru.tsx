@@ -235,9 +235,11 @@ export default function AbsensiGuru() {
 
   // ── Compute: own today's record (exclude fake pending entries) ──
   const myTodayRecord = useMemo(() => {
+    if (!user) return null
     if (isRekapViewer && !isToday) return null
+    // Find real attendance record for current user (not pending- entries)
     return records.find(
-      (r) => r.namaGuru === user?.nama && !r.id.startsWith('pending-'),
+      (r) => r.namaGuru === user.nama && !r.id.startsWith('pending-'),
     ) || null
   }, [records, user, isRekapViewer, isToday])
 
@@ -373,7 +375,7 @@ export default function AbsensiGuru() {
     } finally {
       setSubmittingPulang(false)
     }
-  }, [pulangRecordId, pulangKeterangan, fetchRecords])
+  }, [pulangRecordId, pulangJam, pulangKeterangan, fetchRecords])
 
   // ── Handle Sakit/Izin Submit ──
   const handleSakitIzin = useCallback(async () => {
