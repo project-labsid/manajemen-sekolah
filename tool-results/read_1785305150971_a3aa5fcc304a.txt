@@ -1,0 +1,362 @@
+   320→('cms0a4sb60084oqres2pxzxrp', '199408252020012008', 'Fitri Handayani, S.Pd', '', 'Perempuan', '', '', '', '', '', 'Ekonomi', 'aktif', '', '2026-07-25 11:22:14', '2026-07-25 11:22:14'),
+   321→('cms0a4sb70085oqre0ap1qrz2', '198912302010011009', 'Rudi Hartono, S.Pd', '', 'Laki-laki', '', '', '', '', '', 'Geografi', 'aktif', '', '2026-07-25 11:22:14', '2026-07-25 11:22:14'),
+   322→('cms0a4sb70086oqre8rpopfxi', '199505102021012010', 'Lestari Ningrum, S.Pd', '', 'Perempuan', '', '', '', '', '', 'Sosiologi', 'aktif', '', '2026-07-25 11:22:14', '2026-07-25 11:22:14'),
+   323→('cms0a4sb80087oqrer4fx4ekn', '198607152011011011', 'Wahyu Prasetyo, S.Kom', '', 'Laki-laki', '', '', '', '', '', 'Informatika', 'aktif', '', '2026-07-25 11:22:14', '2026-07-25 11:22:14'),
+   324→('cms0a4sb90088oqreuykyq3l6', '199212202019012012', 'Anita Sari, S.Pd', '', 'Perempuan', '', '', '', 'sekolah@gmail.com', '', 'PKN', 'Aktif', '', '2026-07-25 11:22:14', '2026-07-26 13:14:54'),
+   325→('cms0a4sb90089oqrezyrileuz', '198410052007011013', 'Darmawan, M.Pd', '', 'Laki-laki', '', '', '', 'sekolah@gmail.com', '', 'Seni Budaya', 'Aktif', '', '2026-07-25 11:22:14', '2026-07-26 13:14:12'),
+   326→('cms0a4sba008aoqreiymyufy7', '199603012022012014', 'Mega Silvia, S.Pd', '', 'P', '', '', '', 'sekolah@gmail.com', '', 'PJOK', 'Aktif', '', '2026-07-25 11:22:14', '2026-07-26 13:14:37'),
+   327→('cms0a4sba008boqreul21qmze', '198908172012011015', 'Fajar Nugroho, S.Ag', '', 'Laki-laki', '', '', '', 'selolah@gmail.com', '', 'PAI', 'Aktif', '', '2026-07-25 11:22:14', '2026-07-26 13:13:43');
+   328→
+   329→DROP TABLE IF EXISTS `Siswa`;
+   330→CREATE TABLE `Siswa` (
+   331→  `id` VARCHAR(191) PRIMARY KEY,
+   332→  `nis` VARCHAR(191) UNIQUE,
+   333→  `nisn` VARCHAR(191),
+   334→  `nama` VARCHAR(191),
+   335→  `jenisKelamin` VARCHAR(191),
+   336→  `tempatLahir` VARCHAR(191),
+   337→  `tanggalLahir` DATE,
+   338→  `agama` VARCHAR(191),
+   339→  `alamat` TEXT,
+   340→  `namaAyah` VARCHAR(191),
+   341→  `namaIbu` VARCHAR(191),
+   342→  `noHP` VARCHAR(191),
+   343→  `kelas` VARCHAR(191),
+   344→  `status` VARCHAR(191),
+   345→  `foto` TEXT,
+   346→  `createdAt` DATETIME,
+   347→  `updatedAt` DATETIME
+   348→) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+   349→
+   350→INSERT INTO `Siswa` (`id`, `nis`, `nisn`, `nama`, `jenisKelamin`, `tempatLahir`, `tanggalLahir`, `agama`, `alamat`, `namaAyah`, `namaIbu`, `noHP`, `kelas`, `status`, `foto`, `createdAt`, `updatedAt`) VALUES 
+   351→('cms0a4sbk008uoqredcp1wzfm', '20240001', '', 'Andi Pratama', 'Laki-laki', '', '', 'Islam', '', '', '', '', '10A', 'aktif', '', '2026-07-25 11:22:15', '2026-07-25 11:22:15'),
+   352→('cms0a4sbl008voqrezo3586c9', '20240002', '', 'Budi Setiawan', 'Laki-laki', '', '', 'Islam', '', '', '', '', '10A', 'aktif', '', '2026-07-25 11:22:15', '2026-07-25 11:22:15'),
+   353→('cms0a4sbl008woqreqcpnf2f2', '20240003', '', 'Citra Dewi', 'Laki-laki', '', '', 'Islam', '', '', '', '', '10A', 'aktif', '', '2026-07-25 11:22:15', '2026-07-25 11:22:15'),
+   354→('cms0a4sbm008xoqrem91b1a86', '20240004', '', 'Dian Permata', 'Laki-laki', '', '', 'Islam', '', '', '', '', '10A', 'aktif', '', '2026-07-25 11:22:15', '2026-07-25 11:22:15'),
+   355→('cms0a4sbm008yoqrehxc5d9cr', '20240005', '', 'Eko Saputra', 'Laki-laki', '', '', 'Islam', '', '', '', '', '10B', 'aktif', '', '2026-07-25 11:22:15', '2026-07-25 11:22:15'),
+   356→('cms0a4sbn008zoqrebbj56s1t', '20240006', '', 'Fani Oktavia', 'Laki-laki', '', '', 'Islam', '', '', '', '', '10B', 'aktif', '', '2026-07-25 11:22:15', '2026-07-25 11:22:15'),
+   357→('cms0a4sbn0090oqreycegpfj9', '20240007', '', 'Gilang Ramadhan', 'Laki-laki', '', '', 'Islam', '', '', '', '', '10B', 'aktif', '', '2026-07-25 11:22:15', '2026-07-25 11:22:15'),
+   358→('cms0a4sbo0091oqrelgsre3x7', '20240008', '', 'Hani Mulyani', 'Laki-laki', '', '', 'Islam', '', '', '', '', '10B', 'aktif', '', '2026-07-25 11:22:15', '2026-07-25 11:22:15'),
+   359→('cms0a4sbo0092oqreeucd53j8', '20240009', '', 'Irfan Hakim', 'Laki-laki', '', '', 'Islam', '', '', '', '', '11A', 'aktif', '', '2026-07-25 11:22:15', '2026-07-25 11:22:15'),
+   360→('cms0a4sbo0093oqrejaqjljzp', '20240010', '', 'Joko Widodo', 'Laki-laki', '', '', 'Islam', '', '', '', '', '11A', 'aktif', '', '2026-07-25 11:22:15', '2026-07-25 11:22:15'),
+   361→('cms0a4sbp0094oqrekmvz5xw8', '20240011', '', 'Kartika Sari', 'Laki-laki', '', '', 'Islam', '', '', '', '', '11A', 'aktif', '', '2026-07-25 11:22:15', '2026-07-25 11:22:15'),
+   362→('cms0a4sbp0095oqrez6fx5223', '20240012', '', 'Lina Marlina', 'Laki-laki', '', '', 'Islam', '', '', '', '', '11A', 'aktif', '', '2026-07-25 11:22:15', '2026-07-25 11:22:15'),
+   363→('cms0a4sbq0096oqrewjxvkf5x', '20240013', '', 'Muhammad Rizki', 'Laki-laki', '', '', 'Islam', '', '', '', '', '11B', 'aktif', '', '2026-07-25 11:22:15', '2026-07-25 11:22:15'),
+   364→('cms0a4sbq0097oqrehbwy5xxl', '20240014', '', 'Nur Aini', 'Laki-laki', '', '', 'Islam', '', '', '', '', '11B', 'aktif', '', '2026-07-25 11:22:15', '2026-07-25 11:22:15'),
+   365→('cms0a4sbq0098oqrexkqk9opw', '20240015', '', 'Oscar Pratama', 'Laki-laki', '', '', 'Islam', '', '', '', '', '11B', 'aktif', '', '2026-07-25 11:22:15', '2026-07-25 11:22:15'),
+   366→('cms0a4sbr0099oqreqej9e9de', '20240016', '', 'Putri Amelia', 'Laki-laki', '', '', 'Islam', '', '', '', '', '11B', 'aktif', '', '2026-07-25 11:22:15', '2026-07-25 11:22:15'),
+   367→('cms0a4sbr009aoqrebz8mpd2x', '20240017', '', 'Qori Ananda', 'Laki-laki', '', '', 'Islam', '', '', '', '', '12A', 'aktif', '', '2026-07-25 11:22:15', '2026-07-25 11:22:15'),
+   368→('cms0a4sbs009boqre9rhp5r3m', '20240018', '', 'Rizky Aditya', 'Laki-laki', '', '', 'Islam', '', '', '', '', '12A', 'aktif', '', '2026-07-25 11:22:15', '2026-07-25 11:22:15'),
+   369→('cms0a4sbs009coqrekalq5lky', '20240019', '', 'Sinta Maharani', 'Laki-laki', '', '', 'Islam', '', '', '', '', '12A', 'aktif', '', '2026-07-25 11:22:15', '2026-07-25 11:22:15'),
+   370→('cms0a4sbt009doqrehlmolaql', '20240020', '', 'Taufik Hidayat', 'Laki-laki', '', '', 'Islam', '', '', '', '', '12A', 'aktif', '', '2026-07-25 11:22:15', '2026-07-25 11:22:15'),
+   371→('cms0a4sbt009eoqreon6ssx9h', '20240021', '', 'Umar Faruq', 'Laki-laki', '', '', 'Islam', '', '', '', '', '12B', 'aktif', '', '2026-07-25 11:22:15', '2026-07-25 11:22:15'),
+   372→('cms0a4sbt009foqre96kmlm4z', '20240022', '', 'Vina Oktaviani', 'Laki-laki', '', '', 'Islam', '', '', '', '', '12B', 'aktif', '', '2026-07-25 11:22:15', '2026-07-25 11:22:15'),
+   373→('cms0a4sbu009goqrepw413lmu', '20240023', '', 'Wahyu Setiabudi', 'Laki-laki', '', '', 'Islam', '', '', '', '', '12B', 'aktif', '', '2026-07-25 11:22:15', '2026-07-25 11:22:15'),
+   374→('cms0a4sbu009hoqrettx81xc3', '20240024', '2113111', 'Yuni Astuti', 'P', '', '', 'Islam', '', '', '', '', '1', 'aktif', '', '2026-07-25 11:22:15', '2026-07-26 13:15:10'),
+   375→('cms0j5adv0007rqtk4fib6at0', '127492', '73628191', 'Amid', 'L', 'Purwakarta ', '2026-07-25', 'Islam', 'Hakaluva', 'Babak', 'Jahah', '', '1', 'aktif', '', '2026-07-25 15:34:34', '2026-07-26 13:15:19');
+   376→
+   377→DROP TABLE IF EXISTS `Kelas`;
+   378→CREATE TABLE `Kelas` (
+   379→  `id` VARCHAR(191) PRIMARY KEY,
+   380→  `kodeKelas` VARCHAR(191) UNIQUE,
+   381→  `namaKelas` VARCHAR(191),
+   382→  `waliKelas` VARCHAR(191),
+   383→  `status` VARCHAR(191)
+   384→) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+   385→
+   386→INSERT INTO `Kelas` (`id`, `kodeKelas`, `namaKelas`, `waliKelas`, `status`) VALUES 
+   387→('cms0a4sbb008coqrefatetp1a', '10A', 'X-A', 'Sri Wahyuni, S.Pd', 'aktif'),
+   388→('cms0a4sbc008doqreksdhxrbz', '10B', 'X-B', '', 'aktif'),
+   389→('cms0a4sbc008eoqrep53dmt27', '11A', 'XI-A', '', 'aktif'),
+   390→('cms0a4sbc008foqre1cc8vocl', '11B', 'XI-B', '', 'aktif'),
+   391→('cms0a4sbd008goqre4km84a8c', '12A', 'XII-A', '', 'aktif'),
+   392→('cms0j3vmm0004rqtk9gb9qjxs', '1', 'Kelas 1', 'Siti', 'aktif'),
+   393→('cms1n645b0009p6to9o58wnhd', '2', 'kelas 2', 'sri', 'aktif');
+   394→
+   395→DROP TABLE IF EXISTS `MataPelajaran`;
+   396→CREATE TABLE `MataPelajaran` (
+   397→  `id` VARCHAR(191) PRIMARY KEY,
+   398→  `kodeMapel` VARCHAR(191) UNIQUE,
+   399→  `namaMapel` VARCHAR(191),
+   400→  `kkm` INT DEFAULT 75,
+   401→  `guru` VARCHAR(191),
+   402→  `status` VARCHAR(191)
+   403→) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+   404→
+   405→INSERT INTO `MataPelajaran` (`id`, `kodeMapel`, `namaMapel`, `kkm`, `guru`, `status`) VALUES 
+   406→('cms0a4sbe008ioqreaxttd4pg', 'MTK', 'Matematika', 75, 'Ahmad Fauzi, S.Pd', 'aktif'),
+   407→('cms0a4sbe008joqrepe89k8uw', 'BIN', 'Bahasa Indonesia', 75, 'Sri Wahyuni, S.Pd', 'aktif'),
+   408→('cms0a4sbf008koqreo2kwfcrc', 'FIS', 'Fisika', 75, 'Bambang Irawan, M.Pd', 'aktif'),
+   409→('cms0a4sbf008loqreykjh5uoj', 'KIM', 'Kimia', 75, 'Rina Susanti, S.Pd', 'aktif'),
+   410→('cms0a4sbg008moqrebe7agu2j', 'BIO', 'Biologi', 75, 'Hendra Wijaya, S.Si', 'aktif'),
+   411→('cms0a4sbg008noqred8i9xuu0', 'BIG', 'Bahasa Inggris', 75, 'Diana Putri, S.Pd', 'aktif'),
+   412→('cms0a4sbh008ooqrejdd1z3qn', 'SEJ', 'Sejarah', 75, 'Agus Supriyadi, S.Pd', 'aktif'),
+   413→('cms0a4sbi008poqre1pnshx6a', 'EKO', 'Ekonomi', 75, 'Fitri Handayani, S.Pd', 'aktif'),
+   414→('cms0a4sbi008qoqrewmz23rqj', 'GEO', 'Geografi', 75, 'Rudi Hartono, S.Pd', 'aktif'),
+   415→('cms0a4sbj008roqrexmdaij2t', 'SOS', 'Sosiologi', 75, 'Lestari Ningrum, S.Pd', 'aktif'),
+   416→('cms0a4sbj008soqrebjyvgsyt', 'INF', 'Informatika', 75, 'Wahyu Prasetyo, S.Kom', 'aktif'),
+   417→('cms0a4sbk008toqre81fuee3o', 'PKN', 'PKN', 75, 'Anita Sari, S.Pd', 'aktif');
+   418→
+   419→DROP TABLE IF EXISTS `TahunAjaran`;
+   420→CREATE TABLE `TahunAjaran` (
+   421→  `id` VARCHAR(191) PRIMARY KEY,
+   422→  `nama` VARCHAR(191) UNIQUE,
+   423→  `status` VARCHAR(191)
+   424→) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+   425→
+   426→INSERT INTO `TahunAjaran` (`id`, `nama`, `status`) VALUES 
+   427→('cms0a4sbv009ioqrekppjch6p', '2024/2025', 'aktif'),
+   428→('cms0a4sbv009joqrerk7k5ow5', '2023/2024', 'tidak');
+   429→
+   430→DROP TABLE IF EXISTS `Semester`;
+   431→CREATE TABLE `Semester` (
+   432→  `id` VARCHAR(191) PRIMARY KEY,
+   433→  `semester` VARCHAR(191) UNIQUE,
+   434→  `status` VARCHAR(191)
+   435→) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+   436→
+   437→INSERT INTO `Semester` (`id`, `semester`, `status`) VALUES 
+   438→('cms0a4sbw009koqre2szd10w0', 'Ganjil', 'tidak'),
+   439→('cms0a4sbw009loqre9q6uvnnt', 'Genap', 'aktif');
+   440→
+   441→DROP TABLE IF EXISTS `Nilai`;
+   442→CREATE TABLE `Nilai` (
+   443→  `id` VARCHAR(191) PRIMARY KEY,
+   444→  `tahunAjaran` VARCHAR(191),
+   445→  `semester` VARCHAR(191),
+   446→  `kelas` VARCHAR(191),
+   447→  `mapel` VARCHAR(191),
+   448→  `guru` VARCHAR(191),
+   449→  `nis` VARCHAR(191),
+   450→  `nama` VARCHAR(191),
+   451→  `ph1` DOUBLE DEFAULT 0,
+   452→  `ph2` DOUBLE DEFAULT 0,
+   453→  `ph3` DOUBLE DEFAULT 0,
+   454→  `ph4` DOUBLE DEFAULT 0,
+   455→  `pts` DOUBLE DEFAULT 0,
+   456→  `pas` DOUBLE DEFAULT 0,
+   457→  `rataRata` DOUBLE DEFAULT 0,
+   458→  `nilaiAkhir` DOUBLE DEFAULT 0,
+   459→  `predikat` VARCHAR(191),
+   460→  `deskripsi` TEXT,
+   461→  `createdAt` DATETIME,
+   462→  `updatedAt` DATETIME
+   463→) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+   464→
+   465→DROP TABLE IF EXISTS `AbsensiGuru`;
+   466→CREATE TABLE `AbsensiGuru` (
+   467→  `id` VARCHAR(191) PRIMARY KEY,
+   468→  `tanggal` DATE,
+   469→  `namaGuru` VARCHAR(191),
+   470→  `nip` VARCHAR(191),
+   471→  `jamMasuk` VARCHAR(191),
+   472→  `jamPulang` VARCHAR(191),
+   473→  `durasi` VARCHAR(191),
+   474→  `status` VARCHAR(191),
+   475→  `latitude` VARCHAR(191),
+   476→  `longitude` VARCHAR(191),
+   477→  `alamat` TEXT,
+   478→  `browser` VARCHAR(191),
+   479→  `device` VARCHAR(191),
+   480→  `ip` VARCHAR(191),
+   481→  `keterangan` TEXT,
+   482→  `createdAt` DATETIME
+   483→) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+   484→
+   485→INSERT INTO `AbsensiGuru` (`id`, `tanggal`, `namaGuru`, `nip`, `jamMasuk`, `jamPulang`, `durasi`, `status`, `latitude`, `longitude`, `alamat`, `browser`, `device`, `ip`, `keterangan`, `createdAt`) VALUES 
+   486→('cms14y28d0000m6tk3qoehn5d', '2026-07-26', 'Sri Wahyuni, S.Pd', '199201012020012002', '01:44', '10:11', '8 jam 27 menit', 'Hadir', '', '', '', 'Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Mobile Safari/537.36', '', '21.0.0.1', '', '2026-07-26 01:44:49'),
+   487→('cms1qsayk000ip6toqqtfrr6s', '2026-07-26', 'Super Admin', 'admin', '18:55', '23:39', '4 jam 44 menit', 'Hadir', '-6.5401915', '107.448717', '', 'Chrome 150.0.0.0', 'Windows PC', '21.0.0.1', '', '2026-07-26 11:56:12'),
+   488→('cms1ti3qt0010p6toytmm6ipf', '2026-07-26', 'Ahmad Fauzi, S.Pd', '199001012015011001', '13:12', '17:42', '4 jam 30 menit', 'Hadir', '', '', '', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36', '', '21.0.0.1', '', '2026-07-26 13:12:15'),
+   489→('cms2y63210000r0vrz58y9ied', '2026-07-27', 'Ahmad Fauzi, S.Pd', '199001012015011001', '08:10', '', '', 'Hadir', '', '', '', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36', '', '21.0.0.1', '', '2026-07-27 08:10:38'),
+   490→('cms330nzs0008r0vrv59r1piz', '2026-07-27', 'Drs. Ahmad Hidayat, M.Pd', 'kepsek', '17:25', '19:54', '2 jam 29 menit', 'Hadir', '-6.5401915', '107.448717', '', 'Chrome 150.0.0.0', 'Windows PC', '21.0.0.1', '', '2026-07-27 10:26:23'),
+   491→('cms38z0vh000nr0vrfestiaeo', '2026-07-27', 'Super Admin', 'admin', '20:12', '23:06', '2 jam 54 menit', 'Hadir', '', '', '', 'Chrome 150.0.0.0', 'Windows PC', '21.0.0.1', '', '2026-07-27 13:13:05');
+   492→
+   493→DROP TABLE IF EXISTS `AbsensiSiswa`;
+   494→CREATE TABLE `AbsensiSiswa` (
+   495→  `id` VARCHAR(191) PRIMARY KEY,
+   496→  `tanggal` DATE,
+   497→  `kelas` VARCHAR(191),
+   498→  `nis` VARCHAR(191),
+   499→  `nama` VARCHAR(191),
+   500→  `status` VARCHAR(191),
+   501→  `keterangan` TEXT,
+   502→  `guru` VARCHAR(191),
+   503→  `createdAt` DATETIME
+   504→) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+   505→
+   506→INSERT INTO `AbsensiSiswa` (`id`, `tanggal`, `kelas`, `nis`, `nama`, `status`, `keterangan`, `guru`, `createdAt`) VALUES 
+   507→('cms1qsupk000kp6toy295hmbr', '2026-07-26', '1', '', '', 'Hadir', '', 'Drs. Ahmad Hidayat, M.Pd', '2026-07-26 11:56:37'),
+   508→('cms1qtfhy000np6toxt2f6zat', '2026-07-26', '10A', '', '', 'Hadir', '', 'Super Admin', '2026-07-26 11:57:04'),
+   509→('cms3312uh000ar0vr7x98hhat', '2026-07-27', '1', '127492', 'Amid', 'Sakit', '', 'Drs. Ahmad Hidayat, M.Pd', '2026-07-27 10:26:43'),
+   510→('cms3312ui000br0vr526vudrg', '2026-07-27', '1', '20240024', 'Yuni Astuti', 'Hadir', '', 'Drs. Ahmad Hidayat, M.Pd', '2026-07-27 10:26:43'),
+   511→('cms38xyfw000ir0vrj2e9kvxr', '2026-07-27', '11A', '20240012', 'Lina Marlina', 'Sakit', '', 'Nisa Aulia', '2026-07-27 13:12:15'),
+   512→('cms38xyfz000jr0vrarh7tzzy', '2026-07-27', '11A', '20240010', 'Joko Widodo', 'Hadir', '', 'Nisa Aulia', '2026-07-27 13:12:15'),
+   513→('cms38xyg0000kr0vrrpfq4upi', '2026-07-27', '11A', '20240011', 'Kartika Sari', 'Alpha', '', 'Nisa Aulia', '2026-07-27 13:12:15'),
+   514→('cms38xyg2000lr0vr9018k8qm', '2026-07-27', '11A', '20240009', 'Irfan Hakim', 'Hadir', '', 'Nisa Aulia', '2026-07-27 13:12:15');
+   515→
+   516→DROP TABLE IF EXISTS `Pengumuman`;
+   517→CREATE TABLE `Pengumuman` (
+   518→  `id` VARCHAR(191) PRIMARY KEY,
+   519→  `judul` VARCHAR(191),
+   520→  `isi` TEXT,
+   521→  `lampiran` TEXT,
+   522→  `tanggal` DATE,
+   523→  `status` VARCHAR(191),
+   524→  `createdAt` DATETIME
+   525→) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+   526→
+   527→DROP TABLE IF EXISTS `AuditLog`;
+   528→CREATE TABLE `AuditLog` (
+   529→  `id` VARCHAR(191) PRIMARY KEY,
+   530→  `tanggal` DATETIME,
+   531→  `user` VARCHAR(191),
+   532→  `role` VARCHAR(191),
+   533→  `aktivitas` TEXT,
+   534→  `ip` VARCHAR(191),
+   535→  `detail` TEXT,
+   536→  `createdAt` DATETIME
+   537→) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+   538→
+   539→INSERT INTO `AuditLog` (`id`, `tanggal`, `user`, `role`, `aktivitas`, `ip`, `detail`, `createdAt`) VALUES 
+   540→('cms0a4suy0015oqtj2y2be5mk', '2026-07-25', 'Sri Wahyuni, S.Pd', 'wali-kelas', 'Login', '::1', 'User sri berhasil login', '2026-07-25 11:22:15'),
+   541→('cms0a4v7k0017oqtjmviv9it4', '2026-07-25', 'Ahmad Fauzi, S.Pd', 'guru', 'Login', '::1', 'User ahmad berhasil login', '2026-07-25 11:22:18'),
+   542→('cms0a4vk60019oqtjb8s0zux2', '2026-07-25', 'Ahmad Fauzi, S.Pd', 'guru', 'Login', '::1', 'User ahmad berhasil login', '2026-07-25 11:22:19'),
+   543→('cms0a5188001boqtjzcmbmhjm', '2026-07-25', 'Ahmad Fauzi, S.Pd', 'guru', 'Login', '::1', 'User ahmad berhasil login', '2026-07-25 11:22:26'),
+   544→('cms0a53x6001doqtjm1ca35sx', '2026-07-25', 'Ahmad Fauzi, S.Pd', 'guru', 'Login', '::1', 'User ahmad berhasil login', '2026-07-25 11:22:30'),
+   545→('cms0a54gm001foqtj6n0w1mvj', '2026-07-25', 'Ahmad Fauzi, S.Pd', 'guru', 'Login', '::1', 'User ahmad berhasil login', '2026-07-25 11:22:30'),
+   546→('cms0a5hq7001hoqtj8jadaa2a', '2026-07-25', 'Ahmad Fauzi, S.Pd', 'guru', 'Login', '::1', 'User ahmad berhasil login', '2026-07-25 11:22:47'),
+   547→('cms0ei2kj0001scdef112dv8w', '2026-07-25', 'Ahmad Fauzi, S.Pd', 'guru', 'Login', '::1', 'User ahmad berhasil login', '2026-07-25 13:24:33'),
+   548→('cms0evq870001scjf8d3ehqn0', '2026-07-25', 'Ahmad Fauzi, S.Pd', 'guru', 'Login', '::1', 'User ahmad berhasil login', '2026-07-25 13:35:10'),
+   549→('cms0ewsut0003scjfas1bu94m', '2026-07-25', 'Super Admin', 'super-admin', 'Login', '::1', 'User admin berhasil login', '2026-07-25 13:36:00'),
+   550→('cms0iyd6d0001rqtk1krrpczv', '2026-07-25', 'Ahmad Fauzi, S.Pd', 'guru', 'Login', '21.0.0.1', 'User ahmad berhasil login', '2026-07-25 15:29:11'),
+   551→('cms0izlc00003rqtk01clq8ll', '2026-07-25', 'Super Admin', 'super-admin', 'Login', '21.0.0.1', 'User admin berhasil login', '2026-07-25 15:30:09'),
+   552→('cms0j5adw0008rqtkawklnno5', '2026-07-25', 'Super Admin', 'super-admin', 'Tambah Siswa', '21.0.0.1', 'Menambahkan siswa: Amid (NIS: 127492)', '2026-07-25 15:34:34'),
+   553→('cms0j5w9n0009rqtklsle37e2', '2026-07-25', 'Super Admin', 'super-admin', 'Edit Mata Pelajaran', '21.0.0.1', 'Mengedit mata pelajaran: Bahasa Indonesia (BIN)', '2026-07-25 15:35:03'),
+   554→('cms0j6qcj000brqtkiaradt1a', '2026-07-25', 'Budi Santoso', 'admin', 'Login', '21.0.0.1', 'User adminsekolah berhasil login', '2026-07-25 15:35:42'),
+   555→('cms0j8ki4000drqtks3japeko', '2026-07-25', 'Sri Wahyuni, S.Pd', 'wali-kelas', 'Login', '21.0.0.1', 'User sri berhasil login', '2026-07-25 15:37:08'),
+   556→('cms0k81wt000frqtk7qo7ymx1', '2026-07-25', 'Ahmad Fauzi, S.Pd', 'guru', 'Login', '::1', 'User ahmad berhasil login', '2026-07-25 16:04:43'),
+   557→('cms0kal2c000hrqtk3vlko2q6', '2026-07-25', 'Sri Wahyuni, S.Pd', 'wali-kelas', 'Login', '::1', 'User sri berhasil login', '2026-07-25 16:06:41'),
+   558→('cms0kborh000jrqtkg62320lo', '2026-07-25', 'Drs. Ahmad Hidayat, M.Pd', 'kepala-sekolah', 'Login', '::1', 'User kepsek berhasil login', '2026-07-25 16:07:33'),
+   559→('cms14y28f0001m6tkof2eu3wy', '2026-07-26', 'Sri Wahyuni, S.Pd', 'wali-kelas', 'Clock In Guru', '21.0.0.1', 'Clock in absensi guru: Sri Wahyuni, S.Pd', '2026-07-26 01:44:49'),
+   560→('cms14z6o80003m6tkorpnjkqp', '2026-07-26', 'Super Admin', 'super-admin', 'Login', '21.0.0.1', 'User admin berhasil login', '2026-07-26 01:45:41'),
+   561→('cms17cj1n0005m6tk1dc111dn', '2026-07-26', 'Super Admin', 'super-admin', 'Login', '21.0.0.1', 'User admin berhasil login', '2026-07-26 02:52:03'),
+   562→('cms17e1of0006m6tkiqbt9pok', '2026-07-26', 'Super Admin', 'super-admin', 'Edit Siswa', '21.0.0.1', 'Mengedit siswa: Amid (NIS: 127492)', '2026-07-26 02:53:14'),
+   563→('cms1n19i60001p6toha7o3654', '2026-07-26', 'Super Admin', 'super-admin', 'Login', '21.0.0.1', 'User admin berhasil login', '2026-07-26 10:11:11'),
+   564→('cms1n24vn0003p6toktmwiw6z', '2026-07-26', 'Sri Wahyuni, S.Pd', 'wali-kelas', 'Login', '21.0.0.1', 'User sri berhasil login', '2026-07-26 10:11:52'),
+   565→('cms1n26tl0004p6to2wskvtbv', '2026-07-26', 'Sri Wahyuni, S.Pd', 'wali-kelas', 'Clock Out Guru', '21.0.0.1', 'Clock out absensi guru: Sri Wahyuni, S.Pd', '2026-07-26 10:11:55'),
+   566→('cms1n3t700006p6to7152zwx0', '2026-07-26', 'Super Admin', 'super-admin', 'Login', '21.0.0.1', 'User admin berhasil login', '2026-07-26 10:13:10'),
+   567→('cms1nfoku000dp6tomwpiwun8', '2026-07-26', 'Super Admin', 'super-admin', 'Login', '::1', 'User admin berhasil login', '2026-07-26 10:22:24'),
+   568→('cms1ng79t000fp6tozx62lgrg', '2026-07-26', 'Super Admin', 'super-admin', 'Login', '::1', 'User admin berhasil login', '2026-07-26 10:22:48'),
+   569→('cms1ohfy3000gp6tolk2o0wb3', '2026-07-26', 'Super Admin', 'super-admin', 'Edit Siswa', '21.0.0.1', 'Mengedit siswa: Yuni Astuti (NIS: 20240024)', '2026-07-26 10:51:46'),
+   570→('cms1ohn0i000hp6toie4itdbz', '2026-07-26', 'Super Admin', 'super-admin', 'Edit Siswa', '21.0.0.1', 'Mengedit siswa: Yuni Astuti (NIS: 20240024)', '2026-07-26 10:51:55'),
+   571→('cms1qsaym000jp6to6147zhjw', '2026-07-26', 'Super Admin', 'super-admin', 'Clock In Guru', '21.0.0.1', 'Clock in absensi guru: Super Admin', '2026-07-26 11:56:12'),
+   572→('cms1qsupm000lp6ton6if22uz', '2026-07-26', 'Super Admin', 'super-admin', 'Update Absensi Siswa', '21.0.0.1', 'Mengupdate 1 data absensi siswa', '2026-07-26 11:56:37'),
+   573→('cms1qt1eg000mp6toqezr73xs', '2026-07-26', 'Super Admin', 'super-admin', 'Update Absensi Siswa', '21.0.0.1', 'Mengupdate 1 data absensi siswa', '2026-07-26 11:56:46'),
+   574→('cms1qtfi2000op6toitpoar1f', '2026-07-26', 'Super Admin', 'super-admin', 'Update Absensi Siswa', '21.0.0.1', 'Mengupdate 4 data absensi siswa', '2026-07-26 11:57:04'),
+   575→('cms1qto9v000pp6tot0jn4tko', '2026-07-26', 'Super Admin', 'super-admin', 'Update Absensi Siswa', '21.0.0.1', 'Mengupdate 4 data absensi siswa', '2026-07-26 11:57:16'),
+   576→('cms1tb228000rp6towvt2rej8', '2026-07-26', 'Super Admin', 'super-admin', 'Login', '21.0.0.1', 'User admin berhasil login', '2026-07-26 13:06:46'),
+   577→('cms1tgqxh000xp6tolrg3kkz4', '2026-07-26', 'Sri Wahyuni, S.Pd', 'wali-kelas', 'Login', '21.0.0.1', 'User sri berhasil login', '2026-07-26 13:11:11'),
+   578→('cms1ti2cc000zp6toaxso7kb1', '2026-07-26', 'Ahmad Fauzi, S.Pd', 'guru', 'Login', '21.0.0.1', 'User ahmad berhasil login', '2026-07-26 13:12:13'),
+   579→('cms1ti3qv0011p6toip0j01z8', '2026-07-26', 'Ahmad Fauzi, S.Pd', 'guru', 'Clock In Guru', '21.0.0.1', 'Clock in absensi guru: Ahmad Fauzi, S.Pd', '2026-07-26 13:12:15'),
+   580→('cms1tj3n10013p6tovv800z36', '2026-07-26', 'Drs. Ahmad Hidayat, M.Pd', 'kepala-sekolah', 'Login', '21.0.0.1', 'User kepsek berhasil login', '2026-07-26 13:13:01'),
+   581→('cms1tjzxj0014p6to8pl8p3ip', '2026-07-26', 'Drs. Ahmad Hidayat, M.Pd', 'kepala-sekolah', 'Edit Guru', '21.0.0.1', 'Mengedit guru: Fajar Nugroho, S.Ag (NIP: 198908172012011015)', '2026-07-26 13:13:43'),
+   582→('cms1tklxt0015p6to99lbdzw0', '2026-07-26', 'Drs. Ahmad Hidayat, M.Pd', 'kepala-sekolah', 'Edit Guru', '21.0.0.1', 'Mengedit guru: Darmawan, M.Pd (NIP: 198410052007011013)', '2026-07-26 13:14:12'),
+   583→('cms1tl5bd0016p6to1qx54b3s', '2026-07-26', 'Drs. Ahmad Hidayat, M.Pd', 'kepala-sekolah', 'Edit Guru', '21.0.0.1', 'Mengedit guru: Mega Silvia, S.Pd (NIP: 199603012022012014)', '2026-07-26 13:14:37'),
+   584→('cms1tlip20017p6to6o6jnaaa', '2026-07-26', 'Drs. Ahmad Hidayat, M.Pd', 'kepala-sekolah', 'Edit Guru', '21.0.0.1', 'Mengedit guru: Anita Sari, S.Pd (NIP: 199212202019012012)', '2026-07-26 13:14:54'),
+   585→('cms1tlusm0018p6topnvhoajf', '2026-07-26', 'Drs. Ahmad Hidayat, M.Pd', 'kepala-sekolah', 'Edit Siswa', '21.0.0.1', 'Mengedit siswa: Yuni Astuti (NIS: 20240024)', '2026-07-26 13:15:10'),
+   586→('cms1tm1to0019p6toytyrxor1', '2026-07-26', 'Drs. Ahmad Hidayat, M.Pd', 'kepala-sekolah', 'Edit Siswa', '21.0.0.1', 'Mengedit siswa: Amid (NIS: 127492)', '2026-07-26 13:15:19'),
+   587→('cms1tn0ww001ap6to43siiwnr', '2026-07-26', 'Drs. Ahmad Hidayat, M.Pd', 'kepala-sekolah', 'Update Absensi Siswa', '21.0.0.1', 'Mengupdate 2 data absensi siswa', '2026-07-26 13:16:04'),
+   588→('cms1tsllm001cp6to0u0ixij4', '2026-07-26', 'Sri Wahyuni, S.Pd', 'wali-kelas', 'Login', '21.0.0.1', 'User sri berhasil login', '2026-07-26 13:20:24'),
+   589→('cms20uzug0001p6zewax62gmh', '2026-07-26', 'Super Admin', 'super-admin', 'Login', '::1', 'User admin berhasil login', '2026-07-26 16:38:14'),
+   590→('cms20v3090003p6zetqa224eq', '2026-07-26', 'Super Admin', 'super-admin', 'Login', '::1', 'User admin berhasil login', '2026-07-26 16:38:18'),
+   591→('cms20xk220004p6ze8lyo7nuj', '2026-07-26', 'Super Admin', 'super-admin', 'Clock Out Guru', '21.0.0.1', 'Clock out absensi guru: Super Admin', '2026-07-26 16:40:13'),
+   592→('cms2108dz0006p6zecd95jngu', '2026-07-26', 'Sri Wahyuni, S.Pd', 'wali-kelas', 'Login', '::1', 'User sri berhasil login', '2026-07-26 16:42:18'),
+   593→('cms212w6x0008p6zeb2jho7rw', '2026-07-26', 'Super Admin', 'super-admin', 'Login', '::1', 'User admin berhasil login', '2026-07-26 16:44:22'),
+   594→('cms213ide000ap6ze5ia1or9e', '2026-07-26', 'Sri Wahyuni, S.Pd', 'wali-kelas', 'Login', '::1', 'User sri berhasil login', '2026-07-26 16:44:51'),
+   595→('cms21lmn6000cp6zenbojsyh5', '2026-07-26', 'Super Admin', 'super-admin', 'Login', '::1', 'User admin berhasil login', '2026-07-26 16:58:56'),
+   596→('cms235h1n0001q5ujiiu9v5dc', '2026-07-26', 'Ahmad Fauzi, S.Pd', 'guru', 'Login', '21.0.0.1', 'User ahmad berhasil login', '2026-07-26 17:42:22'),
+   597→('cms235j4q0002q5ujnj6mu88s', '2026-07-26', 'Ahmad Fauzi, S.Pd', 'guru', 'Clock Out Guru', '21.0.0.1', 'Clock out absensi guru: Ahmad Fauzi, S.Pd', '2026-07-26 17:42:24'),
+   598→('cms2y63220001r0vrj5u7j6tf', '2026-07-27', 'Ahmad Fauzi, S.Pd', 'guru', 'Absen Guru: Hadir', '21.0.0.1', 'Absensi guru: Ahmad Fauzi, S.Pd, status: Hadir', '2026-07-27 08:10:38'),
+   599→('cms2y6ev80003r0vr61r2cqb1', '2026-07-27', 'Super Admin', 'super-admin', 'Login', '21.0.0.1', 'User admin berhasil login', '2026-07-27 08:10:54'),
+   600→('cms2ybv920005r0vrt8kjytzb', '2026-07-27', 'Dewi Lestari', 'tata-usaha', 'Login', '21.0.0.1', 'User tu berhasil login', '2026-07-27 08:15:08'),
+   601→('cms2yjqqi0007r0vrjau52vuk', '2026-07-27', 'Drs. Ahmad Hidayat, M.Pd', 'kepala-sekolah', 'Login', '21.0.0.1', 'User kepsek berhasil login', '2026-07-27 08:21:15'),
+   602→('cms330nzu0009r0vrgu3l0bub', '2026-07-27', 'Drs. Ahmad Hidayat, M.Pd', 'kepala-sekolah', 'Absen Guru: Hadir', '21.0.0.1', 'Absensi guru: Drs. Ahmad Hidayat, M.Pd, status: Hadir', '2026-07-27 10:26:23'),
+   603→('cms3312uj000cr0vrtipef9rt', '2026-07-27', 'Drs. Ahmad Hidayat, M.Pd', 'kepala-sekolah', 'Update Absensi Siswa', '21.0.0.1', 'Mengupdate 2 data absensi siswa', '2026-07-27 10:26:43'),
+   604→('cms38cijw000dr0vreieefuvx', '2026-07-27', 'Drs. Ahmad Hidayat, M.Pd', 'kepala-sekolah', 'Clock Out Guru', '21.0.0.1', 'Clock out absensi guru: Drs. Ahmad Hidayat, M.Pd', '2026-07-27 12:55:34'),
+   605→('cms38npgb000fr0vr2283ddxr', '2026-07-27', 'Super Admin', 'super-admin', 'Tambah User', '21.0.0.1', 'Menambahkan user nisaaulia (admin)', '2026-07-27 13:04:17'),
+   606→('cms38v16d000hr0vrf38sk8sn', '2026-07-27', 'Nisa Aulia', 'admin', 'Login', '21.0.0.1', 'User nisaaulia berhasil login', '2026-07-27 13:09:58'),
+   607→('cms38xyg3000mr0vr8si5kjov', '2026-07-27', 'Nisa Aulia', 'admin', 'Update Absensi Siswa', '21.0.0.1', 'Mengupdate 4 data absensi siswa', '2026-07-27 13:12:15'),
+   608→('cms38z0vl000or0vrz0kuskzq', '2026-07-27', 'Super Admin', 'super-admin', 'Absen Guru: Hadir', '21.0.0.1', 'Absensi guru: Super Admin, status: Hadir', '2026-07-27 13:13:05'),
+   609→('cms3f7eqv0000l1usonzaoyg4', '2026-07-27', 'Super Admin', 'super-admin', 'Clock Out Guru', '21.0.0.1', 'Clock out absensi guru: Super Admin', '2026-07-27 16:07:33'),
+   610→('cms4erf640001m4uobi9afyxf', '2026-07-28', 'Super Admin', 'super-admin', 'Login', '21.0.0.1', 'User admin berhasil login', '2026-07-28 08:42:54'),
+   611→('cms4fkauf0001m49n0omw58wr', '2026-07-28', 'Budi Santoso', 'admin', 'Login', '::1', 'User adminsekolah berhasil login', '2026-07-28 09:05:21'),
+   612→('cms4flbmf0001m4fe9dpub2am', '2026-07-28', 'Budi Santoso', 'admin', 'Login', '::1', 'User adminsekolah berhasil login', '2026-07-28 09:06:09'),
+   613→('cms4flbsd0003m4febvbkb38d', '2026-07-28', 'Budi Santoso', 'admin', 'Tambah User', '::1', 'Menambahkan user nisa (guru)', '2026-07-28 09:06:09'),
+   614→('cms50muwb0001s3vr98o70lvs', '2026-07-28', 'Nisa Aulia', 'admin', 'Login', '21.0.0.1', 'User nisaaulia berhasil login', '2026-07-28 18:55:12'),
+   615→('cms51szkv0001s3hpa5riw2zh', '2026-07-28', 'Super Admin', 'super-admin', 'Login', '::1', 'User admin berhasil login', '2026-07-28 19:27:58'),
+   616→('cms5jkmjt0001qktzotunn8ig', '2026-07-29', 'Super Admin', 'super-admin', 'Login', '21.0.0.1', 'User admin berhasil login', '2026-07-29 03:45:21');
+   617→
+   618→DROP TABLE IF EXISTS `Backup`;
+   619→CREATE TABLE `Backup` (
+   620→  `id` VARCHAR(191) PRIMARY KEY,
+   621→  `namaFile` VARCHAR(191),
+   622→  `ukuran` VARCHAR(191),
+   623→  `tanggalBackup` DATETIME,
+   624→  `status` VARCHAR(191),
+   625→  `createdAt` DATETIME
+   626→) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+   627→
+   628→DROP TABLE IF EXISTS `Alumni`;
+   629→CREATE TABLE `Alumni` (
+   630→  `id` VARCHAR(191) PRIMARY KEY,
+   631→  `nis` VARCHAR(191),
+   632→  `nama` VARCHAR(191),
+   633→  `tahunLulus` VARCHAR(191),
+   634→  `keterangan` TEXT
+   635→) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+   636→
+   637→DROP TABLE IF EXISTS `JurnalMengajar`;
+   638→CREATE TABLE `JurnalMengajar` (
+   639→  `id` VARCHAR(191) PRIMARY KEY,
+   640→  `tanggal` DATE,
+   641→  `guru` VARCHAR(191),
+   642→  `kelas` VARCHAR(191),
+   643→  `mapel` VARCHAR(191),
+   644→  `materi` TEXT,
+   645→  `keterangan` TEXT,
+   646→  `createdAt` DATETIME
+   647→) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+   648→
+   649→DROP TABLE IF EXISTS `RiwayatLogin`;
+   650→CREATE TABLE `RiwayatLogin` (
+   651→  `id` VARCHAR(191) PRIMARY KEY,
+   652→  `user` VARCHAR(191),
+   653→  `role` VARCHAR(191),
+   654→  `waktuLogin` DATETIME,
+   655→  `ipAddress` VARCHAR(191),
+   656→  `userAgent` TEXT,
+   657→  `createdAt` DATETIME
+   658→) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+   659→
+   660→INSERT INTO `RiwayatLogin` (`id`, `user`, `role`, `waktuLogin`, `ipAddress`, `userAgent`, `createdAt`) VALUES 
+   661→('cms0a4vk50018oqtjmg6acdm7', 'Ahmad Fauzi, S.Pd', 'guru', '2026-07-25 11:22:19', '::1', 'curl/8.14.1', '2026-07-25 11:22:19'),
+   662→('cms0a5187001aoqtjqiqlxph2', 'Ahmad Fauzi, S.Pd', 'guru', '2026-07-25 11:22:26', '::1', 'curl/8.14.1', '2026-07-25 11:22:26'),
+   663→('cms0a53x6001coqtjcavns22w', 'Ahmad Fauzi, S.Pd', 'guru', '2026-07-25 11:22:30', '::1', 'curl/8.14.1', '2026-07-25 11:22:30'),
+   664→('cms0a54gl001eoqtjtoq7188x', 'Ahmad Fauzi, S.Pd', 'guru', '2026-07-25 11:22:30', '::1', 'curl/8.14.1', '2026-07-25 11:22:30'),
+   665→('cms0a5hq6001goqtj5ld3xjhn', 'Ahmad Fauzi, S.Pd', 'guru', '2026-07-25 11:22:47', '::1', 'curl/8.14.1', '2026-07-25 11:22:47'),
+   666→('cms0ei2kh0000scde1ptgug31', 'Ahmad Fauzi, S.Pd', 'guru', '2026-07-25 13:24:33', '::1', 'curl/8.14.1', '2026-07-25 13:24:33'),
+   667→('cms0evq840000scjf6gl3klji', 'Ahmad Fauzi, S.Pd', 'guru', '2026-07-25 13:35:10', '::1', 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/151.0.0.0 Safari/537.36', '2026-07-25 13:35:10'),
+   668→('cms0ewsus0002scjf1ark0m26', 'Super Admin', 'super-admin', '2026-07-25 13:36:00', '::1', 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/151.0.0.0 Safari/537.36', '2026-07-25 13:36:00'),
+   669→('cms0iyd6c0000rqtkfqrreyqq', 'Ahmad Fauzi, S.Pd', 'guru', '2026-07-25 15:29:11', '21.0.0.1', 'Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Mobile Safari/537.36', '2026-07-25 15:29:11'),
+   670→('cms0izlbz0002rqtkx6376smt', 'Super Admin', 'super-admin', '2026-07-25 15:30:09', '21.0.0.1', 'Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Mobile Safari/537.36', '2026-07-25 15:30:09'),
+   671→('cms0kal2b000grqtkrqt3fbqq', 'Sri Wahyuni, S.Pd', 'wali-kelas', '2026-07-25 16:06:41', '::1', 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/151.0.0.0 Safari/537.36', '2026-07-25 16:06:41'),
+   672→('cms0kborg000irqtktikw7444', 'Drs. Ahmad Hidayat, M.Pd', 'kepala-sekolah', '2026-07-25 16:07:33', '::1', 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/151.0.0.0 Safari/537.36', '2026-07-25 16:07:33'),
+   673→('cms14z6o80002m6tk6fwvk1fk', 'Super Admin', 'super-admin', '2026-07-26 01:45:41', '21.0.0.1', 'Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Mobile Safari/537.36', '2026-07-26 01:45:41'),
+   674→('cms4fkaue0000m49nvoncitm7', 'Budi Santoso', 'admin', '2026-07-28 09:05:21', '::1', 'curl/8.14.1', '2026-07-28 09:05:21'),
+   675→('cms4flbme0000m4febg16n7c5', 'Budi Santoso', 'admin', '2026-07-28 09:06:09', '::1', 'curl/8.14.1', '2026-07-28 09:06:09'),
+   676→('cms50muwa0000s3vrigw58uax', 'Nisa Aulia', 'admin', '2026-07-28 18:55:12', '21.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36', '2026-07-28 18:55:12'),
+   677→('cms51szkt0000s3hp9eyzzhat', 'Super Admin', 'super-admin', '2026-07-28 19:27:58', '::1', 'curl/8.14.1', '2026-07-28 19:27:58'),
+   678→('cms5jkmjr0000qktz3eyjw42n', 'Super Admin', 'super-admin', '2026-07-29 03:45:21', '21.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36', '2026-07-29 03:45:21');
+   679→
+   680→SET FOREIGN_KEY_CHECKS = 1;
+   681→

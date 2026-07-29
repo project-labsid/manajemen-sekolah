@@ -1,0 +1,2002 @@
+     1→{
+     2→  "SettingSekolah": [
+     3→    {
+     4→      "id": "cmrzmpiqw0000rq9oro04azc7",
+     5→      "namaSekolah": "SMA Negeri 1 Contoh",
+     6→      "logo": "",
+     7→      "alamat": "Jl. Pendidikan No. 1, Jakarta",
+     8→      "npsn": "12345678",
+     9→      "email": "info@sman1contoh.sch.id",
+    10→      "website": "www.sman1contoh.sch.id",
+    11→      "telepon": "021-12345678",
+    12→      "kepalaSekolah": "Dr. Hj. Siti Aminah, M.Pd",
+    13→      "nipKepalaSekolah": "196801011990032001",
+    14→      "moto": "Unggul, Berkarakter, Berprestasi",
+    15→      "visi": "Mewujudkan sekolah unggul",
+    16→      "misi": "1. Meningkatkan mutu\n2. Menumbuhkan akhlak mulia\n3. Mengembangkan potensi siswa",
+    17→      "semesterAktif": "Ganjil",
+    18→      "tahunAjaranAktif": "2024/2025",
+    19→      "tema": "light",
+    20→      "darkMode": false,
+    21→      "createdAt": "2026-07-25T00:26:31.592Z",
+    22→      "updatedAt": "2026-07-25T00:26:31.592Z"
+    23→    }
+    24→  ],
+    25→  "Role": [
+    26→    {
+    27→      "id": "cms0a4rpl000zoqreosxvvhnr",
+    28→      "slug": "super-admin",
+    29→      "nama": "Super Admin",
+    30→      "deskripsi": "Akses penuh terhadap seluruh sistem",
+    31→      "status": "aktif",
+    32→      "createdAt": "2026-07-25T11:22:14.218Z",
+    33→      "updatedAt": "2026-07-25T11:22:14.218Z"
+    34→    },
+    35→    {
+    36→      "id": "cms0a4rpo0012oqre8nqfkmsu",
+    37→      "slug": "admin",
+    38→      "nama": "Admin Sekolah",
+    39→      "deskripsi": "Mengelola seluruh operasional sekolah",
+    40→      "status": "aktif",
+    41→      "createdAt": "2026-07-25T11:22:14.221Z",
+    42→      "updatedAt": "2026-07-25T11:22:14.221Z"
+    43→    },
+    44→    {
+    45→      "id": "cms0a4rqn002noqre3k7wuv52",
+    46→      "slug": "operator",
+    47→      "nama": "Operator Sekolah",
+    48→      "deskripsi": "Membantu administrasi sekolah",
+    49→      "status": "aktif",
+    50→      "createdAt": "2026-07-25T11:22:14.256Z",
+    51→      "updatedAt": "2026-07-25T11:22:14.256Z"
+    52→    },
+    53→    {
+    54→      "id": "cms0a4rri0038oqrejlxnfc1m",
+    55→      "slug": "kepala-sekolah",
+    56→      "nama": "Kepala Sekolah",
+    57→      "deskripsi": "Monitoring dan persetujuan",
+    58→      "status": "aktif",
+    59→      "createdAt": "2026-07-25T11:22:14.286Z",
+    60→      "updatedAt": "2026-07-25T11:22:14.286Z"
+    61→    },
+    62→    {
+    63→      "id": "cms0a4rs4003xoqrextrwgv51",
+    64→      "slug": "wakil-kepala-sekolah",
+    65→      "nama": "Wakil Kepala Sekolah",
+    66→      "deskripsi": "Supervisi akademik",
+    67→      "status": "aktif",
+    68→      "createdAt": "2026-07-25T11:22:14.308Z",
+    69→      "updatedAt": "2026-07-25T11:22:14.308Z"
+    70→    },
+    71→    {
+    72→      "id": "cms0a4rsm004ooqresucpvkix",
+    73→      "slug": "tata-usaha",
+    74→      "nama": "Tata Usaha",
+    75→      "deskripsi": "Mengelola administrasi sekolah",
+    76→      "status": "aktif",
+    77→      "createdAt": "2026-07-25T11:22:14.326Z",
+    78→      "updatedAt": "2026-07-25T11:22:14.326Z"
+    79→    },
+    80→    {
+    81→      "id": "cms0a4rsy0057oqreh7a100h3",
+    82→      "slug": "guru",
+    83→      "nama": "Guru",
+    84→      "deskripsi": "Guru mengajar",
+    85→      "status": "aktif",
+    86→      "createdAt": "2026-07-25T11:22:14.338Z",
+    87→      "updatedAt": "2026-07-25T11:22:14.338Z"
+    88→    },
+    89→    {
+    90→      "id": "cms0a4rty005woqrethr8v369",
+    91→      "slug": "wali-kelas",
+    92→      "nama": "Wali Kelas",
+    93→      "deskripsi": "Guru dengan hak tambahan wali kelas",
+    94→      "status": "aktif",
+    95→      "createdAt": "2026-07-25T11:22:14.374Z",
+    96→      "updatedAt": "2026-07-25T11:22:14.374Z"
+    97→    },
+    98→    {
+    99→      "id": "cms0a4ruf006noqrehd112m3o",
+   100→      "slug": "siswa",
+   101→      "nama": "Siswa",
+   102→      "deskripsi": "Siswa (opsional)",
+   103→      "status": "aktif",
+   104→      "createdAt": "2026-07-25T11:22:14.392Z",
+   105→      "updatedAt": "2026-07-25T11:22:14.392Z"
+   106→    },
+   107→    {
+   108→      "id": "cms0a4run006yoqreyl5qthxq",
+   109→      "slug": "orang-tua",
+   110→      "nama": "Orang Tua",
+   111→      "deskripsi": "Orang Tua (opsional)",
+   112→      "status": "aktif",
+   113→      "createdAt": "2026-07-25T11:22:14.399Z",
+   114→      "updatedAt": "2026-07-25T11:22:14.399Z"
+   115→    }
+   116→  ],
+   117→  "Permission": [
+   118→    {
+   119→      "id": "cms0a4rom0000oqree5nvmin5",
+   120→      "slug": "dashboard",
+   121→      "nama": "Dashboard",
+   122→      "kategori": "dashboard",
+   123→      "status": "aktif",
+   124→      "createdAt": "2026-07-25T11:22:14.182Z",
+   125→      "updatedAt": "2026-07-25T11:22:14.182Z"
+   126→    },
+   127→    {
+   128→      "id": "cms0a4ron0001oqre8qxnqs2e",
+   129→      "slug": "users",
+   130→      "nama": "Data User",
+   131→      "kategori": "users",
+   132→      "status": "aktif",
+   133→      "createdAt": "2026-07-25T11:22:14.183Z",
+   134→      "updatedAt": "2026-07-25T11:22:14.183Z"
+   135→    },
+   136→    {
+   137→      "id": "cms0a4rop0002oqredg4o40ca",
+   138→      "slug": "roles",
+   139→      "nama": "Manajemen Role",
+   140→      "kategori": "users",
+   141→      "status": "aktif",
+   142→      "createdAt": "2026-07-25T11:22:14.185Z",
+   143→      "updatedAt": "2026-07-25T11:22:14.185Z"
+   144→    },
+   145→    {
+   146→      "id": "cms0a4rot0003oqreduz7b8hi",
+   147→      "slug": "permissions",
+   148→      "nama": "Manajemen Permission",
+   149→      "kategori": "users",
+   150→      "status": "aktif",
+   151→      "createdAt": "2026-07-25T11:22:14.190Z",
+   152→      "updatedAt": "2026-07-25T11:22:14.190Z"
+   153→    },
+   154→    {
+   155→      "id": "cms0a4row0004oqre41li4gy2",
+   156→      "slug": "riwayat-login",
+   157→      "nama": "Riwayat Login",
+   158→      "kategori": "users",
+   159→      "status": "aktif",
+   160→      "createdAt": "2026-07-25T11:22:14.192Z",
+   161→      "updatedAt": "2026-07-25T11:22:14.192Z"
+   162→    },
+   163→    {
+   164→      "id": "cms0a4roy0005oqrech6yzsc4",
+   165→      "slug": "guru",
+   166→      "nama": "Data Guru",
+   167→      "kategori": "master",
+   168→      "status": "aktif",
+   169→      "createdAt": "2026-07-25T11:22:14.194Z",
+   170→      "updatedAt": "2026-07-25T11:22:14.194Z"
+   171→    },
+   172→    {
+   173→      "id": "cms0a4roy0006oqreyhg6w0ma",
+   174→      "slug": "guru:delete",
+   175→      "nama": "Hapus Guru",
+   176→      "kategori": "master",
+   177→      "status": "aktif",
+   178→      "createdAt": "2026-07-25T11:22:14.195Z",
+   179→      "updatedAt": "2026-07-25T11:22:14.195Z"
+   180→    },
+   181→    {
+   182→      "id": "cms0a4roz0007oqreloc8wjni",
+   183→      "slug": "siswa",
+   184→      "nama": "Data Siswa",
+   185→      "kategori": "master",
+   186→      "status": "aktif",
+   187→      "createdAt": "2026-07-25T11:22:14.196Z",
+   188→      "updatedAt": "2026-07-25T11:22:14.196Z"
+   189→    },
+   190→    {
+   191→      "id": "cms0a4rp00008oqres2tzkpc2",
+   192→      "slug": "kelas",
+   193→      "nama": "Data Kelas",
+   194→      "kategori": "master",
+   195→      "status": "aktif",
+   196→      "createdAt": "2026-07-25T11:22:14.196Z",
+   197→      "updatedAt": "2026-07-25T11:22:14.196Z"
+   198→    },
+   199→    {
+   200→      "id": "cms0a4rp00009oqrej5r94h7i",
+   201→      "slug": "mapel",
+   202→      "nama": "Mata Pelajaran",
+   203→      "kategori": "master",
+   204→      "status": "aktif",
+   205→      "createdAt": "2026-07-25T11:22:14.197Z",
+   206→      "updatedAt": "2026-07-25T11:22:14.197Z"
+   207→    },
+   208→    {
+   209→      "id": "cms0a4rp1000aoqrevo087ylr",
+   210→      "slug": "tahun-ajaran",
+   211→      "nama": "Tahun Ajaran",
+   212→      "kategori": "master",
+   213→      "status": "aktif",
+   214→      "createdAt": "2026-07-25T11:22:14.197Z",
+   215→      "updatedAt": "2026-07-25T11:22:14.197Z"
+   216→    },
+   217→    {
+   218→      "id": "cms0a4rp2000boqred3506vpf",
+   219→      "slug": "semester",
+   220→      "nama": "Semester",
+   221→      "kategori": "master",
+   222→      "status": "aktif",
+   223→      "createdAt": "2026-07-25T11:22:14.198Z",
+   224→      "updatedAt": "2026-07-25T11:22:14.198Z"
+   225→    },
+   226→    {
+   227→      "id": "cms0a4rp3000coqrev23byr1n",
+   228→      "slug": "nilai",
+   229→      "nama": "Input Nilai",
+   230→      "kategori": "nilai",
+   231→      "status": "aktif",
+   232→      "createdAt": "2026-07-25T11:22:14.200Z",
+   233→      "updatedAt": "2026-07-25T11:22:14.200Z"
+   234→    },
+   235→    {
+   236→      "id": "cms0a4rp5000doqrect2lqp8n",
+   237→      "slug": "nilai:edit",
+   238→      "nama": "Edit Nilai",
+   239→      "kategori": "nilai",
+   240→      "status": "aktif",
+   241→      "createdAt": "2026-07-25T11:22:14.201Z",
+   242→      "updatedAt": "2026-07-25T11:22:14.201Z"
+   243→    },
+   244→    {
+   245→      "id": "cms0a4rp6000eoqre2inyzewd",
+   246→      "slug": "nilai:import",
+   247→      "nama": "Import Nilai",
+   248→      "kategori": "nilai",
+   249→      "status": "aktif",
+   250→      "createdAt": "2026-07-25T11:22:14.202Z",
+   251→      "updatedAt": "2026-07-25T11:22:14.202Z"
+   252→    },
+   253→    {
+   254→      "id": "cms0a4rp7000foqreqty1hme9",
+   255→      "slug": "nilai:export",
+   256→      "nama": "Export Nilai",
+   257→      "kategori": "nilai",
+   258→      "status": "aktif",
+   259→      "createdAt": "2026-07-25T11:22:14.203Z",
+   260→      "updatedAt": "2026-07-25T11:22:14.203Z"
+   261→    },
+   262→    {
+   263→      "id": "cms0a4rp7000goqrejedutnou",
+   264→      "slug": "rekap-nilai",
+   265→      "nama": "Rekap Nilai",
+   266→      "kategori": "nilai",
+   267→      "status": "aktif",
+   268→      "createdAt": "2026-07-25T11:22:14.204Z",
+   269→      "updatedAt": "2026-07-25T11:22:14.204Z"
+   270→    },
+   271→    {
+   272→      "id": "cms0a4rp8000hoqreyt8uzw4n",
+   273→      "slug": "absensi-guru",
+   274→      "nama": "Absensi Guru",
+   275→      "kategori": "absensi",
+   276→      "status": "aktif",
+   277→      "createdAt": "2026-07-25T11:22:14.204Z",
+   278→      "updatedAt": "2026-07-25T11:22:14.204Z"
+   279→    },
+   280→    {
+   281→      "id": "cms0a4rp8000ioqre70ht783h",
+   282→      "slug": "absensi-guru:clock-in",
+   283→      "nama": "Absen Masuk",
+   284→      "kategori": "absensi",
+   285→      "status": "aktif",
+   286→      "createdAt": "2026-07-25T11:22:14.205Z",
+   287→      "updatedAt": "2026-07-25T11:22:14.205Z"
+   288→    },
+   289→    {
+   290→      "id": "cms0a4rp9000joqreepqxpzwi",
+   291→      "slug": "absensi-guru:clock-out",
+   292→      "nama": "Absen Pulang",
+   293→      "kategori": "absensi",
+   294→      "status": "aktif",
+   295→      "createdAt": "2026-07-25T11:22:14.205Z",
+   296→      "updatedAt": "2026-07-25T11:22:14.205Z"
+   297→    },
+   298→    {
+   299→      "id": "cms0a4rp9000koqre48cc96ky",
+   300→      "slug": "absensi-siswa",
+   301→      "nama": "Absensi Siswa",
+   302→      "kategori": "absensi",
+   303→      "status": "aktif",
+   304→      "createdAt": "2026-07-25T11:22:14.206Z",
+   305→      "updatedAt": "2026-07-25T11:22:14.206Z"
+   306→    },
+   307→    {
+   308→      "id": "cms0a4rpa000loqre2jpjli87",
+   309→      "slug": "pengumuman",
+   310→      "nama": "Lihat Pengumuman",
+   311→      "kategori": "pengumuman",
+   312→      "status": "aktif",
+   313→      "createdAt": "2026-07-25T11:22:14.206Z",
+   314→      "updatedAt": "2026-07-25T11:22:14.206Z"
+   315→    },
+   316→    {
+   317→      "id": "cms0a4rpa000moqregnwpmv33",
+   318→      "slug": "pengumuman:manage",
+   319→      "nama": "Kelola Pengumuman",
+   320→      "kategori": "pengumuman",
+   321→      "status": "aktif",
+   322→      "createdAt": "2026-07-25T11:22:14.207Z",
+   323→      "updatedAt": "2026-07-25T11:22:14.207Z"
+   324→    },
+   325→    {
+   326→      "id": "cms0a4rpb000noqreeczeapmu",
+   327→      "slug": "laporan",
+   328→      "nama": "Laporan",
+   329→      "kategori": "laporan",
+   330→      "status": "aktif",
+   331→      "createdAt": "2026-07-25T11:22:14.207Z",
+   332→      "updatedAt": "2026-07-25T11:22:14.207Z"
+   333→    },
+   334→    {
+   335→      "id": "cms0a4rpb000ooqre3915tno2",
+   336→      "slug": "laporan:export",
+   337→      "nama": "Export Laporan",
+   338→      "kategori": "laporan",
+   339→      "status": "aktif",
+   340→      "createdAt": "2026-07-25T11:22:14.208Z",
+   341→      "updatedAt": "2026-07-25T11:22:14.208Z"
+   342→    },
+   343→    {
+   344→      "id": "cms0a4rpc000poqrekuhqw769",
+   345→      "slug": "audit-log",
+   346→      "nama": "Audit Log",
+   347→      "kategori": "sistem",
+   348→      "status": "aktif",
+   349→      "createdAt": "2026-07-25T11:22:14.208Z",
+   350→      "updatedAt": "2026-07-25T11:22:14.208Z"
+   351→    },
+   352→    {
+   353→      "id": "cms0a4rpd000qoqreyvvv8zci",
+   354→      "slug": "backup",
+   355→      "nama": "Backup",
+   356→      "kategori": "sistem",
+   357→      "status": "aktif",
+   358→      "createdAt": "2026-07-25T11:22:14.209Z",
+   359→      "updatedAt": "2026-07-25T11:22:14.209Z"
+   360→    },
+   361→    {
+   362→      "id": "cms0a4rpe000roqreunhdvmut",
+   363→      "slug": "restore",
+   364→      "nama": "Restore",
+   365→      "kategori": "sistem",
+   366→      "status": "aktif",
+   367→      "createdAt": "2026-07-25T11:22:14.210Z",
+   368→      "updatedAt": "2026-07-25T11:22:14.210Z"
+   369→    },
+   370→    {
+   371→      "id": "cms0a4rpe000soqreujhq5zn3",
+   372→      "slug": "pengaturan",
+   373→      "nama": "Pengaturan",
+   374→      "kategori": "sistem",
+   375→      "status": "aktif",
+   376→      "createdAt": "2026-07-25T11:22:14.211Z",
+   377→      "updatedAt": "2026-07-25T11:22:14.211Z"
+   378→    },
+   379→    {
+   380→      "id": "cms0a4rpf000toqrea5tjujgq",
+   381→      "slug": "manajemen-sekolah",
+   382→      "nama": "Manajemen Sekolah",
+   383→      "kategori": "sistem",
+   384→      "status": "aktif",
+   385→      "createdAt": "2026-07-25T11:22:14.211Z",
+   386→      "updatedAt": "2026-07-25T11:22:14.211Z"
+   387→    },
+   388→    {
+   389→      "id": "cms0a4rpg000uoqretgh9omzc",
+   390→      "slug": "profil",
+   391→      "nama": "Profil",
+   392→      "kategori": "profil",
+   393→      "status": "aktif",
+   394→      "createdAt": "2026-07-25T11:22:14.212Z",
+   395→      "updatedAt": "2026-07-25T11:22:14.212Z"
+   396→    },
+   397→    {
+   398→      "id": "cms0a4rph000voqre3cbslofu",
+   399→      "slug": "import-data",
+   400→      "nama": "Import Data",
+   401→      "kategori": "data",
+   402→      "status": "aktif",
+   403→      "createdAt": "2026-07-25T11:22:14.213Z",
+   404→      "updatedAt": "2026-07-25T11:22:14.213Z"
+   405→    },
+   406→    {
+   407→      "id": "cms0a4rpi000woqren59wy284",
+   408→      "slug": "export-data",
+   409→      "nama": "Export Data",
+   410→      "kategori": "data",
+   411→      "status": "aktif",
+   412→      "createdAt": "2026-07-25T11:22:14.214Z",
+   413→      "updatedAt": "2026-07-25T11:22:14.214Z"
+   414→    },
+   415→    {
+   416→      "id": "cms0a4rpi000xoqrer3hci9fl",
+   417→      "slug": "cetak-dokumen",
+   418→      "nama": "Cetak Dokumen",
+   419→      "kategori": "data",
+   420→      "status": "aktif",
+   421→      "createdAt": "2026-07-25T11:22:14.215Z",
+   422→      "updatedAt": "2026-07-25T11:22:14.215Z"
+   423→    },
+   424→    {
+   425→      "id": "cms0a4rpj000yoqre0o8zc6yu",
+   426→      "slug": "wildcard-all",
+   427→      "nama": "Akses Penuh (Super Admin)",
+   428→      "kategori": "sistem",
+   429→      "status": "aktif",
+   430→      "createdAt": "2026-07-25T11:22:14.216Z",
+   431→      "updatedAt": "2026-07-25T11:22:14.216Z"
+   432→    }
+   433→  ],
+   434→  "RolePermission": [
+   435→    {
+   436→      "id": "cms0a4rpn0011oqre40g83bnn",
+   437→      "roleId": "cms0a4rpl000zoqreosxvvhnr",
+   438→      "permissionId": "cms0a4rpj000yoqre0o8zc6yu",
+   439→      "createdAt": "2026-07-25T11:22:14.220Z"
+   440→    },
+   441→    {
+   442→      "id": "cms0a4rpq0014oqre4qyv19yq",
+   443→      "roleId": "cms0a4rpo0012oqre8nqfkmsu",
+   444→      "permissionId": "cms0a4rom0000oqree5nvmin5",
+   445→      "createdAt": "2026-07-25T11:22:14.222Z"
+   446→    },
+   447→    {
+   448→      "id": "cms0a4rpr0016oqre97yivgqm",
+   449→      "roleId": "cms0a4rpo0012oqre8nqfkmsu",
+   450→      "permissionId": "cms0a4ron0001oqre8qxnqs2e",
+   451→      "createdAt": "2026-07-25T11:22:14.223Z"
+   452→    },
+   453→    {
+   454→      "id": "cms0a4rps0018oqreq33ooflk",
+   455→      "roleId": "cms0a4rpo0012oqre8nqfkmsu",
+   456→      "permissionId": "cms0a4row0004oqre41li4gy2",
+   457→      "createdAt": "2026-07-25T11:22:14.224Z"
+   458→    },
+   459→    {
+   460→      "id": "cms0a4rps001aoqresq0ypesj",
+   461→      "roleId": "cms0a4rpo0012oqre8nqfkmsu",
+   462→      "permissionId": "cms0a4roy0005oqrech6yzsc4",
+   463→      "createdAt": "2026-07-25T11:22:14.225Z"
+   464→    },
+   465→    {
+   466→      "id": "cms0a4rpu001coqre5ntw4fii",
+   467→      "roleId": "cms0a4rpo0012oqre8nqfkmsu",
+   468→      "permissionId": "cms0a4roz0007oqreloc8wjni",
+   469→      "createdAt": "2026-07-25T11:22:14.226Z"
+   470→    },
+   471→    {
+   472→      "id": "cms0a4rpv001eoqred5tgxiq4",
+   473→      "roleId": "cms0a4rpo0012oqre8nqfkmsu",
+   474→      "permissionId": "cms0a4rp00008oqres2tzkpc2",
+   475→      "createdAt": "2026-07-25T11:22:14.227Z"
+   476→    },
+   477→    {
+   478→      "id": "cms0a4rpw001goqre962jsaxv",
+   479→      "roleId": "cms0a4rpo0012oqre8nqfkmsu",
+   480→      "permissionId": "cms0a4rp00009oqrej5r94h7i",
+   481→      "createdAt": "2026-07-25T11:22:14.229Z"
+   482→    },
+   483→    {
+   484→      "id": "cms0a4rpy001ioqreqss2yo30",
+   485→      "roleId": "cms0a4rpo0012oqre8nqfkmsu",
+   486→      "permissionId": "cms0a4rp1000aoqrevo087ylr",
+   487→      "createdAt": "2026-07-25T11:22:14.230Z"
+   488→    },
+   489→    {
+   490→      "id": "cms0a4rpy001koqre8opclbh4",
+   491→      "roleId": "cms0a4rpo0012oqre8nqfkmsu",
+   492→      "permissionId": "cms0a4rp2000boqred3506vpf",
+   493→      "createdAt": "2026-07-25T11:22:14.231Z"
+   494→    },
+   495→    {
+   496→      "id": "cms0a4rpz001moqrexep3misp",
+   497→      "roleId": "cms0a4rpo0012oqre8nqfkmsu",
+   498→      "permissionId": "cms0a4rp3000coqrev23byr1n",
+   499→      "createdAt": "2026-07-25T11:22:14.232Z"
+   500→    },
+   501→    {
+   502→      "id": "cms0a4rq1001ooqre3bqeijzb",
+   503→      "roleId": "cms0a4rpo0012oqre8nqfkmsu",
+   504→      "permissionId": "cms0a4rp5000doqrect2lqp8n",
+   505→      "createdAt": "2026-07-25T11:22:14.233Z"
+   506→    },
+   507→    {
+   508→      "id": "cms0a4rq2001qoqre2k7rko1v",
+   509→      "roleId": "cms0a4rpo0012oqre8nqfkmsu",
+   510→      "permissionId": "cms0a4rp6000eoqre2inyzewd",
+   511→      "createdAt": "2026-07-25T11:22:14.234Z"
+   512→    },
+   513→    {
+   514→      "id": "cms0a4rq3001soqredbl53jn2",
+   515→      "roleId": "cms0a4rpo0012oqre8nqfkmsu",
+   516→      "permissionId": "cms0a4rp7000foqreqty1hme9",
+   517→      "createdAt": "2026-07-25T11:22:14.235Z"
+   518→    },
+   519→    {
+   520→      "id": "cms0a4rq4001uoqre8i3blvzy",
+   521→      "roleId": "cms0a4rpo0012oqre8nqfkmsu",
+   522→      "permissionId": "cms0a4rp7000goqrejedutnou",
+   523→      "createdAt": "2026-07-25T11:22:14.237Z"
+   524→    },
+   525→    {
+   526→      "id": "cms0a4rq5001woqre3aslrl7p",
+   527→      "roleId": "cms0a4rpo0012oqre8nqfkmsu",
+   528→      "permissionId": "cms0a4rp8000hoqreyt8uzw4n",
+   529→      "createdAt": "2026-07-25T11:22:14.238Z"
+   530→    },
+   531→    {
+   532→      "id": "cms0a4rq6001yoqreb3xs4tcc",
+   533→      "roleId": "cms0a4rpo0012oqre8nqfkmsu",
+   534→      "permissionId": "cms0a4rp9000koqre48cc96ky",
+   535→      "createdAt": "2026-07-25T11:22:14.239Z"
+   536→    },
+   537→    {
+   538→      "id": "cms0a4rq70020oqreycm6ugyo",
+   539→      "roleId": "cms0a4rpo0012oqre8nqfkmsu",
+   540→      "permissionId": "cms0a4rpa000loqre2jpjli87",
+   541→      "createdAt": "2026-07-25T11:22:14.240Z"
+   542→    },
+   543→    {
+   544→      "id": "cms0a4rq80022oqrexis01z4n",
+   545→      "roleId": "cms0a4rpo0012oqre8nqfkmsu",
+   546→      "permissionId": "cms0a4rpa000moqregnwpmv33",
+   547→      "createdAt": "2026-07-25T11:22:14.241Z"
+   548→    },
+   549→    {
+   550→      "id": "cms0a4rq90024oqre7ke7395a",
+   551→      "roleId": "cms0a4rpo0012oqre8nqfkmsu",
+   552→      "permissionId": "cms0a4rpb000noqreeczeapmu",
+   553→      "createdAt": "2026-07-25T11:22:14.242Z"
+   554→    },
+   555→    {
+   556→      "id": "cms0a4rqa0026oqreeewcr3tt",
+   557→      "roleId": "cms0a4rpo0012oqre8nqfkmsu",
+   558→      "permissionId": "cms0a4rpb000ooqre3915tno2",
+   559→      "createdAt": "2026-07-25T11:22:14.243Z"
+   560→    },
+   561→    {
+   562→      "id": "cms0a4rqe0028oqre49c4i1sh",
+   563→      "roleId": "cms0a4rpo0012oqre8nqfkmsu",
+   564→      "permissionId": "cms0a4rpd000qoqreyvvv8zci",
+   565→      "createdAt": "2026-07-25T11:22:14.246Z"
+   566→    },
+   567→    {
+   568→      "id": "cms0a4rqf002aoqrem143hk13",
+   569→      "roleId": "cms0a4rpo0012oqre8nqfkmsu",
+   570→      "permissionId": "cms0a4rpe000roqreunhdvmut",
+   571→      "createdAt": "2026-07-25T11:22:14.247Z"
+   572→    },
+   573→    {
+   574→      "id": "cms0a4rqh002coqreo6ott7pe",
+   575→      "roleId": "cms0a4rpo0012oqre8nqfkmsu",
+   576→      "permissionId": "cms0a4rpe000soqreujhq5zn3",
+   577→      "createdAt": "2026-07-25T11:22:14.249Z"
+   578→    },
+   579→    {
+   580→      "id": "cms0a4rqi002eoqrepugqneaw",
+   581→      "roleId": "cms0a4rpo0012oqre8nqfkmsu",
+   582→      "permissionId": "cms0a4rpf000toqrea5tjujgq",
+   583→      "createdAt": "2026-07-25T11:22:14.250Z"
+   584→    },
+   585→    {
+   586→      "id": "cms0a4rqj002goqremfxhwzfu",
+   587→      "roleId": "cms0a4rpo0012oqre8nqfkmsu",
+   588→      "permissionId": "cms0a4rph000voqre3cbslofu",
+   589→      "createdAt": "2026-07-25T11:22:14.252Z"
+   590→    },
+   591→    {
+   592→      "id": "cms0a4rqk002ioqrezrbbl5a3",
+   593→      "roleId": "cms0a4rpo0012oqre8nqfkmsu",
+   594→      "permissionId": "cms0a4rpi000woqren59wy284",
+   595→      "createdAt": "2026-07-25T11:22:14.253Z"
+   596→    },
+   597→    {
+   598→      "id": "cms0a4rql002koqreh6kbuyy9",
+   599→      "roleId": "cms0a4rpo0012oqre8nqfkmsu",
+   600→      "permissionId": "cms0a4rpi000xoqrer3hci9fl",
+   601→      "createdAt": "2026-07-25T11:22:14.254Z"
+   602→    },
+   603→    {
+   604→      "id": "cms0a4rqm002moqre3jf94slm",
+   605→      "roleId": "cms0a4rpo0012oqre8nqfkmsu",
+   606→      "permissionId": "cms0a4rpg000uoqretgh9omzc",
+   607→      "createdAt": "2026-07-25T11:22:14.255Z"
+   608→    },
+   609→    {
+   610→      "id": "cms0a4rqo002poqrew0vxyxeb",
+   611→      "roleId": "cms0a4rqn002noqre3k7wuv52",
+   612→      "permissionId": "cms0a4rom0000oqree5nvmin5",
+   613→      "createdAt": "2026-07-25T11:22:14.257Z"
+   614→    },
+   615→    {
+   616→      "id": "cms0a4rr6002roqrednin3868",
+   617→      "roleId": "cms0a4rqn002noqre3k7wuv52",
+   618→      "permissionId": "cms0a4roy0005oqrech6yzsc4",
+   619→      "createdAt": "2026-07-25T11:22:14.275Z"
+   620→    },
+   621→    {
+   622→      "id": "cms0a4rr8002toqrevrvaewqe",
+   623→      "roleId": "cms0a4rqn002noqre3k7wuv52",
+   624→      "permissionId": "cms0a4roz0007oqreloc8wjni",
+   625→      "createdAt": "2026-07-25T11:22:14.277Z"
+   626→    },
+   627→    {
+   628→      "id": "cms0a4rr9002voqrey9e6r8wq",
+   629→      "roleId": "cms0a4rqn002noqre3k7wuv52",
+   630→      "permissionId": "cms0a4rph000voqre3cbslofu",
+   631→      "createdAt": "2026-07-25T11:22:14.278Z"
+   632→    },
+   633→    {
+   634→      "id": "cms0a4rrb002xoqre9wxq483v",
+   635→      "roleId": "cms0a4rqn002noqre3k7wuv52",
+   636→      "permissionId": "cms0a4rpi000woqren59wy284",
+   637→      "createdAt": "2026-07-25T11:22:14.279Z"
+   638→    },
+   639→    {
+   640→      "id": "cms0a4rrc002zoqreijsi9jty",
+   641→      "roleId": "cms0a4rqn002noqre3k7wuv52",
+   642→      "permissionId": "cms0a4rpa000loqre2jpjli87",
+   643→      "createdAt": "2026-07-25T11:22:14.281Z"
+   644→    },
+   645→    {
+   646→      "id": "cms0a4rrd0031oqrelhg0hq97",
+   647→      "roleId": "cms0a4rqn002noqre3k7wuv52",
+   648→      "permissionId": "cms0a4rpa000moqregnwpmv33",
+   649→      "createdAt": "2026-07-25T11:22:14.281Z"
+   650→    },
+   651→    {
+   652→      "id": "cms0a4rre0033oqrethftyujb",
+   653→      "roleId": "cms0a4rqn002noqre3k7wuv52",
+   654→      "permissionId": "cms0a4rpb000noqreeczeapmu",
+   655→      "createdAt": "2026-07-25T11:22:14.283Z"
+   656→    },
+   657→    {
+   658→      "id": "cms0a4rrg0035oqre1q93dh8w",
+   659→      "roleId": "cms0a4rqn002noqre3k7wuv52",
+   660→      "permissionId": "cms0a4rpb000ooqre3915tno2",
+   661→      "createdAt": "2026-07-25T11:22:14.284Z"
+   662→    },
+   663→    {
+   664→      "id": "cms0a4rrh0037oqrefdrazwga",
+   665→      "roleId": "cms0a4rqn002noqre3k7wuv52",
+   666→      "permissionId": "cms0a4rpg000uoqretgh9omzc",
+   667→      "createdAt": "2026-07-25T11:22:14.285Z"
+   668→    },
+   669→    {
+   670→      "id": "cms0a4rrk003aoqrexb3fkkjq",
+   671→      "roleId": "cms0a4rri0038oqrejlxnfc1m",
+   672→      "permissionId": "cms0a4rom0000oqree5nvmin5",
+   673→      "createdAt": "2026-07-25T11:22:14.288Z"
+   674→    },
+   675→    {
+   676→      "id": "cms0a4rrm003coqre5rrg0ycd",
+   677→      "roleId": "cms0a4rri0038oqrejlxnfc1m",
+   678→      "permissionId": "cms0a4roy0005oqrech6yzsc4",
+   679→      "createdAt": "2026-07-25T11:22:14.290Z"
+   680→    },
+   681→    {
+   682→      "id": "cms0a4rro003eoqrevpbabzb9",
+   683→      "roleId": "cms0a4rri0038oqrejlxnfc1m",
+   684→      "permissionId": "cms0a4roz0007oqreloc8wjni",
+   685→      "createdAt": "2026-07-25T11:22:14.292Z"
+   686→    },
+   687→    {
+   688→      "id": "cms0a4rrp003goqrek2jvusbu",
+   689→      "roleId": "cms0a4rri0038oqrejlxnfc1m",
+   690→      "permissionId": "cms0a4rp3000coqrev23byr1n",
+   691→      "createdAt": "2026-07-25T11:22:14.294Z"
+   692→    },
+   693→    {
+   694→      "id": "cms0a4rrr003ioqre3qwxk9x4",
+   695→      "roleId": "cms0a4rri0038oqrejlxnfc1m",
+   696→      "permissionId": "cms0a4rp7000goqrejedutnou",
+   697→      "createdAt": "2026-07-25T11:22:14.295Z"
+   698→    },
+   699→    {
+   700→      "id": "cms0a4rrs003koqrez7a4lrx1",
+   701→      "roleId": "cms0a4rri0038oqrejlxnfc1m",
+   702→      "permissionId": "cms0a4rp8000hoqreyt8uzw4n",
+   703→      "createdAt": "2026-07-25T11:22:14.296Z"
+   704→    },
+   705→    {
+   706→      "id": "cms0a4rrt003moqref2clbd0c",
+   707→      "roleId": "cms0a4rri0038oqrejlxnfc1m",
+   708→      "permissionId": "cms0a4rp9000koqre48cc96ky",
+   709→      "createdAt": "2026-07-25T11:22:14.298Z"
+   710→    },
+   711→    {
+   712→      "id": "cms0a4rru003ooqre3gj8oz2d",
+   713→      "roleId": "cms0a4rri0038oqrejlxnfc1m",
+   714→      "permissionId": "cms0a4rpa000loqre2jpjli87",
+   715→      "createdAt": "2026-07-25T11:22:14.299Z"
+   716→    },
+   717→    {
+   718→      "id": "cms0a4rry003qoqrehhwja37r",
+   719→      "roleId": "cms0a4rri0038oqrejlxnfc1m",
+   720→      "permissionId": "cms0a4rpb000noqreeczeapmu",
+   721→      "createdAt": "2026-07-25T11:22:14.303Z"
+   722→    },
+   723→    {
+   724→      "id": "cms0a4rs0003soqremd52pu2f",
+   725→      "roleId": "cms0a4rri0038oqrejlxnfc1m",
+   726→      "permissionId": "cms0a4rpb000ooqre3915tno2",
+   727→      "createdAt": "2026-07-25T11:22:14.304Z"
+   728→    },
+   729→    {
+   730→      "id": "cms0a4rs2003uoqreih8xli82",
+   731→      "roleId": "cms0a4rri0038oqrejlxnfc1m",
+   732→      "permissionId": "cms0a4rpi000xoqrer3hci9fl",
+   733→      "createdAt": "2026-07-25T11:22:14.306Z"
+   734→    },
+   735→    {
+   736→      "id": "cms0a4rs3003woqresjoyfxr8",
+   737→      "roleId": "cms0a4rri0038oqrejlxnfc1m",
+   738→      "permissionId": "cms0a4rpg000uoqretgh9omzc",
+   739→      "createdAt": "2026-07-25T11:22:14.308Z"
+   740→    },
+   741→    {
+   742→      "id": "cms0a4rs5003zoqre7app3q8d",
+   743→      "roleId": "cms0a4rs4003xoqrextrwgv51",
+   744→      "permissionId": "cms0a4rom0000oqree5nvmin5",
+   745→      "createdAt": "2026-07-25T11:22:14.309Z"
+   746→    },
+   747→    {
+   748→      "id": "cms0a4rs60041oqreyfpceuiq",
+   749→      "roleId": "cms0a4rs4003xoqrextrwgv51",
+   750→      "permissionId": "cms0a4roy0005oqrech6yzsc4",
+   751→      "createdAt": "2026-07-25T11:22:14.311Z"
+   752→    },
+   753→    {
+   754→      "id": "cms0a4rs80043oqrey70c7pok",
+   755→      "roleId": "cms0a4rs4003xoqrextrwgv51",
+   756→      "permissionId": "cms0a4roz0007oqreloc8wjni",
+   757→      "createdAt": "2026-07-25T11:22:14.312Z"
+   758→    },
+   759→    {
+   760→      "id": "cms0a4rs90045oqrebvyq7su2",
+   761→      "roleId": "cms0a4rs4003xoqrextrwgv51",
+   762→      "permissionId": "cms0a4rp3000coqrev23byr1n",
+   763→      "createdAt": "2026-07-25T11:22:14.313Z"
+   764→    },
+   765→    {
+   766→      "id": "cms0a4rsa0047oqrez786c0e7",
+   767→      "roleId": "cms0a4rs4003xoqrextrwgv51",
+   768→      "permissionId": "cms0a4rp7000goqrejedutnou",
+   769→      "createdAt": "2026-07-25T11:22:14.314Z"
+   770→    },
+   771→    {
+   772→      "id": "cms0a4rsb0049oqretz9pfskx",
+   773→      "roleId": "cms0a4rs4003xoqrextrwgv51",
+   774→      "permissionId": "cms0a4rp8000hoqreyt8uzw4n",
+   775→      "createdAt": "2026-07-25T11:22:14.315Z"
+   776→    },
+   777→    {
+   778→      "id": "cms0a4rsb004boqre8peadjgn",
+   779→      "roleId": "cms0a4rs4003xoqrextrwgv51",
+   780→      "permissionId": "cms0a4rp9000koqre48cc96ky",
+   781→      "createdAt": "2026-07-25T11:22:14.316Z"
+   782→    },
+   783→    {
+   784→      "id": "cms0a4rsd004doqrevod0xwe6",
+   785→      "roleId": "cms0a4rs4003xoqrextrwgv51",
+   786→      "permissionId": "cms0a4rpa000loqre2jpjli87",
+   787→      "createdAt": "2026-07-25T11:22:14.317Z"
+   788→    },
+   789→    {
+   790→      "id": "cms0a4rse004foqreqqy94epj",
+   791→      "roleId": "cms0a4rs4003xoqrextrwgv51",
+   792→      "permissionId": "cms0a4rpa000moqregnwpmv33",
+   793→      "createdAt": "2026-07-25T11:22:14.319Z"
+   794→    },
+   795→    {
+   796→      "id": "cms0a4rsg004hoqrexqr0fj3x",
+   797→      "roleId": "cms0a4rs4003xoqrextrwgv51",
+   798→      "permissionId": "cms0a4rpb000noqreeczeapmu",
+   799→      "createdAt": "2026-07-25T11:22:14.320Z"
+   800→    },
+   801→    {
+   802→      "id": "cms0a4rsi004joqresh5bjrwx",
+   803→      "roleId": "cms0a4rs4003xoqrextrwgv51",
+   804→      "permissionId": "cms0a4rpb000ooqre3915tno2",
+   805→      "createdAt": "2026-07-25T11:22:14.322Z"
+   806→    },
+   807→    {
+   808→      "id": "cms0a4rsj004loqreq3jqonwh",
+   809→      "roleId": "cms0a4rs4003xoqrextrwgv51",
+   810→      "permissionId": "cms0a4rpi000xoqrer3hci9fl",
+   811→      "createdAt": "2026-07-25T11:22:14.323Z"
+   812→    },
+   813→    {
+   814→      "id": "cms0a4rsl004noqre7qiodax8",
+   815→      "roleId": "cms0a4rs4003xoqrextrwgv51",
+   816→      "permissionId": "cms0a4rpg000uoqretgh9omzc",
+   817→      "createdAt": "2026-07-25T11:22:14.326Z"
+   818→    },
+   819→    {
+   820→      "id": "cms0a4rsn004qoqre4ti8agsb",
+   821→      "roleId": "cms0a4rsm004ooqresucpvkix",
+   822→      "permissionId": "cms0a4rom0000oqree5nvmin5",
+   823→      "createdAt": "2026-07-25T11:22:14.328Z"
+   824→    },
+   825→    {
+   826→      "id": "cms0a4rso004soqrew1d2jift",
+   827→      "roleId": "cms0a4rsm004ooqresucpvkix",
+   828→      "permissionId": "cms0a4roy0005oqrech6yzsc4",
+   829→      "createdAt": "2026-07-25T11:22:14.329Z"
+   830→    },
+   831→    {
+   832→      "id": "cms0a4rsq004uoqreo879obxa",
+   833→      "roleId": "cms0a4rsm004ooqresucpvkix",
+   834→      "permissionId": "cms0a4roz0007oqreloc8wjni",
+   835→      "createdAt": "2026-07-25T11:22:14.330Z"
+   836→    },
+   837→    {
+   838→      "id": "cms0a4rsr004woqre5djizw7y",
+   839→      "roleId": "cms0a4rsm004ooqresucpvkix",
+   840→      "permissionId": "cms0a4rph000voqre3cbslofu",
+   841→      "createdAt": "2026-07-25T11:22:14.331Z"
+   842→    },
+   843→    {
+   844→      "id": "cms0a4rss004yoqre8ehutiqd",
+   845→      "roleId": "cms0a4rsm004ooqresucpvkix",
+   846→      "permissionId": "cms0a4rpi000woqren59wy284",
+   847→      "createdAt": "2026-07-25T11:22:14.332Z"
+   848→    },
+   849→    {
+   850→      "id": "cms0a4rst0050oqreng3y8zmm",
+   851→      "roleId": "cms0a4rsm004ooqresucpvkix",
+   852→      "permissionId": "cms0a4rpi000xoqrer3hci9fl",
+   853→      "createdAt": "2026-07-25T11:22:14.333Z"
+   854→    },
+   855→    {
+   856→      "id": "cms0a4rsu0052oqre1q37rfjf",
+   857→      "roleId": "cms0a4rsm004ooqresucpvkix",
+   858→      "permissionId": "cms0a4rpa000loqre2jpjli87",
+   859→      "createdAt": "2026-07-25T11:22:14.335Z"
+   860→    },
+   861→    {
+   862→      "id": "cms0a4rsw0054oqreen7tr2hj",
+   863→      "roleId": "cms0a4rsm004ooqresucpvkix",
+   864→      "permissionId": "cms0a4rpa000moqregnwpmv33",
+   865→      "createdAt": "2026-07-25T11:22:14.336Z"
+   866→    },
+   867→    {
+   868→      "id": "cms0a4rsx0056oqredamwd1hq",
+   869→      "roleId": "cms0a4rsm004ooqresucpvkix",
+   870→      "permissionId": "cms0a4rpg000uoqretgh9omzc",
+   871→      "createdAt": "2026-07-25T11:22:14.337Z"
+   872→    },
+   873→    {
+   874→      "id": "cms0a4rsz0059oqrewvzocxc9",
+   875→      "roleId": "cms0a4rsy0057oqreh7a100h3",
+   876→      "permissionId": "cms0a4rom0000oqree5nvmin5",
+   877→      "createdAt": "2026-07-25T11:22:14.339Z"
+   878→    },
+   879→    {
+   880→      "id": "cms0a4rt0005boqre41xzrtja",
+   881→      "roleId": "cms0a4rsy0057oqreh7a100h3",
+   882→      "permissionId": "cms0a4rp8000hoqreyt8uzw4n",
+   883→      "createdAt": "2026-07-25T11:22:14.340Z"
+   884→    },
+   885→    {
+   886→      "id": "cms0a4rt2005doqrecnmnrlxj",
+   887→      "roleId": "cms0a4rsy0057oqreh7a100h3",
+   888→      "permissionId": "cms0a4rp8000ioqre70ht783h",
+   889→      "createdAt": "2026-07-25T11:22:14.342Z"
+   890→    },
+   891→    {
+   892→      "id": "cms0a4rt3005foqre5zmpgikr",
+   893→      "roleId": "cms0a4rsy0057oqreh7a100h3",
+   894→      "permissionId": "cms0a4rp9000joqreepqxpzwi",
+   895→      "createdAt": "2026-07-25T11:22:14.344Z"
+   896→    },
+   897→    {
+   898→      "id": "cms0a4rt5005hoqrew3vseg9a",
+   899→      "roleId": "cms0a4rsy0057oqreh7a100h3",
+   900→      "permissionId": "cms0a4rp9000koqre48cc96ky",
+   901→      "createdAt": "2026-07-25T11:22:14.345Z"
+   902→    },
+   903→    {
+   904→      "id": "cms0a4rt6005joqres5nip2d7",
+   905→      "roleId": "cms0a4rsy0057oqreh7a100h3",
+   906→      "permissionId": "cms0a4rp3000coqrev23byr1n",
+   907→      "createdAt": "2026-07-25T11:22:14.346Z"
+   908→    },
+   909→    {
+   910→      "id": "cms0a4rt7005loqre8jar40rk",
+   911→      "roleId": "cms0a4rsy0057oqreh7a100h3",
+   912→      "permissionId": "cms0a4rp5000doqrect2lqp8n",
+   913→      "createdAt": "2026-07-25T11:22:14.348Z"
+   914→    },
+   915→    {
+   916→      "id": "cms0a4rt8005noqreaub650l7",
+   917→      "roleId": "cms0a4rsy0057oqreh7a100h3",
+   918→      "permissionId": "cms0a4rp6000eoqre2inyzewd",
+   919→      "createdAt": "2026-07-25T11:22:14.349Z"
+   920→    },
+   921→    {
+   922→      "id": "cms0a4rta005poqreswzsgyh7",
+   923→      "roleId": "cms0a4rsy0057oqreh7a100h3",
+   924→      "permissionId": "cms0a4rp7000foqreqty1hme9",
+   925→      "createdAt": "2026-07-25T11:22:14.350Z"
+   926→    },
+   927→    {
+   928→      "id": "cms0a4rtb005roqreo3rldkpo",
+   929→      "roleId": "cms0a4rsy0057oqreh7a100h3",
+   930→      "permissionId": "cms0a4rp7000goqrejedutnou",
+   931→      "createdAt": "2026-07-25T11:22:14.351Z"
+   932→    },
+   933→    {
+   934→      "id": "cms0a4rtc005toqrelpa738jt",
+   935→      "roleId": "cms0a4rsy0057oqreh7a100h3",
+   936→      "permissionId": "cms0a4rpa000loqre2jpjli87",
+   937→      "createdAt": "2026-07-25T11:22:14.352Z"
+   938→    },
+   939→    {
+   940→      "id": "cms0a4rtx005voqre7ilaa1wc",
+   941→      "roleId": "cms0a4rsy0057oqreh7a100h3",
+   942→      "permissionId": "cms0a4rpg000uoqretgh9omzc",
+   943→      "createdAt": "2026-07-25T11:22:14.373Z"
+   944→    },
+   945→    {
+   946→      "id": "cms0a4rtz005yoqrexh82dfpf",
+   947→      "roleId": "cms0a4rty005woqrethr8v369",
+   948→      "permissionId": "cms0a4rom0000oqree5nvmin5",
+   949→      "createdAt": "2026-07-25T11:22:14.376Z"
+   950→    },
+   951→    {
+   952→      "id": "cms0a4ru00060oqrem4cl8w10",
+   953→      "roleId": "cms0a4rty005woqrethr8v369",
+   954→      "permissionId": "cms0a4rp8000hoqreyt8uzw4n",
+   955→      "createdAt": "2026-07-25T11:22:14.377Z"
+   956→    },
+   957→    {
+   958→      "id": "cms0a4ru20062oqrepe5ugyay",
+   959→      "roleId": "cms0a4rty005woqrethr8v369",
+   960→      "permissionId": "cms0a4rp8000ioqre70ht783h",
+   961→      "createdAt": "2026-07-25T11:22:14.378Z"
+   962→    },
+   963→    {
+   964→      "id": "cms0a4ru30064oqresgqxwpms",
+   965→      "roleId": "cms0a4rty005woqrethr8v369",
+   966→      "permissionId": "cms0a4rp9000joqreepqxpzwi",
+   967→      "createdAt": "2026-07-25T11:22:14.379Z"
+   968→    },
+   969→    {
+   970→      "id": "cms0a4ru40066oqrekamqw2w1",
+   971→      "roleId": "cms0a4rty005woqrethr8v369",
+   972→      "permissionId": "cms0a4rp9000koqre48cc96ky",
+   973→      "createdAt": "2026-07-25T11:22:14.380Z"
+   974→    },
+   975→    {
+   976→      "id": "cms0a4ru50068oqrepeuriv6n",
+   977→      "roleId": "cms0a4rty005woqrethr8v369",
+   978→      "permissionId": "cms0a4rp3000coqrev23byr1n",
+   979→      "createdAt": "2026-07-25T11:22:14.382Z"
+   980→    },
+   981→    {
+   982→      "id": "cms0a4ru6006aoqrexmmylz0n",
+   983→      "roleId": "cms0a4rty005woqrethr8v369",
+   984→      "permissionId": "cms0a4rp5000doqrect2lqp8n",
+   985→      "createdAt": "2026-07-25T11:22:14.383Z"
+   986→    },
+   987→    {
+   988→      "id": "cms0a4ru8006coqrehgneli8l",
+   989→      "roleId": "cms0a4rty005woqrethr8v369",
+   990→      "permissionId": "cms0a4rp6000eoqre2inyzewd",
+   991→      "createdAt": "2026-07-25T11:22:14.384Z"
+   992→    },
+   993→    {
+   994→      "id": "cms0a4ru9006eoqregphgi1re",
+   995→      "roleId": "cms0a4rty005woqrethr8v369",
+   996→      "permissionId": "cms0a4rp7000foqreqty1hme9",
+   997→      "createdAt": "2026-07-25T11:22:14.385Z"
+   998→    },
+   999→    {
+  1000→      "id": "cms0a4rua006goqrevvy12rek",
+  1001→      "roleId": "cms0a4rty005woqrethr8v369",
+  1002→      "permissionId": "cms0a4rp7000goqrejedutnou",
+  1003→      "createdAt": "2026-07-25T11:22:14.387Z"
+  1004→    },
+  1005→    {
+  1006→      "id": "cms0a4ruc006ioqrecwc1bbyw",
+  1007→      "roleId": "cms0a4rty005woqrethr8v369",
+  1008→      "permissionId": "cms0a4rpa000loqre2jpjli87",
+  1009→      "createdAt": "2026-07-25T11:22:14.388Z"
+  1010→    },
+  1011→    {
+  1012→      "id": "cms0a4rud006koqrehg3niqmy",
+  1013→      "roleId": "cms0a4rty005woqrethr8v369",
+  1014→      "permissionId": "cms0a4rpi000xoqrer3hci9fl",
+  1015→      "createdAt": "2026-07-25T11:22:14.390Z"
+  1016→    },
+  1017→    {
+  1018→      "id": "cms0a4rue006moqreix40mjyh",
+  1019→      "roleId": "cms0a4rty005woqrethr8v369",
+  1020→      "permissionId": "cms0a4rpg000uoqretgh9omzc",
+  1021→      "createdAt": "2026-07-25T11:22:14.391Z"
+  1022→    },
+  1023→    {
+  1024→      "id": "cms0a4rug006poqrefi7n4aku",
+  1025→      "roleId": "cms0a4ruf006noqrehd112m3o",
+  1026→      "permissionId": "cms0a4rom0000oqree5nvmin5",
+  1027→      "createdAt": "2026-07-25T11:22:14.393Z"
+  1028→    },
+  1029→    {
+  1030→      "id": "cms0a4ruh006roqrebuyutd83",
+  1031→      "roleId": "cms0a4ruf006noqrehd112m3o",
+  1032→      "permissionId": "cms0a4rp3000coqrev23byr1n",
+  1033→      "createdAt": "2026-07-25T11:22:14.394Z"
+  1034→    },
+  1035→    {
+  1036→      "id": "cms0a4ruj006toqrefwoimyjs",
+  1037→      "roleId": "cms0a4ruf006noqrehd112m3o",
+  1038→      "permissionId": "cms0a4rp9000koqre48cc96ky",
+  1039→      "createdAt": "2026-07-25T11:22:14.395Z"
+  1040→    },
+  1041→    {
+  1042→      "id": "cms0a4ruk006voqre7t24fyqg",
+  1043→      "roleId": "cms0a4ruf006noqrehd112m3o",
+  1044→      "permissionId": "cms0a4rpa000loqre2jpjli87",
+  1045→      "createdAt": "2026-07-25T11:22:14.397Z"
+  1046→    },
+  1047→    {
+  1048→      "id": "cms0a4rul006xoqrel8wkjcty",
+  1049→      "roleId": "cms0a4ruf006noqrehd112m3o",
+  1050→      "permissionId": "cms0a4rpg000uoqretgh9omzc",
+  1051→      "createdAt": "2026-07-25T11:22:14.398Z"
+  1052→    },
+  1053→    {
+  1054→      "id": "cms0a4ruo0070oqrejcyf5crk",
+  1055→      "roleId": "cms0a4run006yoqreyl5qthxq",
+  1056→      "permissionId": "cms0a4rom0000oqree5nvmin5",
+  1057→      "createdAt": "2026-07-25T11:22:14.400Z"
+  1058→    },
+  1059→    {
+  1060→      "id": "cms0a4rup0072oqreoihkf2bs",
+  1061→      "roleId": "cms0a4run006yoqreyl5qthxq",
+  1062→      "permissionId": "cms0a4rp3000coqrev23byr1n",
+  1063→      "createdAt": "2026-07-25T11:22:14.401Z"
+  1064→    },
+  1065→    {
+  1066→      "id": "cms0a4ruq0074oqregr1m0lrm",
+  1067→      "roleId": "cms0a4run006yoqreyl5qthxq",
+  1068→      "permissionId": "cms0a4rp9000koqre48cc96ky",
+  1069→      "createdAt": "2026-07-25T11:22:14.403Z"
+  1070→    },
+  1071→    {
+  1072→      "id": "cms0a4rur0076oqrep10out9j",
+  1073→      "roleId": "cms0a4run006yoqreyl5qthxq",
+  1074→      "permissionId": "cms0a4rpa000loqre2jpjli87",
+  1075→      "createdAt": "2026-07-25T11:22:14.404Z"
+  1076→    },
+  1077→    {
+  1078→      "id": "cms0a4ruv0078oqrefs7gmkr0",
+  1079→      "roleId": "cms0a4run006yoqreyl5qthxq",
+  1080→      "permissionId": "cms0a4rpg000uoqretgh9omzc",
+  1081→      "createdAt": "2026-07-25T11:22:14.407Z"
+  1082→    },
+  1083→    {
+  1084→      "id": "cms1s5fsz0001p6illexogu50",
+  1085→      "roleId": "cms0a4rri0038oqrejlxnfc1m",
+  1086→      "permissionId": "cms0a4rpa000moqregnwpmv33",
+  1087→      "createdAt": "2026-07-26T12:34:24.707Z"
+  1088→    },
+  1089→    {
+  1090→      "id": "cms50zpyw0001s3dw8ku1l0dm",
+  1091→      "roleId": "cms0a4rpl000zoqreosxvvhnr",
+  1092→      "permissionId": "cms0a4rp8000hoqreyt8uzw4n",
+  1093→      "createdAt": "2026-07-28T19:05:13.016Z"
+  1094→    },
+  1095→    {
+  1096→      "id": "cms50zpyy0003s3dwrt2xnygm",
+  1097→      "roleId": "cms0a4rpl000zoqreosxvvhnr",
+  1098→      "permissionId": "cms0a4rp8000ioqre70ht783h",
+  1099→      "createdAt": "2026-07-28T19:05:13.019Z"
+  1100→    },
+  1101→    {
+  1102→      "id": "cms50zpyz0005s3dwis0t18ri",
+  1103→      "roleId": "cms0a4rpl000zoqreosxvvhnr",
+  1104→      "permissionId": "cms0a4rp9000joqreepqxpzwi",
+  1105→      "createdAt": "2026-07-28T19:05:13.020Z"
+  1106→    },
+  1107→    {
+  1108→      "id": "cms50zpz10007s3dwy28xcugz",
+  1109→      "roleId": "cms0a4rqn002noqre3k7wuv52",
+  1110→      "permissionId": "cms0a4rp8000hoqreyt8uzw4n",
+  1111→      "createdAt": "2026-07-28T19:05:13.022Z"
+  1112→    },
+  1113→    {
+  1114→      "id": "cms50zpz30009s3dwe8jhlqh5",
+  1115→      "roleId": "cms0a4rqn002noqre3k7wuv52",
+  1116→      "permissionId": "cms0a4rp8000ioqre70ht783h",
+  1117→      "createdAt": "2026-07-28T19:05:13.023Z"
+  1118→    },
+  1119→    {
+  1120→      "id": "cms50zpz5000bs3dwjy45gy6c",
+  1121→      "roleId": "cms0a4rqn002noqre3k7wuv52",
+  1122→      "permissionId": "cms0a4rp9000joqreepqxpzwi",
+  1123→      "createdAt": "2026-07-28T19:05:13.026Z"
+  1124→    },
+  1125→    {
+  1126→      "id": "cms50zpz7000ds3dwolvnpl9q",
+  1127→      "roleId": "cms0a4rsm004ooqresucpvkix",
+  1128→      "permissionId": "cms0a4rp8000hoqreyt8uzw4n",
+  1129→      "createdAt": "2026-07-28T19:05:13.027Z"
+  1130→    },
+  1131→    {
+  1132→      "id": "cms50zpz7000fs3dwrc7x7iw1",
+  1133→      "roleId": "cms0a4rsm004ooqresucpvkix",
+  1134→      "permissionId": "cms0a4rp8000ioqre70ht783h",
+  1135→      "createdAt": "2026-07-28T19:05:13.028Z"
+  1136→    },
+  1137→    {
+  1138→      "id": "cms50zpz9000hs3dwllyn88fz",
+  1139→      "roleId": "cms0a4rsm004ooqresucpvkix",
+  1140→      "permissionId": "cms0a4rp9000joqreepqxpzwi",
+  1141→      "createdAt": "2026-07-28T19:05:13.030Z"
+  1142→    }
+  1143→  ],
+  1144→  "UserRole": [
+  1145→    {
+  1146→      "id": "cms0a4rxb007boqre97cdxp3h",
+  1147→      "userId": "cms0a4rxa0079oqrepzj50s1p",
+  1148→      "roleId": "cms0a4rpl000zoqreosxvvhnr",
+  1149→      "createdAt": "2026-07-25T11:22:14.496Z"
+  1150→    },
+  1151→    {
+  1152→      "id": "cms0a4rza007eoqre7b225ubl",
+  1153→      "userId": "cms0a4rz9007coqren4d60eok",
+  1154→      "roleId": "cms0a4rpo0012oqre8nqfkmsu",
+  1155→      "createdAt": "2026-07-25T11:22:14.566Z"
+  1156→    },
+  1157→    {
+  1158→      "id": "cms0a4s19007hoqre7elu7wey",
+  1159→      "userId": "cms0a4s18007foqreghyoyggi",
+  1160→      "roleId": "cms0a4rqn002noqre3k7wuv52",
+  1161→      "createdAt": "2026-07-25T11:22:14.637Z"
+  1162→    },
+  1163→    {
+  1164→      "id": "cms0a4s37007koqrebm7zb7il",
+  1165→      "userId": "cms0a4s36007ioqreqz3onkuf",
+  1166→      "roleId": "cms0a4rri0038oqrejlxnfc1m",
+  1167→      "createdAt": "2026-07-25T11:22:14.708Z"
+  1168→    },
+  1169→    {
+  1170→      "id": "cms0a4s56007noqretv5gq4pm",
+  1171→      "userId": "cms0a4s55007loqreiztfmkfq",
+  1172→      "roleId": "cms0a4rs4003xoqrextrwgv51",
+  1173→      "createdAt": "2026-07-25T11:22:14.778Z"
+  1174→    },
+  1175→    {
+  1176→      "id": "cms0a4s75007qoqree8lhk2k6",
+  1177→      "userId": "cms0a4s73007ooqre2glazbyi",
+  1178→      "roleId": "cms0a4rsm004ooqresucpvkix",
+  1179→      "createdAt": "2026-07-25T11:22:14.849Z"
+  1180→    },
+  1181→    {
+  1182→      "id": "cms0a4s93007toqreghk1ipp5",
+  1183→      "userId": "cms0a4s92007roqreqy9gcub1",
+  1184→      "roleId": "cms0a4rsy0057oqreh7a100h3",
+  1185→      "createdAt": "2026-07-25T11:22:14.920Z"
+  1186→    },
+  1187→    {
+  1188→      "id": "cms0a4sb2007woqre8tu03yw7",
+  1189→      "userId": "cms0a4sb0007uoqre6f2ermtd",
+  1190→      "roleId": "cms0a4rty005woqrethr8v369",
+  1191→      "createdAt": "2026-07-25T11:22:14.990Z"
+  1192→    }
+  1193→  ],
+  1194→  "User": [
+  1195→    {
+  1196→      "id": "cms0a4rxa0079oqrepzj50s1p",
+  1197→      "nama": "Super Admin",
+  1198→      "username": "admin",
+  1199→      "password": "$2b$10$UzPArLNuHLa/X0WbhVwrfOwMKl0.UVWY/lWWrW4BYflNB1ay32pY.",
+  1200→      "passwordText": "admin123",
+  1201→      "role": "super-admin",
+  1202→      "status": "aktif",
+  1203→      "foto": "",
+  1204→      "email": "admin@tuweri.sch.id",
+  1205→      "noHP": "081234567890",
+  1206→      "nip": "000000000",
+  1207→      "jabatan": "Super Administrator",
+  1208→      "lastLogin": "2026-07-29T03:45:21.444Z",
+  1209→      "createdAt": "2026-07-25T11:22:14.494Z",
+  1210→      "updatedAt": "2026-07-29T03:45:21.446Z"
+  1211→    },
+  1212→    {
+  1213→      "id": "cms0a4rz9007coqren4d60eok",
+  1214→      "nama": "Budi Santoso",
+  1215→      "username": "adminsekolah",
+  1216→      "password": "$2b$10$cLla.bif1uouw92c2Hyo4OskTErsf5Fm/7wb8.P.F7tCNH2Ccfdru",
+  1217→      "passwordText": "admin123",
+  1218→      "role": "admin",
+  1219→      "status": "aktif",
+  1220→      "foto": "",
+  1221→      "email": "",
+  1222→      "noHP": "",
+  1223→      "nip": "198501012010011001",
+  1224→      "jabatan": "Admin Sekolah",
+  1225→      "lastLogin": "2026-07-28T09:06:09.300Z",
+  1226→      "createdAt": "2026-07-25T11:22:14.565Z",
+  1227→      "updatedAt": "2026-07-28T09:06:09.301Z"
+  1228→    },
+  1229→    {
+  1230→      "id": "cms0a4s18007foqreghyoyggi",
+  1231→      "nama": "Siti Aminah",
+  1232→      "username": "operator",
+  1233→      "password": "$2b$10$HgLMP8mNng7MjQfH5Epo.O4zt7enk0X2ILqRiGr.AuztUGDQZWUSG",
+  1234→      "passwordText": "operator123",
+  1235→      "role": "operator",
+  1236→      "status": "aktif",
+  1237→      "foto": "",
+  1238→      "email": "",
+  1239→      "noHP": "",
+  1240→      "nip": "199001012015002001",
+  1241→      "jabatan": "Operator",
+  1242→      "lastLogin": null,
+  1243→      "createdAt": "2026-07-25T11:22:14.636Z",
+  1244→      "updatedAt": "2026-07-25T11:22:14.636Z"
+  1245→    },
+  1246→    {
+  1247→      "id": "cms0a4s36007ioqreqz3onkuf",
+  1248→      "nama": "Drs. Ahmad Hidayat, M.Pd",
+  1249→      "username": "kepsek",
+  1250→      "password": "$2b$10$PMnoJmgTOxJTp3e33eag/OuraB3.rZsJpcjFl9Z7ll73V8oXlxY.e",
+  1251→      "passwordText": "kepsek123",
+  1252→      "role": "kepala-sekolah",
+  1253→      "status": "aktif",
+  1254→      "foto": "",
+  1255→      "email": "",
+  1256→      "noHP": "",
+  1257→      "nip": "197501012003121001",
+  1258→      "jabatan": "Kepala Sekolah",
+  1259→      "lastLogin": "2026-07-27T08:21:15.927Z",
+  1260→      "createdAt": "2026-07-25T11:22:14.707Z",
+  1261→      "updatedAt": "2026-07-27T08:21:15.928Z"
+  1262→    },
+  1263→    {
+  1264→      "id": "cms0a4s55007loqreiztfmkfq",
+  1265→      "nama": "Ir. Rahmawati, M.Pd",
+  1266→      "username": "wakasek",
+  1267→      "password": "$2b$10$i8RBtT4TxlnSbQsAlGTot.46b/RBQ56QJMTgzfGzZiOmGS977rl7u",
+  1268→      "passwordText": "wakasek123",
+  1269→      "role": "wakil-kepala-sekolah",
+  1270→      "status": "aktif",
+  1271→      "foto": "",
+  1272→      "email": "",
+  1273→      "noHP": "",
+  1274→      "nip": "198001012005012001",
+  1275→      "jabatan": "Wakil Kepala Sekolah",
+  1276→      "lastLogin": null,
+  1277→      "createdAt": "2026-07-25T11:22:14.777Z",
+  1278→      "updatedAt": "2026-07-25T11:22:14.777Z"
+  1279→    },
+  1280→    {
+  1281→      "id": "cms0a4s73007ooqre2glazbyi",
+  1282→      "nama": "Dewi Lestari",
+  1283→      "username": "tu",
+  1284→      "password": "$2b$10$Udx83dPP5wxDboTciH729.SMmB8Wvnp44libqNBJJnsKLUZjvdTj6",
+  1285→      "passwordText": "tu123",
+  1286→      "role": "tata-usaha",
+  1287→      "status": "aktif",
+  1288→      "foto": "",
+  1289→      "email": "",
+  1290→      "noHP": "",
+  1291→      "nip": "199201012018002002",
+  1292→      "jabatan": "Tata Usaha",
+  1293→      "lastLogin": "2026-07-27T08:15:08.531Z",
+  1294→      "createdAt": "2026-07-25T11:22:14.848Z",
+  1295→      "updatedAt": "2026-07-27T08:15:08.532Z"
+  1296→    },
+  1297→    {
+  1298→      "id": "cms0a4s92007roqreqy9gcub1",
+  1299→      "nama": "Ahmad Fauzi, S.Pd",
+  1300→      "username": "ahmad",
+  1301→      "password": "$2b$10$AdbHnTPa3iXJGe0CnPSHWeulf7T32OGXXXuw3HyDALhB5wPhgBoNW",
+  1302→      "passwordText": "guru123",
+  1303→      "role": "guru",
+  1304→      "status": "aktif",
+  1305→      "foto": "",
+  1306→      "email": "",
+  1307→      "noHP": "",
+  1308→      "nip": "199001012015011001",
+  1309→      "jabatan": "Guru Matematika",
+  1310→      "lastLogin": "2026-07-26T17:42:22.088Z",
+  1311→      "createdAt": "2026-07-25T11:22:14.918Z",
+  1312→      "updatedAt": "2026-07-26T17:42:22.089Z"
+  1313→    },
+  1314→    {
+  1315→      "id": "cms0a4sb0007uoqre6f2ermtd",
+  1316→      "nama": "Sri Wahyuni, S.Pd",
+  1317→      "username": "sri",
+  1318→      "password": "$2b$10$JB1CFaOW2Mw5h.vh2h1B8uvh1QVvc03yjD55DzDij3e.YOAKPWSnS",
+  1319→      "passwordText": "guru123",
+  1320→      "role": "wali-kelas",
+  1321→      "status": "aktif",
+  1322→      "foto": "",
+  1323→      "email": "",
+  1324→      "noHP": "",
+  1325→      "nip": "199201012020012002",
+  1326→      "jabatan": "Guru / Wali Kelas",
+  1327→      "lastLogin": "2026-07-26T16:44:51.261Z",
+  1328→      "createdAt": "2026-07-25T11:22:14.989Z",
+  1329→      "updatedAt": "2026-07-26T16:44:51.263Z"
+  1330→    },
+  1331→    {
+  1332→      "id": "cms38npg9000er0vrsogwcctg",
+  1333→      "nama": "Nisa Aulia",
+  1334→      "username": "nisaaulia",
+  1335→      "password": "$2b$10$8s9vxQCyMeZX8bYFiq9ATumLhqOdysS/ku3hWtn6ZNZKkoHmBCEp6",
+  1336→      "passwordText": "Nisa123",
+  1337→      "role": "admin",
+  1338→      "status": "aktif",
+  1339→      "foto": "",
+  1340→      "email": "nisaaulia@gmail.com",
+  1341→      "noHP": "-",
+  1342→      "nip": "-",
+  1343→      "jabatan": "guru",
+  1344→      "lastLogin": "2026-07-28T18:55:12.872Z",
+  1345→      "createdAt": "2026-07-27T13:04:17.050Z",
+  1346→      "updatedAt": "2026-07-28T18:55:12.873Z"
+  1347→    },
+  1348→    {
+  1349→      "id": "cms4flbsc0002m4fe70sny42e",
+  1350→      "nama": "Nisa Aulia",
+  1351→      "username": "nisa",
+  1352→      "password": "$2b$10$A6mR0/NDr3mkGlThegowb.f.3SG15wU8z3VQVm6jWzI.psOiRCEli",
+  1353→      "passwordText": "nisa123",
+  1354→      "role": "guru",
+  1355→      "status": "aktif",
+  1356→      "foto": "",
+  1357→      "email": "",
+  1358→      "noHP": "",
+  1359→      "nip": "199501012020012003",
+  1360→      "jabatan": "Guru Bahasa Arab",
+  1361→      "lastLogin": null,
+  1362→      "createdAt": "2026-07-28T09:06:09.516Z",
+  1363→      "updatedAt": "2026-07-28T09:06:09.516Z"
+  1364→    }
+  1365→  ],
+  1366→  "Guru": [
+  1367→    {
+  1368→      "id": "cms0a4sb2007xoqresvypsfev",
+  1369→      "nip": "199001012015011001",
+  1370→      "nama": "Ahmad Fauzi, S.Pd",
+  1371→      "gelar": "",
+  1372→      "jenisKelamin": "Laki-laki",
+  1373→      "tempatLahir": "",
+  1374→      "tanggalLahir": "",
+  1375→      "alamat": "",
+  1376→      "email": "",
+  1377→      "noHP": "",
+  1378→      "mapel": "Matematika",
+  1379→      "status": "aktif",
+  1380→      "foto": "",
+  1381→      "createdAt": "2026-07-25T11:22:14.990Z",
+  1382→      "updatedAt": "2026-07-25T11:22:14.990Z"
+  1383→    },
+  1384→    {
+  1385→      "id": "cms0a4sb3007yoqrerva4phln",
+  1386→      "nip": "199201012020012002",
+  1387→      "nama": "Sri Wahyuni, S.Pd",
+  1388→      "gelar": "",
+  1389→      "jenisKelamin": "Perempuan",
+  1390→      "tempatLahir": "",
+  1391→      "tanggalLahir": "",
+  1392→      "alamat": "",
+  1393→      "email": "",
+  1394→      "noHP": "",
+  1395→      "mapel": "Bahasa Indonesia",
+  1396→      "status": "aktif",
+  1397→      "foto": "",
+  1398→      "createdAt": "2026-07-25T11:22:14.991Z",
+  1399→      "updatedAt": "2026-07-25T11:22:14.991Z"
+  1400→    },
+  1401→    {
+  1402→      "id": "cms0a4sb3007zoqrekh3vnp5t",
+  1403→      "nip": "198803152010011003",
+  1404→      "nama": "Bambang Irawan, M.Pd",
+  1405→      "gelar": "",
+  1406→      "jenisKelamin": "Laki-laki",
+  1407→      "tempatLahir": "",
+  1408→      "tanggalLahir": "",
+  1409→      "alamat": "",
+  1410→      "email": "",
+  1411→      "noHP": "",
+  1412→      "mapel": "Fisika",
+  1413→      "status": "aktif",
+  1414→      "foto": "",
+  1415→      "createdAt": "2026-07-25T11:22:14.992Z",
+  1416→      "updatedAt": "2026-07-25T11:22:14.992Z"
+  1417→    },
+  1418→    {
+  1419→      "id": "cms0a4sb40080oqrejtv58k8h",
+  1420→      "nip": "199105202018012004",
+  1421→      "nama": "Rina Susanti, S.Pd",
+  1422→      "gelar": "",
+  1423→      "jenisKelamin": "Perempuan",
+  1424→      "tempatLahir": "",
+  1425→      "tanggalLahir": "",
+  1426→      "alamat": "",
+  1427→      "email": "",
+  1428→      "noHP": "",
+  1429→      "mapel": "Kimia",
+  1430→      "status": "aktif",
+  1431→      "foto": "",
+  1432→      "createdAt": "2026-07-25T11:22:14.992Z",
+  1433→      "updatedAt": "2026-07-25T11:22:14.992Z"
+  1434→    },
+  1435→    {
+  1436→      "id": "cms0a4sb50081oqreyjl0pi7x",
+  1437→      "nip": "198706102009011005",
+  1438→      "nama": "Hendra Wijaya, S.Si",
+  1439→      "gelar": "",
+  1440→      "jenisKelamin": "Laki-laki",
+  1441→      "tempatLahir": "",
+  1442→      "tanggalLahir": "",
+  1443→      "alamat": "",
+  1444→      "email": "",
+  1445→      "noHP": "",
+  1446→      "mapel": "Biologi",
+  1447→      "status": "aktif",
+  1448→      "foto": "",
+  1449→      "createdAt": "2026-07-25T11:22:14.993Z",
+  1450→      "updatedAt": "2026-07-25T11:22:14.993Z"
+  1451→    },
+  1452→    {
+  1453→      "id": "cms0a4sb50082oqrely5d4yea",
+  1454→      "nip": "199302152019012006",
+  1455→      "nama": "Diana Putri, S.Pd",
+  1456→      "gelar": "",
+  1457→      "jenisKelamin": "Perempuan",
+  1458→      "tempatLahir": "",
+  1459→      "tanggalLahir": "",
+  1460→      "alamat": "",
+  1461→      "email": "",
+  1462→      "noHP": "",
+  1463→      "mapel": "Bahasa Inggris",
+  1464→      "status": "aktif",
+  1465→      "foto": "",
+  1466→      "createdAt": "2026-07-25T11:22:14.993Z",
+  1467→      "updatedAt": "2026-07-25T11:22:14.993Z"
+  1468→    },
+  1469→    {
+  1470→      "id": "cms0a4sb50083oqref2jys1or",
+  1471→      "nip": "198511202008011007",
+  1472→      "nama": "Agus Supriyadi, S.Pd",
+  1473→      "gelar": "",
+  1474→      "jenisKelamin": "Laki-laki",
+  1475→      "tempatLahir": "",
+  1476→      "tanggalLahir": "",
+  1477→      "alamat": "",
+  1478→      "email": "",
+  1479→      "noHP": "",
+  1480→      "mapel": "Sejarah",
+  1481→      "status": "aktif",
+  1482→      "foto": "",
+  1483→      "createdAt": "2026-07-25T11:22:14.994Z",
+  1484→      "updatedAt": "2026-07-25T11:22:14.994Z"
+  1485→    },
+  1486→    {
+  1487→      "id": "cms0a4sb60084oqres2pxzxrp",
+  1488→      "nip": "199408252020012008",
+  1489→      "nama": "Fitri Handayani, S.Pd",
+  1490→      "gelar": "",
+  1491→      "jenisKelamin": "Perempuan",
+  1492→      "tempatLahir": "",
+  1493→      "tanggalLahir": "",
+  1494→      "alamat": "",
+  1495→      "email": "",
+  1496→      "noHP": "",
+  1497→      "mapel": "Ekonomi",
+  1498→      "status": "aktif",
+  1499→      "foto": "",
+  1500→      "createdAt": "2026-07-25T11:22:14.995Z",
+  1501→      "updatedAt": "2026-07-25T11:22:14.995Z"
+  1502→    },
+  1503→    {
+  1504→      "id": "cms0a4sb70085oqre0ap1qrz2",
+  1505→      "nip": "198912302010011009",
+  1506→      "nama": "Rudi Hartono, S.Pd",
+  1507→      "gelar": "",
+  1508→      "jenisKelamin": "Laki-laki",
+  1509→      "tempatLahir": "",
+  1510→      "tanggalLahir": "",
+  1511→      "alamat": "",
+  1512→      "email": "",
+  1513→      "noHP": "",
+  1514→      "mapel": "Geografi",
+  1515→      "status": "aktif",
+  1516→      "foto": "",
+  1517→      "createdAt": "2026-07-25T11:22:14.995Z",
+  1518→      "updatedAt": "2026-07-25T11:22:14.995Z"
+  1519→    },
+  1520→    {
+  1521→      "id": "cms0a4sb70086oqre8rpopfxi",
+  1522→      "nip": "199505102021012010",
+  1523→      "nama": "Lestari Ningrum, S.Pd",
+  1524→      "gelar": "",
+  1525→      "jenisKelamin": "Perempuan",
+  1526→      "tempatLahir": "",
+  1527→      "tanggalLahir": "",
+  1528→      "alamat": "",
+  1529→      "email": "",
+  1530→      "noHP": "",
+  1531→      "mapel": "Sosiologi",
+  1532→      "status": "aktif",
+  1533→      "foto": "",
+  1534→      "createdAt": "2026-07-25T11:22:14.996Z",
+  1535→      "updatedAt": "2026-07-25T11:22:14.996Z"
+  1536→    },
+  1537→    {
+  1538→      "id": "cms0a4sb80087oqrer4fx4ekn",
+  1539→      "nip": "198607152011011011",
+  1540→      "nama": "Wahyu Prasetyo, S.Kom",
+  1541→      "gelar": "",
+  1542→      "jenisKelamin": "Laki-laki",
+  1543→      "tempatLahir": "",
+  1544→      "tanggalLahir": "",
+  1545→      "alamat": "",
+  1546→      "email": "",
+  1547→      "noHP": "",
+  1548→      "mapel": "Informatika",
+  1549→      "status": "aktif",
+  1550→      "foto": "",
+  1551→      "createdAt": "2026-07-25T11:22:14.996Z",
+  1552→      "updatedAt": "2026-07-25T11:22:14.996Z"
+  1553→    },
+  1554→    {
+  1555→      "id": "cms0a4sb90088oqreuykyq3l6",
+  1556→      "nip": "199212202019012012",
+  1557→      "nama": "Anita Sari, S.Pd",
+  1558→      "gelar": "",
+  1559→      "jenisKelamin": "Perempuan",
+  1560→      "tempatLahir": "",
+  1561→      "tanggalLahir": "",
+  1562→      "alamat": "",
+  1563→      "email": "sekolah@gmail.com",
+  1564→      "noHP": "",
+  1565→      "mapel": "PKN",
+  1566→      "status": "Aktif",
+  1567→      "foto": "",
+  1568→      "createdAt": "2026-07-25T11:22:14.997Z",
+  1569→      "updatedAt": "2026-07-26T13:14:54.565Z"
+  1570→    },
+  1571→    {
+  1572→      "id": "cms0a4sb90089oqrezyrileuz",
+  1573→      "nip": "198410052007011013",
+  1574→      "nama": "Darmawan, M.Pd",
+  1575→      "gelar": "",
+  1576→      "jenisKelamin": "Laki-laki",
+  1577→      "tempatLahir": "",
+  1578→      "tanggalLahir": "",
+  1579→      "alamat": "",
+  1580→      "email": "sekolah@gmail.com",
+  1581→      "noHP": "",
+  1582→      "mapel": "Seni Budaya",
+  1583→      "status": "Aktif",
+  1584→      "foto": "",
+  1585→      "createdAt": "2026-07-25T11:22:14.998Z",
+  1586→      "updatedAt": "2026-07-26T13:14:12.112Z"
+  1587→    },
+  1588→    {
+  1589→      "id": "cms0a4sba008aoqreiymyufy7",
+  1590→      "nip": "199603012022012014",
+  1591→      "nama": "Mega Silvia, S.Pd",
+  1592→      "gelar": "",
+  1593→      "jenisKelamin": "P",
+  1594→      "tempatLahir": "",
+  1595→      "tanggalLahir": "",
+  1596→      "alamat": "",
+  1597→      "email": "sekolah@gmail.com",
+  1598→      "noHP": "",
+  1599→      "mapel": "PJOK",
+  1600→      "status": "Aktif",
+  1601→      "foto": "",
+  1602→      "createdAt": "2026-07-25T11:22:14.998Z",
+  1603→      "updatedAt": "2026-07-26T13:14:37.224Z"
+  1604→    },
+  1605→    {
+  1606→      "id": "cms0a4sba008boqreul21qmze",
+  1607→      "nip": "198908172012011015",
+  1608→      "nama": "Fajar Nugroho, S.Ag",
+  1609→      "gelar": "",
+  1610→      "jenisKelamin": "Laki-laki",
+  1611→      "tempatLahir": "",
+  1612→      "tanggalLahir": "",
+  1613→      "alamat": "",
+  1614→      "email": "selolah@gmail.com",
+  1615→      "noHP": "",
+  1616→      "mapel": "PAI",
+  1617→      "status": "Aktif",
+  1618→      "foto": "",
+  1619→      "createdAt": "2026-07-25T11:22:14.999Z",
+  1620→      "updatedAt": "2026-07-26T13:13:43.590Z"
+  1621→    }
+  1622→  ],
+  1623→  "Siswa": [
+  1624→    {
+  1625→      "id": "cms0a4sbk008uoqredcp1wzfm",
+  1626→      "nis": "20240001",
+  1627→      "nisn": "",
+  1628→      "nama": "Andi Pratama",
+  1629→      "jenisKelamin": "Laki-laki",
+  1630→      "tempatLahir": "",
+  1631→      "tanggalLahir": "",
+  1632→      "agama": "Islam",
+  1633→      "alamat": "",
+  1634→      "namaAyah": "",
+  1635→      "namaIbu": "",
+  1636→      "noHP": "",
+  1637→      "kelas": "10A",
+  1638→      "status": "aktif",
+  1639→      "foto": "",
+  1640→      "createdAt": "2026-07-25T11:22:15.009Z",
+  1641→      "updatedAt": "2026-07-25T11:22:15.009Z"
+  1642→    },
+  1643→    {
+  1644→      "id": "cms0a4sbl008voqrezo3586c9",
+  1645→      "nis": "20240002",
+  1646→      "nisn": "",
+  1647→      "nama": "Budi Setiawan",
+  1648→      "jenisKelamin": "Laki-laki",
+  1649→      "tempatLahir": "",
+  1650→      "tanggalLahir": "",
+  1651→      "agama": "Islam",
+  1652→      "alamat": "",
+  1653→      "namaAyah": "",
+  1654→      "namaIbu": "",
+  1655→      "noHP": "",
+  1656→      "kelas": "10A",
+  1657→      "status": "aktif",
+  1658→      "foto": "",
+  1659→      "createdAt": "2026-07-25T11:22:15.009Z",
+  1660→      "updatedAt": "2026-07-25T11:22:15.009Z"
+  1661→    },
+  1662→    {
+  1663→      "id": "cms0a4sbl008woqreqcpnf2f2",
+  1664→      "nis": "20240003",
+  1665→      "nisn": "",
+  1666→      "nama": "Citra Dewi",
+  1667→      "jenisKelamin": "Laki-laki",
+  1668→      "tempatLahir": "",
+  1669→      "tanggalLahir": "",
+  1670→      "agama": "Islam",
+  1671→      "alamat": "",
+  1672→      "namaAyah": "",
+  1673→      "namaIbu": "",
+  1674→      "noHP": "",
+  1675→      "kelas": "10A",
+  1676→      "status": "aktif",
+  1677→      "foto": "",
+  1678→      "createdAt": "2026-07-25T11:22:15.010Z",
+  1679→      "updatedAt": "2026-07-25T11:22:15.010Z"
+  1680→    },
+  1681→    {
+  1682→      "id": "cms0a4sbm008xoqrem91b1a86",
+  1683→      "nis": "20240004",
+  1684→      "nisn": "",
+  1685→      "nama": "Dian Permata",
+  1686→      "jenisKelamin": "Laki-laki",
+  1687→      "tempatLahir": "",
+  1688→      "tanggalLahir": "",
+  1689→      "agama": "Islam",
+  1690→      "alamat": "",
+  1691→      "namaAyah": "",
+  1692→      "namaIbu": "",
+  1693→      "noHP": "",
+  1694→      "kelas": "10A",
+  1695→      "status": "aktif",
+  1696→      "foto": "",
+  1697→      "createdAt": "2026-07-25T11:22:15.010Z",
+  1698→      "updatedAt": "2026-07-25T11:22:15.010Z"
+  1699→    },
+  1700→    {
+  1701→      "id": "cms0a4sbm008yoqrehxc5d9cr",
+  1702→      "nis": "20240005",
+  1703→      "nisn": "",
+  1704→      "nama": "Eko Saputra",
+  1705→      "jenisKelamin": "Laki-laki",
+  1706→      "tempatLahir": "",
+  1707→      "tanggalLahir": "",
+  1708→      "agama": "Islam",
+  1709→      "alamat": "",
+  1710→      "namaAyah": "",
+  1711→      "namaIbu": "",
+  1712→      "noHP": "",
+  1713→      "kelas": "10B",
+  1714→      "status": "aktif",
+  1715→      "foto": "",
+  1716→      "createdAt": "2026-07-25T11:22:15.011Z",
+  1717→      "updatedAt": "2026-07-25T11:22:15.011Z"
+  1718→    },
+  1719→    {
+  1720→      "id": "cms0a4sbn008zoqrebbj56s1t",
+  1721→      "nis": "20240006",
+  1722→      "nisn": "",
+  1723→      "nama": "Fani Oktavia",
+  1724→      "jenisKelamin": "Laki-laki",
+  1725→      "tempatLahir": "",
+  1726→      "tanggalLahir": "",
+  1727→      "agama": "Islam",
+  1728→      "alamat": "",
+  1729→      "namaAyah": "",
+  1730→      "namaIbu": "",
+  1731→      "noHP": "",
+  1732→      "kelas": "10B",
+  1733→      "status": "aktif",
+  1734→      "foto": "",
+  1735→      "createdAt": "2026-07-25T11:22:15.011Z",
+  1736→      "updatedAt": "2026-07-25T11:22:15.011Z"
+  1737→    },
+  1738→    {
+  1739→      "id": "cms0a4sbn0090oqreycegpfj9",
+  1740→      "nis": "20240007",
+  1741→      "nisn": "",
+  1742→      "nama": "Gilang Ramadhan",
+  1743→      "jenisKelamin": "Laki-laki",
+  1744→      "tempatLahir": "",
+  1745→      "tanggalLahir": "",
+  1746→      "agama": "Islam",
+  1747→      "alamat": "",
+  1748→      "namaAyah": "",
+  1749→      "namaIbu": "",
+  1750→      "noHP": "",
+  1751→      "kelas": "10B",
+  1752→      "status": "aktif",
+  1753→      "foto": "",
+  1754→      "createdAt": "2026-07-25T11:22:15.012Z",
+  1755→      "updatedAt": "2026-07-25T11:22:15.012Z"
+  1756→    },
+  1757→    {
+  1758→      "id": "cms0a4sbo0091oqrelgsre3x7",
+  1759→      "nis": "20240008",
+  1760→      "nisn": "",
+  1761→      "nama": "Hani Mulyani",
+  1762→      "jenisKelamin": "Laki-laki",
+  1763→      "tempatLahir": "",
+  1764→      "tanggalLahir": "",
+  1765→      "agama": "Islam",
+  1766→      "alamat": "",
+  1767→      "namaAyah": "",
+  1768→      "namaIbu": "",
+  1769→      "noHP": "",
+  1770→      "kelas": "10B",
+  1771→      "status": "aktif",
+  1772→      "foto": "",
+  1773→      "createdAt": "2026-07-25T11:22:15.012Z",
+  1774→      "updatedAt": "2026-07-25T11:22:15.012Z"
+  1775→    },
+  1776→    {
+  1777→      "id": "cms0a4sbo0092oqreeucd53j8",
+  1778→      "nis": "20240009",
+  1779→      "nisn": "",
+  1780→      "nama": "Irfan Hakim",
+  1781→      "jenisKelamin": "Laki-laki",
+  1782→      "tempatLahir": "",
+  1783→      "tanggalLahir": "",
+  1784→      "agama": "Islam",
+  1785→      "alamat": "",
+  1786→      "namaAyah": "",
+  1787→      "namaIbu": "",
+  1788→      "noHP": "",
+  1789→      "kelas": "11A",
+  1790→      "status": "aktif",
+  1791→      "foto": "",
+  1792→      "createdAt": "2026-07-25T11:22:15.012Z",
+  1793→      "updatedAt": "2026-07-25T11:22:15.012Z"
+  1794→    },
+  1795→    {
+  1796→      "id": "cms0a4sbo0093oqrejaqjljzp",
+  1797→      "nis": "20240010",
+  1798→      "nisn": "",
+  1799→      "nama": "Joko Widodo",
+  1800→      "jenisKelamin": "Laki-laki",
+  1801→      "tempatLahir": "",
+  1802→      "tanggalLahir": "",
+  1803→      "agama": "Islam",
+  1804→      "alamat": "",
+  1805→      "namaAyah": "",
+  1806→      "namaIbu": "",
+  1807→      "noHP": "",
+  1808→      "kelas": "11A",
+  1809→      "status": "aktif",
+  1810→      "foto": "",
+  1811→      "createdAt": "2026-07-25T11:22:15.013Z",
+  1812→      "updatedAt": "2026-07-25T11:22:15.013Z"
+  1813→    },
+  1814→    {
+  1815→      "id": "cms0a4sbp0094oqrekmvz5xw8",
+  1816→      "nis": "20240011",
+  1817→      "nisn": "",
+  1818→      "nama": "Kartika Sari",
+  1819→      "jenisKelamin": "Laki-laki",
+  1820→      "tempatLahir": "",
+  1821→      "tanggalLahir": "",
+  1822→      "agama": "Islam",
+  1823→      "alamat": "",
+  1824→      "namaAyah": "",
+  1825→      "namaIbu": "",
+  1826→      "noHP": "",
+  1827→      "kelas": "11A",
+  1828→      "status": "aktif",
+  1829→      "foto": "",
+  1830→      "createdAt": "2026-07-25T11:22:15.013Z",
+  1831→      "updatedAt": "2026-07-25T11:22:15.013Z"
+  1832→    },
+  1833→    {
+  1834→      "id": "cms0a4sbp0095oqrez6fx5223",
+  1835→      "nis": "20240012",
+  1836→      "nisn": "",
+  1837→      "nama": "Lina Marlina",
+  1838→      "jenisKelamin": "Laki-laki",
+  1839→      "tempatLahir": "",
+  1840→      "tanggalLahir": "",
+  1841→      "agama": "Islam",
+  1842→      "alamat": "",
+  1843→      "namaAyah": "",
+  1844→      "namaIbu": "",
+  1845→      "noHP": "",
+  1846→      "kelas": "11A",
+  1847→      "status": "aktif",
+  1848→      "foto": "",
+  1849→      "createdAt": "2026-07-25T11:22:15.014Z",
+  1850→      "updatedAt": "2026-07-25T11:22:15.014Z"
+  1851→    },
+  1852→    {
+  1853→      "id": "cms0a4sbq0096oqrewjxvkf5x",
+  1854→      "nis": "20240013",
+  1855→      "nisn": "",
+  1856→      "nama": "Muhammad Rizki",
+  1857→      "jenisKelamin": "Laki-laki",
+  1858→      "tempatLahir": "",
+  1859→      "tanggalLahir": "",
+  1860→      "agama": "Islam",
+  1861→      "alamat": "",
+  1862→      "namaAyah": "",
+  1863→      "namaIbu": "",
+  1864→      "noHP": "",
+  1865→      "kelas": "11B",
+  1866→      "status": "aktif",
+  1867→      "foto": "",
+  1868→      "createdAt": "2026-07-25T11:22:15.014Z",
+  1869→      "updatedAt": "2026-07-25T11:22:15.014Z"
+  1870→    },
+  1871→    {
+  1872→      "id": "cms0a4sbq0097oqrehbwy5xxl",
+  1873→      "nis": "20240014",
+  1874→      "nisn": "",
+  1875→      "nama": "Nur Aini",
+  1876→      "jenisKelamin": "Laki-laki",
+  1877→      "tempatLahir": "",
+  1878→      "tanggalLahir": "",
+  1879→      "agama": "Islam",
+  1880→      "alamat": "",
+  1881→      "namaAyah": "",
+  1882→      "namaIbu": "",
+  1883→      "noHP": "",
+  1884→      "kelas": "11B",
+  1885→      "status": "aktif",
+  1886→      "foto": "",
+  1887→      "createdAt": "2026-07-25T11:22:15.014Z",
+  1888→      "updatedAt": "2026-07-25T11:22:15.014Z"
+  1889→    },
+  1890→    {
+  1891→      "id": "cms0a4sbq0098oqrexkqk9opw",
+  1892→      "nis": "20240015",
+  1893→      "nisn": "",
+  1894→      "nama": "Oscar Pratama",
+  1895→      "jenisKelamin": "Laki-laki",
+  1896→      "tempatLahir": "",
+  1897→      "tanggalLahir": "",
+  1898→      "agama": "Islam",
+  1899→      "alamat": "",
+  1900→      "namaAyah": "",
+  1901→      "namaIbu": "",
+  1902→      "noHP": "",
+  1903→      "kelas": "11B",
+  1904→      "status": "aktif",
+  1905→      "foto": "",
+  1906→      "createdAt": "2026-07-25T11:22:15.015Z",
+  1907→      "updatedAt": "2026-07-25T11:22:15.015Z"
+  1908→    },
+  1909→    {
+  1910→      "id": "cms0a4sbr0099oqreqej9e9de",
+  1911→      "nis": "20240016",
+  1912→      "nisn": "",
+  1913→      "nama": "Putri Amelia",
+  1914→      "jenisKelamin": "Laki-laki",
+  1915→      "tempatLahir": "",
+  1916→      "tanggalLahir": "",
+  1917→      "agama": "Islam",
+  1918→      "alamat": "",
+  1919→      "namaAyah": "",
+  1920→      "namaIbu": "",
+  1921→      "noHP": "",
+  1922→      "kelas": "11B",
+  1923→      "status": "aktif",
+  1924→      "foto": "",
+  1925→      "createdAt": "2026-07-25T11:22:15.015Z",
+  1926→      "updatedAt": "2026-07-25T11:22:15.015Z"
+  1927→    },
+  1928→    {
+  1929→      "id": "cms0a4sbr009aoqrebz8mpd2x",
+  1930→      "nis": "20240017",
+  1931→      "nisn": "",
+  1932→      "nama": "Qori Ananda",
+  1933→      "jenisKelamin": "Laki-laki",
+  1934→      "tempatLahir": "",
+  1935→      "tanggalLahir": "",
+  1936→      "agama": "Islam",
+  1937→      "alamat": "",
+  1938→      "namaAyah": "",
+  1939→      "namaIbu": "",
+  1940→      "noHP": "",
+  1941→      "kelas": "12A",
+  1942→      "status": "aktif",
+  1943→      "foto": "",
+  1944→      "createdAt": "2026-07-25T11:22:15.016Z",
+  1945→      "updatedAt": "2026-07-25T11:22:15.016Z"
+  1946→    },
+  1947→    {
+  1948→      "id": "cms0a4sbs009boqre9rhp5r3m",
+  1949→      "nis": "20240018",
+  1950→      "nisn": "",
+  1951→      "nama": "Rizky Aditya",
+  1952→      "jenisKelamin": "Laki-laki",
+  1953→      "tempatLahir": "",
+  1954→      "tanggalLahir": "",
+  1955→      "agama": "Islam",
+  1956→      "alamat": "",
+  1957→      "namaAyah": "",
+  1958→      "namaIbu": "",
+  1959→      "noHP": "",
+  1960→      "kelas": "12A",
+  1961→      "status": "aktif",
+  1962→      "foto": "",
+  1963→      "createdAt": "2026-07-25T11:22:15.016Z",
+  1964→      "updatedAt": "2026-07-25T11:22:15.016Z"
+  1965→    },
+  1966→    {
+  1967→      "id": "cms0a4sbs009coqrekalq5lky",
+  1968→      "nis": "20240019",
+  1969→      "nisn": "",
+  1970→      "nama": "Sinta Maharani",
+  1971→      "jenisKelamin": "Laki-laki",
+  1972→      "tempatLahir": "",
+  1973→      "tanggalLahir": "",
+  1974→      "agama": "Islam",
+  1975→      "alamat": "",
+  1976→      "namaAyah": "",
+  1977→      "namaIbu": "",
+  1978→      "noHP": "",
+  1979→      "kelas": "12A",
+  1980→      "status": "aktif",
+  1981→      "foto": "",
+  1982→      "createdAt": "2026-07-25T11:22:15.017Z",
+  1983→      "updatedAt": "2026-07-25T11:22:15.017Z"
+  1984→    },
+  1985→    {
+  1986→      "id": "cms0a4sbt009doqrehlmolaql",
+  1987→      "nis": "20240020",
+  1988→      "nisn": "",
+  1989→      "nama": "Taufik Hidayat",
+  1990→      "jenisKelamin": "Laki-laki",
+  1991→      "tempatLahir": "",
+  1992→      "tanggalLahir": "",
+  1993→      "agama": "Islam",
+  1994→      "alamat": "",
+  1995→      "namaAyah": "",
+  1996→      "namaIbu": "",
+  1997→      "noHP": "",
+  1998→      "kelas": "12A",
+  1999→      "status": "aktif",
+  2000→      "foto": "",
+
+[showing lines 1-2000 of 3414; use offset=2001 with limit to continue reading]
