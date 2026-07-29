@@ -3,8 +3,8 @@
 -- Generated for phpMyAdmin import
 -- ========================================
 
-CREATE DATABASE IF NOT EXISTS `siakad_db` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-USE `siakad_db`;
+CREATE DATABASE IF NOT EXISTS `siakad_sdmi` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+USE `siakad_sdmi`;
 
 SET FOREIGN_KEY_CHECKS = 0;
 

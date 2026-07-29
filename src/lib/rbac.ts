@@ -8,19 +8,33 @@ export const initAuth = _initAuth
 // ── Permission cache (in-memory, refreshed on server start) ──
 let permissionCache: Map<string, Set<string>> = new Map()
 let cacheLoaded = false
+let dbAvailable: boolean | null = null
 
 export async function loadPermissionCache() {
-  const rolePermissions = await db.rolePermission.findMany({
-    include: { role: true, permission: true },
-  })
-  permissionCache.clear()
-  for (const rp of rolePermissions) {
-    if (rp.role.status !== 'aktif') continue
-    const existing = permissionCache.get(rp.role.slug) || new Set<string>()
-    existing.add(rp.permission.slug)
-    permissionCache.set(rp.role.slug, existing)
+  try {
+    const rolePermissions = await db.rolePermission.findMany({
+      include: { role: true, permission: true },
+    })
+    permissionCache.clear()
+    for (const rp of rolePermissions) {
+      if (rp.role.status !== 'aktif') continue
+      const existing = permissionCache.get(rp.role.slug) || new Set<string>()
+      existing.add(rp.permission.slug)
+      permissionCache.set(rp.role.slug, existing)
+    }
+    cacheLoaded = true
+    dbAvailable = true
+  } catch (error: unknown) {
+    dbAvailable = false
+    cacheLoaded = false
+    const msg = error instanceof Error ? error.message : String(error)
+    console.error('[RBAC] Gagal memuat permission cache:', msg)
   }
-  cacheLoaded = true
+}
+
+/** Check if database is reachable */
+export function isDatabaseAvailable(): boolean {
+  return dbAvailable === true
 }
 
 async function ensureCache() {
@@ -30,15 +44,17 @@ async function ensureCache() {
 /** Check if a role slug has a specific permission */
 export async function hasPermission(roleSlug: string, permissionSlug: string): Promise<boolean> {
   await ensureCache()
+  if (!cacheLoaded) return false
   const perms = permissionCache.get(roleSlug)
   if (!perms) return false
-  if (perms.has('wildcard-all')) return true // super admin wildcard
+  if (perms.has('wildcard-all')) return true
   return perms.has(permissionSlug)
 }
 
 /** Check if role has ANY of the given permissions */
 export async function hasAnyPermission(roleSlug: string, slugs: string[]): Promise<boolean> {
   await ensureCache()
+  if (!cacheLoaded) return false
   const perms = permissionCache.get(roleSlug)
   if (!perms) return false
   if (perms.has('wildcard-all')) return true
@@ -48,30 +64,34 @@ export async function hasAnyPermission(roleSlug: string, slugs: string[]): Promi
 /** Get all permission slugs for a role */
 export async function getPermissionsForRole(roleSlug: string): Promise<string[]> {
   await ensureCache()
+  if (!cacheLoaded) return []
   const perms = permissionCache.get(roleSlug)
   if (!perms) return []
-  if (perms.has('wildcard-all')) return ['*'] // signal to frontend that this is super admin
+  if (perms.has('wildcard-all')) return ['*']
   return Array.from(perms)
 }
 
 /** Get all permissions for a user (by their role slug) */
 export async function getUserPermissions(userRole: string): Promise<string[]> {
-  // Also check UserRole table for additional roles
-  const userRoles = await db.userRole.findMany({
-    where: { user: { role: userRole } },
-    include: { role: true },
-  })
-  await ensureCache()
-  const allPerms = new Set<string>()
-  const mainPerms = permissionCache.get(userRole)
-  if (mainPerms) for (const p of mainPerms) allPerms.add(p)
-  for (const ur of userRoles) {
-    if (ur.role.status !== 'aktif') continue
-    const rp = permissionCache.get(ur.role.slug)
-    if (rp) for (const p of rp) allPerms.add(p)
+  try {
+    const userRoles = await db.userRole.findMany({
+      where: { user: { role: userRole } },
+      include: { role: true },
+    })
+    await ensureCache()
+    const allPerms = new Set<string>()
+    const mainPerms = permissionCache.get(userRole)
+    if (mainPerms) for (const p of mainPerms) allPerms.add(p)
+    for (const ur of userRoles) {
+      if (ur.role.status !== 'aktif') continue
+      const rp = permissionCache.get(ur.role.slug)
+      if (rp) for (const p of rp) allPerms.add(p)
+    }
+    if (allPerms.has('wildcard-all')) return ['*']
+    return Array.from(allPerms)
+  } catch {
+    return []
   }
-  if (allPerms.has('wildcard-all')) return ['*']
-  return Array.from(allPerms)
 }
 
 /** Invalidate cache (after role/permission changes) */
@@ -152,7 +172,6 @@ export function withAuth(permission?: string | string[]) {
           }
         }
 
-        // Inject request metadata
         const ctx = {
           user,
           ip: request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || '',

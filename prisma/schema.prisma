@@ -246,7 +246,6 @@ model Alumni {
   id         String @id @default(cuid())
   nis        String @default("")
   nama       String @default("")
-  kelas      String @default("")
   tahunLulus String @default("")
   keterangan String @default("")
 }
