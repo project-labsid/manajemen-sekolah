@@ -3,7 +3,6 @@ import { PrismaClient } from '@prisma/client'
 function createPrismaClient() {
   let url = process.env.DATABASE_URL || ''
 
-  // For TiDB Cloud: add SSL in CODE (not in env var) to avoid Vercel mangling { } characters
   if (url.includes('tidbcloud.com')) {
     const baseUrl = url.split('?')[0]
     url = baseUrl + '?ssl={"rejectUnauthorized":true}'
