@@ -1,19 +1,16 @@
 import { PrismaClient } from '@prisma/client'
-import { PrismaTiDBCloudServerless } from '@tidbcloud/serverless'
 
 function createPrismaClient() {
-  const dbUrl = process.env.DATABASE_URL || ''
+  let url = process.env.DATABASE_URL || ''
 
-  // Use TiDB Cloud Serverless adapter for TiDB Cloud (handles SSL automatically via HTTPS)
-  if (dbUrl.includes('tidbcloud.com')) {
-    return new PrismaClient({
-      adapter: new PrismaTiDBCloudServerless({ url: dbUrl }),
-      log: process.env.NODE_ENV === 'development' ? ['error'] : [],
-    })
+  // For TiDB Cloud: add SSL in CODE (not in env var) to avoid Vercel mangling { } characters
+  if (url.includes('tidbcloud.com')) {
+    const baseUrl = url.split('?')[0]
+    url = baseUrl + '?ssl={"rejectUnauthorized":true}'
   }
 
-  // Standard MySQL connection for local development
   return new PrismaClient({
+    url,
     log: process.env.NODE_ENV === 'development' ? ['error'] : [],
   })
 }
