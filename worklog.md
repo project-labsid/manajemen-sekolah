@@ -91,3 +91,23 @@ Stage Summary:
 - Project is now Vercel-deploy ready
 - All config files created: vercel.json, .env.example
 - Schema is MySQL-ready with proper VarChar(191) constraints
+
+---
+Task ID: 3
+Agent: main
+Task: Fix TiDB Cloud SSL connection error using @tidbcloud/serverless adapter
+
+Work Log:
+- Diagnosed: URL-encoded SSL params (?ssl=%7B...%7D) in DATABASE_URL don't work on Vercel
+- Root cause: mysql2 driver SSL config in connection string gets stripped/mishandled by Vercel env
+- Solution: Use @tidbcloud/serverless Prisma adapter (connects over HTTPS, SSL handled automatically)
+- Updated prisma/schema.prisma: removed deprecated driverAdapters preview feature (no longer needed)
+- Updated src/lib/db.ts: detects tidbcloud.com URL and uses PrismaTiDBCloudServerless adapter
+- Updated package.json: added @tidbcloud/serverless dependency
+- Installed and verified: prisma generate succeeds, lint clean
+- DATABASE_URL in Vercel should be CLEAN (no ?ssl=... params needed)
+
+Stage Summary:
+- SSL error fixed by using @tidbcloud/serverless adapter instead of mysql2 SSL params
+- 3 files changed: prisma/schema.prisma, src/lib/db.ts, package.json
+- User needs to apply changes locally, fix git push, then redeploy
