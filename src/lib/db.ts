@@ -1,15 +1,19 @@
 import { PrismaClient } from '@prisma/client'
+import { bindAdapter } from '@prisma/driver-adapter-utils'
+import { TiDBCloudAdapter } from './tidb-adapter'
 
 function createPrismaClient() {
-  let url = process.env.DATABASE_URL || ''
+  const dbUrl = process.env.DATABASE_URL || ''
 
-  if (url.includes('tidbcloud.com')) {
-    const baseUrl = url.split('?')[0]
-    url = baseUrl + '?ssl={"rejectUnauthorized":true}'
+  if (dbUrl.includes('tidbcloud.com')) {
+    const adapter = new TiDBCloudAdapter(dbUrl)
+    return new PrismaClient({
+      adapter: bindAdapter(adapter),
+      log: [],
+    })
   }
 
   return new PrismaClient({
-    datasourceUrl: url,
     log: process.env.NODE_ENV === 'development' ? ['error'] : [],
   })
 }
