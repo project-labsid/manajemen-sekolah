@@ -1,15 +1,23 @@
 import { PrismaClient } from '@prisma/client'
 
-const globalForPrisma = globalThis as {
-  prisma?: PrismaClient
-}
+function createPrismaClient() {
+  let url = process.env.DATABASE_URL || ''
 
-export const db =
-  globalForPrisma.prisma ??
-  new PrismaClient({
+  if (url.includes('tidbcloud.com')) {
+    const baseUrl = url.split('?')[0]
+    url = baseUrl + '?ssl={"rejectUnauthorized":true}'
+  }
+
+  return new PrismaClient({
+    url,
     log: process.env.NODE_ENV === 'development' ? ['error'] : [],
   })
-
-if (process.env.NODE_ENV !== 'production') {
-  globalForPrisma.prisma = db
 }
+
+const globalForPrisma = globalThis as unknown as {
+  prisma: PrismaClient | undefined
+}
+
+export const db = globalForPrisma.prisma ?? createPrismaClient()
+
+if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = db  
