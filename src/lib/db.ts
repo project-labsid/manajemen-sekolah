@@ -9,7 +9,7 @@ function createPrismaClient() {
   }
 
   return new PrismaClient({
-    url,
+    datasourceUrl: url,
     log: process.env.NODE_ENV === 'development' ? ['error'] : [],
   })
 }
@@ -20,4 +20,4 @@ const globalForPrisma = globalThis as unknown as {
 
 export const db = globalForPrisma.prisma ?? createPrismaClient()
 
-if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = db  
+if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = db
