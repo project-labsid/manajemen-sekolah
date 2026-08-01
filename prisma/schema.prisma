@@ -1,36 +1,41 @@
 generator client {
-  provider   = "prisma-client-js"
-  engineType = "library"
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider     = "postgresql"
+  url          = env("DATABASE_URL")
+  relationMode = "prisma"
 }
 
 model SettingSekolah {
-  id                String   @id @default(cuid()) @db.VarChar(191)
-  namaSekolah       String   @default("MIS AL ASY'ARIYAH") @db.Text
-  logo              String   @default("") @db.Text
-  alamat            String   @default("") @db.Text
-  npsn              String   @default("") @db.VarChar(191)
-  email             String   @default("") @db.VarChar(191)
-  website           String   @default("") @db.VarChar(191)
-  telepon           String   @default("") @db.VarChar(191)
-  kepalaSekolah     String   @default("") @db.VarChar(191)
-  nipKepalaSekolah  String   @default("") @db.VarChar(191)
-  motto             String   @default("") @db.Text
-  visi              String   @default("") @db.Text
-  misi              String   @default("") @db.Text
-  semesterAktif     String   @default("Genap") @db.VarChar(191)
-  tahunAjaranAktif  String   @default("2024/2025") @db.VarChar(191)
-  tema              String   @default("light") @db.VarChar(191)
+  id                String   @id @default(cuid())
+  namaSekolah       String   @default("MIS AL ASY'ARIYAH")
+  logo              String   @default("")
+  alamat            String   @default("")
+  npsn              String   @default("")
+  email             String   @default("")
+  website           String   @default("")
+  telepon           String   @default("")
+  kepalaSekolah     String   @default("")
+  nipKepalaSekolah  String   @default("")
+  motto             String   @default("")
+  visi              String   @default("")
+  misi              String   @default("")
+  semesterAktif     String   @default("Genap")
+  tahunAjaranAktif  String   @default("2024/2025")
+  tema              String   @default("light")
   darkMode          Boolean  @default(false)
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
 }
 
 model Role {
-  id        String          @id @default(cuid()) @db.VarChar(191)
-  slug      String          @unique @db.VarChar(191)
-  nama      String          @db.VarChar(191)
-  deskripsi String          @default("") @db.Text
-  status    String          @default("aktif") @db.VarChar(191)
+  id        String          @id @default(cuid())
+  slug      String          @unique
+  nama      String
+  deskripsi String          @default("")
+  status    String          @default("aktif")
   createdAt DateTime        @default(now())
   updatedAt DateTime        @updatedAt
   permissions RolePermission[]
@@ -38,20 +43,20 @@ model Role {
 }
 
 model Permission {
-  id       String          @id @default(cuid()) @db.VarChar(191)
-  slug     String          @unique @db.VarChar(191)
-  nama     String          @db.VarChar(191)
-  kategori String          @default("umum") @db.VarChar(191)
-  status   String          @default("aktif") @db.VarChar(191)
+  id       String          @id @default(cuid())
+  slug     String          @unique
+  nama     String
+  kategori String          @default("umum")
+  status   String          @default("aktif")
   createdAt DateTime        @default(now())
   updatedAt DateTime        @updatedAt
   roles    RolePermission[]
 }
 
 model RolePermission {
-  id           String     @id @default(cuid()) @db.VarChar(191)
-  roleId       String     @db.VarChar(191)
-  permissionId String     @db.VarChar(191)
+  id           String     @id @default(cuid())
+  roleId       String
+  permissionId String
   role         Role       @relation(fields: [roleId], references: [id], onDelete: Cascade)
   permission   Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
   createdAt    DateTime   @default(now())
@@ -59,9 +64,9 @@ model RolePermission {
 }
 
 model UserRole {
-  id     String @id @default(cuid()) @db.VarChar(191)
-  userId String @db.VarChar(191)
-  roleId String @db.VarChar(191)
+  id     String @id @default(cuid())
+  userId String
+  roleId String
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
   role   Role   @relation(fields: [roleId], references: [id], onDelete: Cascade)
   createdAt DateTime @default(now())
@@ -69,18 +74,18 @@ model UserRole {
 }
 
 model User {
-  id           String     @id @default(cuid()) @db.VarChar(191)
-  nama         String     @db.VarChar(191)
-  username     String     @unique @db.VarChar(191)
-  password     String     @db.VarChar(191)
-  passwordText String     @default("") @db.VarChar(191)
-  role         String     @default("guru") @db.VarChar(191)
-  status       String     @default("aktif") @db.VarChar(191)
-  foto         String   @default("") @db.Text
-  email        String     @default("") @db.VarChar(191)
-  noHP         String   @default("") @db.VarChar(191)
-  nip          String   @default("") @db.VarChar(191)
-  jabatan      String   @default("") @db.VarChar(191)
+  id           String     @id @default(cuid())
+  nama         String
+  username     String     @unique
+  password     String
+  passwordText String     @default("")
+  role         String     @default("guru")
+  status       String     @default("aktif")
+  foto         String   @default("")
+  email        String     @default("")
+  noHP         String     @default("")
+  nip          String     @default("")
+  jabatan      String     @default("")
   lastLogin    DateTime?
   createdAt    DateTime   @default(now())
   updatedAt    DateTime   @updatedAt
@@ -88,81 +93,81 @@ model User {
 }
 
 model Guru {
-  id           String   @id @default(cuid()) @db.VarChar(191)
-  nip          String   @unique @db.VarChar(191)
-  nama         String   @db.VarChar(191)
-  gelar        String   @default("") @db.VarChar(191)
-  jenisKelamin String   @default("Laki-laki") @db.VarChar(191)
-  tempatLahir  String   @default("") @db.VarChar(191)
-  tanggalLahir String   @default("") @db.VarChar(191)
-  alamat       String   @default("") @db.Text
-  email        String   @default("") @db.VarChar(191)
-  noHP         String   @default("") @db.VarChar(191)
-  mapel        String   @default("") @db.VarChar(191)
-  status       String   @default("aktif") @db.VarChar(191)
-  foto         String   @default("") @db.Text
+  id           String   @id @default(cuid())
+  nip          String   @unique
+  nama         String
+  gelar        String   @default("")
+  jenisKelamin String   @default("Laki-laki")
+  tempatLahir  String   @default("")
+  tanggalLahir String   @default("")
+  alamat       String   @default("")
+  email        String   @default("")
+  noHP         String   @default("")
+  mapel        String   @default("")
+  status       String   @default("aktif")
+  foto         String   @default("")
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 }
 
 model Siswa {
-  id           String   @id @default(cuid()) @db.VarChar(191)
-  nis          String   @unique @db.VarChar(191)
-  nisn         String   @default("") @db.VarChar(191)
-  nama         String   @db.VarChar(191)
-  jenisKelamin String   @default("Laki-laki") @db.VarChar(191)
-  tempatLahir  String   @default("") @db.VarChar(191)
-  tanggalLahir String   @default("") @db.VarChar(191)
-  agama        String   @default("Islam") @db.VarChar(191)
-  alamat       String   @default("") @db.Text
-  namaAyah     String   @default("") @db.VarChar(191)
-  namaIbu      String   @default("") @db.VarChar(191)
-  noHP         String   @default("") @db.VarChar(191)
-  kelas        String   @default("") @db.VarChar(191)
-  status       String   @default("aktif") @db.VarChar(191)
-  foto         String   @default("") @db.Text
+  id           String   @id @default(cuid())
+  nis          String   @unique
+  nisn         String   @default("")
+  nama         String
+  jenisKelamin String   @default("Laki-laki")
+  tempatLahir  String   @default("")
+  tanggalLahir String   @default("")
+  agama        String   @default("Islam")
+  alamat       String   @default("")
+  namaAyah     String   @default("")
+  namaIbu      String   @default("")
+  noHP         String   @default("")
+  kelas        String   @default("")
+  status       String   @default("aktif")
+  foto         String   @default("")
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 }
 
 model Kelas {
-  id        String @id @default(cuid()) @db.VarChar(191)
-  kodeKelas String @unique @db.VarChar(191)
-  namaKelas String @db.VarChar(191)
-  waliKelas String @default("") @db.VarChar(191)
-  status    String @default("aktif") @db.VarChar(191)
+  id        String @id @default(cuid())
+  kodeKelas String @unique
+  namaKelas String
+  waliKelas String @default("")
+  status    String @default("aktif")
 }
 
 model MataPelajaran {
-  id        String @id @default(cuid()) @db.VarChar(191)
-  kodeMapel String @unique @db.VarChar(191)
-  namaMapel String @db.VarChar(191)
+  id        String @id @default(cuid())
+  kodeMapel String @unique
+  namaMapel String
   kkm       Int    @default(75)
-  guru      String   @default("") @db.VarChar(191)
-  status    String   @default("aktif") @db.VarChar(191)
+  guru      String   @default("")
+  status    String   @default("aktif")
 }
 
 model TahunAjaran {
-  id     String @id @default(cuid()) @db.VarChar(191)
-  nama   String @unique @db.VarChar(191)
-  status String @default("aktif") @db.VarChar(191)
+  id     String @id @default(cuid())
+  nama   String @unique
+  status String @default("aktif")
 }
 
 model Semester {
-  id       String @id @default(cuid()) @db.VarChar(191)
-  semester String @unique @db.VarChar(191)
-  status   String   @default("aktif") @db.VarChar(191)
+  id       String @id @default(cuid())
+  semester String @unique
+  status   String @default("aktif")
 }
 
 model Nilai {
-  id          String   @id @default(cuid()) @db.VarChar(191)
-  tahunAjaran String   @default("2024/2025") @db.VarChar(191)
-  semester    String   @default("Genap") @db.VarChar(191)
-  kelas       String   @default("") @db.VarChar(191)
-  mapel       String   @default("") @db.VarChar(191)
-  guru        String   @default("") @db.VarChar(191)
-  nis         String   @default("") @db.VarChar(191)
-  nama        String   @default("") @db.VarChar(191)
+  id          String   @id @default(cuid())
+  tahunAjaran String   @default("2024/2025")
+  semester    String   @default("Genap")
+  kelas       String   @default("")
+  mapel       String   @default("")
+  guru        String   @default("")
+  nis         String   @default("")
+  nama        String   @default("")
   ph1         Float    @default(0)
   ph2         Float    @default(0)
   ph3         Float    @default(0)
@@ -171,98 +176,98 @@ model Nilai {
   pas         Float    @default(0)
   rataRata    Float    @default(0)
   nilaiAkhir  Float    @default(0)
-  predikat    String   @default("") @db.VarChar(191)
-  deskripsi   String   @default("") @db.Text
+  predikat    String   @default("")
+  deskripsi   String   @default("")
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 }
 
 model AbsensiGuru {
-  id         String   @id @default(cuid()) @db.VarChar(191)
-  tanggal    String   @default("") @db.VarChar(191)
-  namaGuru   String   @default("") @db.VarChar(191)
-  nip        String   @default("") @db.VarChar(191)
-  jamMasuk   String   @default("") @db.VarChar(191)
-  jamPulang  String   @default("") @db.VarChar(191)
-  durasi     String   @default("") @db.VarChar(191)
-  status     String   @default("") @db.VarChar(191)
-  latitude   String   @default("") @db.VarChar(191)
-  longitude  String   @default("") @db.VarChar(191)
-  alamat     String   @default("") @db.Text
-  browser    String   @default("") @db.VarChar(191)
-  device     String   @default("") @db.VarChar(191)
-  ip         String   @default("") @db.VarChar(191)
-  keterangan String   @default("") @db.Text
+  id         String   @id @default(cuid())
+  tanggal    String   @default("")
+  namaGuru   String   @default("")
+  nip        String   @default("")
+  jamMasuk   String   @default("")
+  jamPulang  String   @default("")
+  durasi     String   @default("")
+  status     String   @default("")
+  latitude   String   @default("")
+  longitude  String   @default("")
+  alamat     String   @default("")
+  browser    String   @default("")
+  device     String   @default("")
+  ip         String   @default("")
+  keterangan String   @default("")
   createdAt  DateTime @default(now())
 }
 
 model AbsensiSiswa {
-  id         String  @id @default(cuid()) @db.VarChar(191)
-  tanggal    String  @default("") @db.VarChar(191)
-  kelas      String  @default("") @db.VarChar(191)
-  nis        String  @default("") @db.VarChar(191)
-  nama       String  @default("") @db.VarChar(191)
-  status     String  @default("Hadir") @db.VarChar(191)
-  keterangan String  @default("") @db.Text
-  guru       String  @default("") @db.VarChar(191)
+  id         String  @id @default(cuid())
+  tanggal    String  @default("")
+  kelas      String  @default("")
+  nis        String  @default("")
+  nama       String  @default("")
+  status     String  @default("Hadir")
+  keterangan String  @default("")
+  guru       String  @default("")
   createdAt  DateTime @default(now())
 }
 
 model Pengumuman {
-  id        String   @id @default(cuid()) @db.VarChar(191)
-  judul     String   @db.VarChar(191)
-  isi       String   @default("") @db.Text
-  lampiran  String   @default("") @db.Text
-  tanggal   String   @default("") @db.VarChar(191)
-  status    String   @default("aktif") @db.VarChar(191)
+  id        String   @id @default(cuid())
+  judul     String
+  isi       String   @default("")
+  lampiran  String   @default("")
+  tanggal   String   @default("")
+  status    String   @default("aktif")
   createdAt DateTime @default(now())
 }
 
 model AuditLog {
-  id         String   @id @default(cuid()) @db.VarChar(191)
-  tanggal    String   @default("") @db.VarChar(191)
-  user       String   @default("") @db.VarChar(191)
-  role       String   @default("") @db.VarChar(191)
-  aktivitas  String   @default("") @db.Text
-  ip         String   @default("") @db.VarChar(191)
-  detail     String   @default("") @db.Text
+  id         String   @id @default(cuid())
+  tanggal    String   @default("")
+  user       String   @default("")
+  role       String   @default("")
+  aktivitas  String   @default("")
+  ip         String   @default("")
+  detail     String   @default("")
   createdAt  DateTime @default(now())
 }
 
 model Backup {
-  id            String   @id @default(cuid()) @db.VarChar(191)
-  namaFile      String   @default("") @db.VarChar(191)
-  ukuran        String   @default("") @db.VarChar(191)
-  tanggalBackup String   @default("") @db.VarChar(191)
-  status        String   @default("aktif") @db.VarChar(191)
+  id            String   @id @default(cuid())
+  namaFile      String   @default("")
+  ukuran        String   @default("")
+  tanggalBackup String   @default("")
+  status        String   @default("aktif")
   createdAt     DateTime @default(now())
 }
 
 model Alumni {
-  id         String @id @default(cuid()) @db.VarChar(191)
-  nis        String @default("") @db.VarChar(191)
-  nama       String @default("") @db.VarChar(191)
-  tahunLulus String @default("") @db.VarChar(191)
-  keterangan String   @default("") @db.Text
+  id         String @id @default(cuid())
+  nis        String @default("")
+  nama       String @default("")
+  tahunLulus String @default("")
+  keterangan String   @default("")
 }
 
 model JurnalMengajar {
-  id         String  @id @default(cuid()) @db.VarChar(191)
-  tanggal    String  @default("") @db.VarChar(191)
-  guru       String  @default("") @db.VarChar(191)
-  kelas      String  @default("") @db.VarChar(191)
-  mapel      String  @default("") @db.VarChar(191)
-  materi     String  @default("") @db.Text
-  keterangan String  @default("") @db.Text
+  id         String  @id @default(cuid())
+  tanggal    String  @default("")
+  guru       String  @default("")
+  kelas      String  @default("")
+  mapel      String  @default("")
+  materi     String  @default("")
+  keterangan String  @default("")
   createdAt  DateTime @default(now())
 }
 
 model RiwayatLogin {
-  id         String   @id @default(cuid()) @db.VarChar(191)
-  user       String   @default("") @db.VarChar(191)
-  role       String   @default("") @db.VarChar(191)
-  waktuLogin String   @default("") @db.VarChar(191)
-  ipAddress  String   @default("") @db.VarChar(191)
-  userAgent  String   @default("") @db.Text
+  id         String   @id @default(cuid())
+  user       String   @default("")
+  role       String   @default("")
+  waktuLogin String   @default("")
+  ipAddress  String   @default("")
+  userAgent  String   @default("")
   createdAt  DateTime @default(now())
 }
