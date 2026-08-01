@@ -232,7 +232,7 @@ export default function AbsensiGuru() {
 
   // ── Compute: today string for the selected date ──
   const selectedDateStr = useMemo(
-    () => format(selectedDate, 'yyyy-MM-dd'),
+    () => selectedDate.toLocaleDateString('sv-SE', { timeZone: 'Asia/Jakarta' }),
     [selectedDate],
   )
   const isToday = selectedDateStr === getTodayString()

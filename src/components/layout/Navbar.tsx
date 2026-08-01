@@ -1,10 +1,9 @@
 'use client'
 import { useEffect, useState } from 'react'
 import { useAppStore } from '@/lib/store'
-import { Menu, Bell, Search, ChevronDown } from 'lucide-react'
+import { Menu, Bell, ChevronDown } from 'lucide-react'
 
-const HARI = ['Minggu','Senin','Selasa','Rabu','Kamis','Jumat','Sabtu']
-const BULAN = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember']
+const TZ = 'Asia/Jakarta' as const
 
 const PAGE_TITLES: Record<string, string> = {
   dashboard: 'Dashboard',
@@ -34,8 +33,12 @@ export default function Navbar() {
   useEffect(() => {
     const tick = () => {
       const now = new Date()
-      setTime(now.toLocaleTimeString('id-ID'))
-      setDateStr(`${HARI[now.getDay()]}, ${now.getDate()} ${BULAN[now.getMonth()]} ${now.getFullYear()} - ${now.toLocaleTimeString('id-ID')}`)
+      setTime(now.toLocaleTimeString('id-ID', { timeZone: TZ }))
+      const dayName = now.toLocaleDateString('id-ID', { timeZone: TZ, weekday: 'long' })
+      const day = now.toLocaleDateString('id-ID', { timeZone: TZ, day: 'numeric' })
+      const month = now.toLocaleDateString('id-ID', { timeZone: TZ, month: 'long' })
+      const year = now.toLocaleDateString('id-ID', { timeZone: TZ, year: 'numeric' })
+      setDateStr(`${dayName}, ${day} ${month} ${year} - ${now.toLocaleTimeString('id-ID', { timeZone: TZ })}`)
     }
     tick()
     const iv = setInterval(tick, 1000)
