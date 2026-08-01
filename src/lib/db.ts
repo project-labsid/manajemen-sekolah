@@ -1,19 +1,17 @@
 import { PrismaClient } from '@prisma/client'
-import { bindAdapter } from '@prisma/driver-adapter-utils'
-import { TiDBCloudAdapter } from './tidb-adapter'
 
 function createPrismaClient() {
-  const dbUrl = process.env.DATABASE_URL || ''
+  let url = process.env.DATABASE_URL || ''
 
-  if (dbUrl.includes('tidbcloud.com')) {
-    const adapter = new TiDBCloudAdapter(dbUrl)
-    return new PrismaClient({
-      adapter: bindAdapter(adapter),
-      log: [],
-    })
+  // Fix for Supabase connection pooler (Supavisor)
+  if (url.includes('supabase.co')) {
+    const sep = url.includes('?') ? '&' : '?'
+    if (!url.includes('sslmode')) url += sep + 'sslmode=require'
+    if (!url.includes('pgbouncer')) url += '&pgbouncer=true'
   }
 
   return new PrismaClient({
+    datasourceUrl: url,
     log: process.env.NODE_ENV === 'development' ? ['error'] : [],
   })
 }
