@@ -14,7 +14,8 @@ export default function Pengumuman() {
   const [totalPages, setTotalPages] = useState(1)
   const [modal, setModal] = useState(false)
   const [edit, setEdit] = useState<any>(null)
-  const [form, setForm] = useState({ judul: '', isi: '', tanggal: new Date().toISOString().split('T')[0], status: 'aktif', lampiran: '' })
+  const getWIBToday = () => new Date().toLocaleDateString('sv-SE', { timeZone: 'Asia/Jakarta' })
+  const [form, setForm] = useState({ judul: '', isi: '', tanggal: getWIBToday(), status: 'aktif', lampiran: '' })
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
   const limit = 10
@@ -31,7 +32,7 @@ export default function Pengumuman() {
 
   useEffect(() => { load() }, [page])
 
-  const openAdd = () => { setEdit(null); setForm({ judul: '', isi: '', tanggal: new Date().toISOString().split('T')[0], status: 'aktif', lampiran: '' }); setError(''); setModal(true) }
+  const openAdd = () => { setEdit(null); setForm({ judul: '', isi: '', tanggal: getWIBToday(), status: 'aktif', lampiran: '' }); setError(''); setModal(true) }
   const openEdit = (item: any) => { setEdit(item); setForm({ judul: item.judul, isi: item.isi, tanggal: item.tanggal, status: item.status, lampiran: item.lampiran || '' }); setError(''); setModal(true) }
 
   const handleSave = async () => {

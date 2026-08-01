@@ -47,7 +47,7 @@ export default function GuruDashboard() {
   useEffect(() => {
     async function load() {
       try {
-        const today = new Date().toISOString().split('T')[0]
+        const today = new Date().toLocaleDateString('sv-SE', { timeZone: 'Asia/Jakarta' })
         const [dashRes, absenRes, pgmRes] = await Promise.all([
           api.get<any>('/dashboard'),
           api.get<{ data: any[] }>(`/absensi-guru?tanggal=${today}&nama=${encodeURIComponent(user?.nama || '')}`),

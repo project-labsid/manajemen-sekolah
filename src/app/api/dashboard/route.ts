@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { authenticate, requirePermission, initAuth, AuthError } from '@/lib/rbac'
 import { db } from '@/lib/db'
+import { getWIBDate } from '@/lib/utils'
 
 export async function GET(request: NextRequest) {
   try {
@@ -8,7 +9,7 @@ export async function GET(request: NextRequest) {
     const user = authenticate(request)
     await requirePermission(user, 'dashboard')
 
-    const today = new Date().toISOString().split('T')[0]
+    const today = getWIBDate()
     const userNama = user.nama || ''
 
     // Check if user is guru (not super-admin or admin)

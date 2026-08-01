@@ -110,8 +110,13 @@ function getRoleBadge(roleSlug?: string) {
 /*  Helpers                                                            */
 /* ------------------------------------------------------------------ */
 
+function getWIBNow(): Date {
+  const str = new Date().toLocaleString('en-US', { timeZone: 'Asia/Jakarta' })
+  return new Date(str)
+}
+
 function getTodayString(): string {
-  return new Date().toISOString().split('T')[0]
+  return new Date().toLocaleDateString('sv-SE', { timeZone: 'Asia/Jakarta' })
 }
 
 function formatDateDisplay(dateStr: string): string {
@@ -145,8 +150,7 @@ function getDeviceInfo(): string {
 }
 
 function getLocalTime(): string {
-  const now = new Date()
-  return now.toTimeString().slice(0, 5)
+  return new Date().toLocaleTimeString('en-GB', { timeZone: 'Asia/Jakarta', hour: '2-digit', minute: '2-digit' })
 }
 
 function getStatusBadge(status: string) {

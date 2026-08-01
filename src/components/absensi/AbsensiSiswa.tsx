@@ -97,7 +97,7 @@ const STATUS_COLORS: Record<StatusType, string> = {
 /* ------------------------------------------------------------------ */
 
 function getTodayString(): string {
-  return new Date().toISOString().split('T')[0]
+  return new Date().toLocaleDateString('sv-SE', { timeZone: 'Asia/Jakarta' })
 }
 
 /* ------------------------------------------------------------------ */

@@ -18,7 +18,7 @@ export async function GET(request: NextRequest) {
     await requirePermission(user, 'absensi-guru')
 
     const url = new URL(request.url)
-    const tanggal = url.searchParams.get('tanggal') || new Date().toISOString().split('T')[0]
+    const tanggal = url.searchParams.get('tanggal') || new Date().toLocaleDateString('sv-SE', { timeZone: 'Asia/Jakarta' })
     const nama = url.searchParams.get('nama') || ''
 
     const isRekapViewer = REKAP_VIEWER_ROLES.includes(user.role)
@@ -139,9 +139,10 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Keterangan wajib diisi untuk status Sakit/Izin' }, { status: 400 })
     }
 
-    const today = new Date().toISOString().split('T')[0]
-    // Use client-provided time if available, otherwise use server time
-    const jamMasuk = (status === 'Hadir') ? (clientJamMasuk || new Date().toTimeString().slice(0, 5)) : ''
+    const today = new Date().toLocaleDateString('sv-SE', { timeZone: 'Asia/Jakarta' })
+    // Use client-provided time if available, otherwise use WIB time
+    const wibTime = new Date().toLocaleTimeString('en-GB', { timeZone: 'Asia/Jakarta', hour: '2-digit', minute: '2-digit' })
+    const jamMasuk = (status === 'Hadir') ? (clientJamMasuk || wibTime) : ''
 
     // Check for duplicate: same date + (NIP if provided, or nama)
     const existingWhere: Record<string, unknown> = { tanggal: today }
@@ -217,8 +218,9 @@ export async function PUT(request: NextRequest) {
       return NextResponse.json({ error: 'Absensi pulang sudah tercatat' }, { status: 409 })
     }
 
-    // Use client-provided time if available, otherwise use server time
-    const jamPulang = clientJamPulang || new Date().toTimeString().slice(0, 5)
+    // Use client-provided time if available, otherwise use WIB time
+    const wibTime = new Date().toLocaleTimeString('en-GB', { timeZone: 'Asia/Jakarta', hour: '2-digit', minute: '2-digit' })
+    const jamPulang = clientJamPulang || wibTime
 
     const jamMasukTime = new Date(`1970-01-01T${existing.jamMasuk}:00`)
     const jamPulangTime = new Date(`1970-01-01T${jamPulang}:00`)

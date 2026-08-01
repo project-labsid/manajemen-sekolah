@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getUserFromRequest } from '@/lib/auth'
 import { db } from '@/lib/db'
+import { getWIBDate } from '@/lib/utils'
 
 export async function POST(request: NextRequest) {
   try {
@@ -10,7 +11,7 @@ export async function POST(request: NextRequest) {
       const ip = request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || ''
       await db.auditLog.create({
         data: {
-          tanggal: now.toISOString().split('T')[0],
+          tanggal: getWIBDate(),
           user: user.nama,
           role: user.role,
           aktivitas: 'Logout',

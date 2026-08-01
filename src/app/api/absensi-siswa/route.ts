@@ -9,7 +9,7 @@ export async function GET(request: NextRequest) {
     await requireAnyPermission(user, ['absensi-siswa', 'absensi-siswa:view'])
 
     const url = new URL(request.url)
-    const tanggal = url.searchParams.get('tanggal') || new Date().toISOString().split('T')[0]
+    const tanggal = url.searchParams.get('tanggal') || new Date().toLocaleDateString('sv-SE', { timeZone: 'Asia/Jakarta' })
     const kelas = url.searchParams.get('kelas') || ''
 
     const where: Record<string, unknown> = { tanggal }

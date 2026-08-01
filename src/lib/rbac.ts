@@ -1,4 +1,5 @@
 import { db } from '@/lib/db'
+import { getWIBDate } from '@/lib/utils'
 import { NextRequest, NextResponse } from 'next/server'
 import { getUserFromRequest, type JwtPayload, initAuth as _initAuth } from '@/lib/auth'
 
@@ -148,7 +149,7 @@ export async function createAuditLog(data: {
   try {
     await db.auditLog.create({
       data: {
-        tanggal: new Date().toISOString().split('T')[0],
+        tanggal: getWIBDate(),
         ...data,
       },
     })
