@@ -1,8 +1,8 @@
 'use client'
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import { api } from '@/lib/api'
 import { useAppStore } from '@/lib/store'
-import { Save, School, BookOpen, Palette, Building, Users, ChevronRight, Search, Plus, Pencil, Trash2, X, Eye, EyeOff, Loader2, UserCog } from 'lucide-react'
+import { Save, BookOpen, Palette, Building, Search, Pencil, X, Eye, EyeOff, Loader2, UserCog, AlertTriangle, Database, RefreshCw, Shield, ChevronRight, Trash2 } from 'lucide-react'
 import { toast } from 'sonner'
 
 const currentYear = new Date().getFullYear()
@@ -13,11 +13,50 @@ const tahunAjaranList = [
   `${currentYear + 1}/${currentYear + 2}`,
 ]
 
-type TabKey = 'sekolah' | 'akademik' | 'tampilan' | 'guru-profiles'
+type TabKey = 'sekolah' | 'akademik' | 'tampilan' | 'guru-profiles' | 'reset-data'
+
+interface ResetSummary {
+  users: number
+  siswa: number
+  guru: number
+  kelas: number
+  mataPelajaran: number
+  nilai: number
+  absensiGuru: number
+  absensiSiswa: number
+  pengumuman: number
+  auditLog: number
+  jurnalMengajar: number
+  alumni: number
+  riwayatLogin: number
+  backup: number
+  tahunAjaran: number
+  semester: number
+}
+
+const DATA_LABELS: Record<keyof ResetSummary, string> = {
+  users: 'User',
+  siswa: 'Siswa',
+  guru: 'Guru',
+  kelas: 'Kelas',
+  mataPelajaran: 'Mata Pelajaran',
+  nilai: 'Nilai',
+  absensiGuru: 'Absensi Guru',
+  absensiSiswa: 'Absensi Siswa',
+  pengumuman: 'Pengumuman',
+  auditLog: 'Audit Log',
+  jurnalMengajar: 'Jurnal Mengajar',
+  alumni: 'Alumni',
+  riwayatLogin: 'Riwayat Login',
+  backup: 'Backup',
+  tahunAjaran: 'Tahun Ajaran',
+  semester: 'Semester',
+}
 
 export default function Pengaturan() {
   const { user } = useAppStore()
   const isAdmin = user?.role === 'admin'
+  const isSuperAdmin = user?.role === 'super-admin'
   const [activeTab, setActiveTab] = useState<TabKey>('sekolah')
   const [saving, setSaving] = useState(false)
   const [msg, setMsg] = useState('')
@@ -34,8 +73,16 @@ export default function Pengaturan() {
   const [showPassword, setShowPassword] = useState(false)
   const [savingGuru, setSavingGuru] = useState(false)
 
+  // Reset data state
+  const [resetSummary, setResetSummary] = useState<ResetSummary | null>(null)
+  const [loadingSummary, setLoadingSummary] = useState(false)
+  const [resetting, setResetting] = useState(false)
+  const [confirmStep, setConfirmStep] = useState(0) // 0=none, 1=show summary, 2=type confirm
+  const [confirmText, setConfirmText] = useState('')
+
   useEffect(() => { loadSettings() }, [])
   useEffect(() => { if (activeTab === 'guru-profiles') loadGuruList() }, [activeTab])
+  useEffect(() => { if (activeTab === 'reset-data' && isSuperAdmin) loadResetSummary() }, [activeTab, isSuperAdmin])
 
   const loadSettings = async () => {
     try {
@@ -91,14 +138,66 @@ export default function Pengaturan() {
     } finally { setSavingGuru(false) }
   }
 
-  const tabs: { key: TabKey; label: string; icon: React.ReactNode; adminOnly?: boolean }[] = [
+  // Reset data functions
+  const loadResetSummary = useCallback(async () => {
+    setLoadingSummary(true)
+    try {
+      const res = await api.get<{ summary: ResetSummary }>('/reset-data')
+      setResetSummary(res.summary)
+    } catch {
+      setResetSummary(null)
+    } finally {
+      setLoadingSummary(false)
+    }
+  }, [])
+
+  const handleOpenReset = () => {
+    setConfirmStep(1)
+    setConfirmText('')
+  }
+
+  const handleProceedReset = () => {
+    setConfirmStep(2)
+  }
+
+  const handleExecuteReset = async () => {
+    if (confirmText !== 'HAPUS SEMUA') return
+    setResetting(true)
+    try {
+      await api.del('/reset-data')
+      toast.success('Semua data berhasil direset!')
+      setConfirmStep(0)
+      setConfirmText('')
+      setResetSummary(null)
+    } catch (e: any) {
+      toast.error(e.message || 'Gagal mereset data')
+    } finally {
+      setResetting(false)
+    }
+  }
+
+  const handleCancelReset = () => {
+    setConfirmStep(0)
+    setConfirmText('')
+  }
+
+  const totalRecords = resetSummary
+    ? Object.values(resetSummary).reduce((a, b) => a + b, 0)
+    : 0
+
+  const tabs: { key: TabKey; label: string; icon: React.ReactNode; adminOnly?: boolean; superAdminOnly?: boolean }[] = [
     { key: 'sekolah', label: 'Data Sekolah', icon: <Building className="w-4 h-4" /> },
     { key: 'akademik', label: 'Akademik', icon: <BookOpen className="w-4 h-4" /> },
     { key: 'guru-profiles', label: 'Profil Guru', icon: <UserCog className="w-4 h-4" />, adminOnly: true },
     { key: 'tampilan', label: 'Tampilan', icon: <Palette className="w-4 h-4" /> },
+    { key: 'reset-data', label: 'Reset Data', icon: <Database className="w-4 h-4" />, superAdminOnly: true },
   ]
 
-  const visibleTabs = isAdmin ? tabs : tabs.filter(t => !t.adminOnly)
+  const visibleTabs = isSuperAdmin
+    ? tabs
+    : isAdmin
+      ? tabs.filter(t => !t.superAdminOnly)
+      : tabs.filter(t => !t.adminOnly && !t.superAdminOnly)
 
   const inputCls = "w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-slate-600 bg-gray-50 dark:bg-slate-700 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
   const labelCls = "block text-sm font-medium mb-1.5"
@@ -118,7 +217,7 @@ export default function Pengaturan() {
             <button key={t.key} onClick={() => setActiveTab(t.key)}
               className={`flex items-center gap-2 px-5 py-4 text-sm font-medium border-b-2 transition-all -mb-px whitespace-nowrap ${
                 activeTab === t.key
-                  ? 'border-blue-600 text-blue-600'
+                  ? (t.key === 'reset-data' ? 'border-red-500 text-red-600' : 'border-blue-600 text-blue-600')
                   : 'border-transparent text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'
               }`}>
               {t.icon} {t.label}
@@ -161,7 +260,7 @@ export default function Pengaturan() {
             </div>
           )}
 
-          {activeTab === 'guru-profiles' && isAdmin && (
+          {activeTab === 'guru-profiles' && (isAdmin || isSuperAdmin) && (
             <div className="space-y-4">
               <div className="flex items-center justify-between">
                 <p className="text-sm text-muted-foreground">Kelola profil akun guru. Ubah nama, username, email, dan password guru.</p>
@@ -268,7 +367,137 @@ export default function Pengaturan() {
             </div>
           )}
 
-          {isAdmin && activeTab !== 'guru-profiles' && (
+          {activeTab === 'reset-data' && isSuperAdmin && (
+            <div className="space-y-6">
+              {/* Warning Header */}
+              <div className="flex items-start gap-4 p-5 rounded-2xl bg-red-50 dark:bg-red-900/10 border-2 border-red-200 dark:border-red-800/50">
+                <div className="flex-shrink-0 p-3 rounded-xl bg-red-100 dark:bg-red-900/30">
+                  <AlertTriangle className="w-6 h-6 text-red-600 dark:text-red-400" />
+                </div>
+                <div>
+                  <h3 className="text-base font-bold text-red-700 dark:text-red-400">Reset Seluruh Data</h3>
+                  <p className="text-sm text-red-600 dark:text-red-300/80 mt-1">
+                    Fitur ini akan menghapus <strong>SEMUA data</strong> kecuali akun Super Admin, Roles, Permissions, dan Pengaturan Sekolah. Tindakan ini <strong>tidak dapat dibatalkan</strong>.
+                  </p>
+                </div>
+              </div>
+
+              {/* What's preserved */}
+              <div className="p-4 rounded-xl bg-emerald-50 dark:bg-emerald-900/10 border border-emerald-200 dark:border-emerald-800/50">
+                <div className="flex items-center gap-2 mb-2">
+                  <Shield className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                  <p className="text-sm font-semibold text-emerald-700 dark:text-emerald-400">Data yang dipertahankan:</p>
+                </div>
+                <ul className="text-sm text-emerald-600 dark:text-emerald-300/80 space-y-1 ml-6 list-disc">
+                  <li>Akun Super Admin</li>
+                  <li>Roles & Permissions (sistem RBAC)</li>
+                  <li>Pengaturan Sekolah</li>
+                </ul>
+              </div>
+
+              {/* Data summary */}
+              {loadingSummary ? (
+                <div className="flex items-center justify-center py-12">
+                  <Loader2 className="w-8 h-8 animate-spin text-gray-400" />
+                </div>
+              ) : resetSummary ? (
+                <div className="space-y-4">
+                  <div className="flex items-center gap-2">
+                    <Database className="w-5 h-5 text-gray-500" />
+                    <p className="text-sm font-semibold" style={{ color: '#0a2540' }}>
+                      Ringkasan Data ({totalRecords.toLocaleString('id-ID')} total record)
+                    </p>
+                  </div>
+                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+                    {(Object.entries(resetSummary) as [keyof ResetSummary, number][]).map(([key, count]) => (
+                      <div key={key} className="p-3 rounded-xl bg-gray-50 dark:bg-slate-700/50 border border-gray-100 dark:border-slate-600">
+                        <p className="text-2xl font-bold" style={{ color: '#0a2540' }}>{count.toLocaleString('id-ID')}</p>
+                        <p className="text-xs text-muted-foreground mt-0.5">{DATA_LABELS[key]}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ) : null}
+
+              {/* Step 1: Initial button */}
+              {confirmStep === 0 && (
+                <div className="flex justify-end">
+                  <button
+                    onClick={handleOpenReset}
+                    className="flex items-center gap-2 px-6 py-3 rounded-xl bg-red-600 hover:bg-red-700 text-white text-sm font-semibold transition-all shadow-sm hover:shadow-md active:scale-[0.98]"
+                  >
+                    <RefreshCw className="w-4 h-4" />
+                    Reset Semua Data
+                  </button>
+                </div>
+              )}
+
+              {/* Step 2: Confirmation with summary */}
+              {confirmStep === 1 && (
+                <div className="p-5 rounded-2xl border-2 border-amber-300 dark:border-amber-700 bg-amber-50 dark:bg-amber-900/10">
+                  <div className="flex items-start gap-3 mb-4">
+                    <AlertTriangle className="w-5 h-5 text-amber-600 dark:text-amber-400 flex-shrink-0 mt-0.5" />
+                    <div>
+                      <p className="text-sm font-bold text-amber-800 dark:text-amber-300">Konfirmasi Reset Data</p>
+                      <p className="text-sm text-amber-700 dark:text-amber-200/80 mt-1">
+                        Anda akan menghapus <strong>{totalRecords.toLocaleString('id-ID')} record</strong> dari sistem.
+                        Pastikan Anda sudah melakukan backup jika diperlukan.
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex justify-end gap-3">
+                    <button onClick={handleCancelReset}
+                      className="px-5 py-2.5 rounded-xl text-sm font-medium border border-gray-300 dark:border-slate-600 hover:bg-gray-100 dark:hover:bg-slate-700 transition-colors">
+                      Batal
+                    </button>
+                    <button onClick={handleProceedReset}
+                      className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-amber-600 hover:bg-amber-700 text-white text-sm font-semibold transition-colors">
+                      Lanjutkan
+                      <ChevronRight className="w-4 h-4" />
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {/* Step 3: Type confirmation */}
+              {confirmStep === 2 && (
+                <div className="p-5 rounded-2xl border-2 border-red-400 dark:border-red-700 bg-red-50 dark:bg-red-900/10">
+                  <div className="flex items-start gap-3 mb-4">
+                    <AlertTriangle className="w-5 h-5 text-red-600 dark:text-red-400 flex-shrink-0 mt-0.5" />
+                    <div className="flex-1">
+                      <p className="text-sm font-bold text-red-800 dark:text-red-300">Langkah Terakhir</p>
+                      <p className="text-sm text-red-700 dark:text-red-200/80 mt-1">
+                        Ketik <code className="px-2 py-0.5 rounded bg-red-200 dark:bg-red-800/50 font-mono font-bold text-red-800 dark:text-red-200">HAPUS SEMUA</code> untuk konfirmasi.
+                      </p>
+                      <input
+                        type="text"
+                        value={confirmText}
+                        onChange={(e) => setConfirmText(e.target.value)}
+                        placeholder="Ketik HAPUS SEMUA di sini..."
+                        className="mt-3 w-full px-4 py-2.5 rounded-xl border-2 border-red-300 dark:border-red-700 bg-white dark:bg-slate-800 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500"
+                      />
+                    </div>
+                  </div>
+                  <div className="flex justify-end gap-3">
+                    <button onClick={handleCancelReset}
+                      className="px-5 py-2.5 rounded-xl text-sm font-medium border border-gray-300 dark:border-slate-600 hover:bg-gray-100 dark:hover:bg-slate-700 transition-colors">
+                      Batal
+                    </button>
+                    <button
+                      onClick={handleExecuteReset}
+                      disabled={confirmText !== 'HAPUS SEMUA' || resetting}
+                      className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-red-600 hover:bg-red-700 text-white text-sm font-semibold disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                    >
+                      {resetting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />}
+                      {resetting ? 'Menghapus...' : 'Hapus Semua Data'}
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
+          {(isAdmin || isSuperAdmin) && activeTab !== 'guru-profiles' && activeTab !== 'reset-data' && (
             <div className="mt-6 pt-5 border-t border-gray-100 dark:border-slate-700 flex justify-end">
               <button onClick={handleSave} disabled={saving} className="flex items-center gap-2 px-6 py-2.5 rounded-xl text-white text-sm font-medium disabled:opacity-50" style={{ background: '#2563eb' }}>
                 <Save className="w-4 h-4" /> {saving ? 'Menyimpan...' : 'Simpan Pengaturan'}
@@ -276,7 +505,7 @@ export default function Pengaturan() {
             </div>
           )}
 
-          {!isAdmin && <p className="text-sm text-yellow-600 mt-4">Hanya administrator yang dapat mengubah pengaturan sekolah.</p>}
+          {!isAdmin && !isSuperAdmin && <p className="text-sm text-yellow-600 mt-4">Hanya administrator yang dapat mengubah pengaturan sekolah.</p>}
         </div>
       </div>
     </div>
